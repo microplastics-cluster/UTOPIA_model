@@ -1,0 +1,16 @@
+box,compType,volume_m3,SPM_mgL,T_K,discharge_m3s
+Global,"Ocean Surface Water",3.88*10**15
+Global,"Ocean Mixed Water",
+Global,"Ocean Column Water",1.16*10**17
+Global,"Coast Surface Water",
+Global,"Coast Column Water",
+Global,"Surface Freshwater ",
+Global,"Bulk FreshWater",
+Global,"Sediment",1.16*10**12
+Global,"Urban Soil Surface",
+Global,"Urban Soil",1.94*10**10
+Global,"Background Soil Surface",
+Global,"Background Soil",1.19*10**12
+Global,"Agricultural Soil Surface",
+Global,"Agricultural Soil",7.29*10**11
+Global,"Air",7.76*10**16

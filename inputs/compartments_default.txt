@@ -1,0 +1,29 @@
+#                
+# compartments_default.txt contains the compartments considered by the model.        
+# It is possible to insert new compartments or comment out existing ones.    
+# Lines starting with '''#''' are comments. Lines are either comments or data.    
+# Beware of empty lines (particularly at the end of the file) !    
+#                
+# The first non-comment line contains the names of the variables.      
+# These names are used in the code  only change them if you know what you
+# are doing !             
+#                
+# Columns:               
+#                
+# ID : integer number of the compartment         
+# name : a description  must be valid Python dictionary key (no spaces etc.)  
+# temp_variable : the variable name that contains the temperature       
+# of the compartment (in seasonal_default.txt)           
+# halflife_variable : variable name that contains the halflife of chemicals      
+# in the compartment : (in chemicals_default.txt)          
+# EA_variable : variable name that contains activation energy of chemicals      
+# in the compartment : (in chemicals_default.txt)          
+#                
+ID name temp_variable halflife_variable EA_variable            
+1 upper_atmosphere tair1 halflife_air EA_air            
+2 lower_atmosphere tair2 halflife_air EA_air            
+3 vegetation tair2 halflife_veg EA_veg            
+4 fresh_water tair2 halflife_freshwater EA_freshwater            
+5 ocean_water tair2 halflife_ocean EA_ocean            
+6 soil tair2 halflife_soil EA_soil            
+7 sediment tair2 halflife_sediment EA_sediment            

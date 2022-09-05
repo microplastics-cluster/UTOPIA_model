@@ -1,0 +1,20 @@
+#compartments:
+#ID : integer number of the compartment         
+# name : a description  must be valid Python dictionary key (no spaces etc.) 
+
+ID,name
+1,Ocean_Surface_Water
+2,Ocean_Mixed_Water
+3,Ocean_Column_Water
+4,Coast_Surface_Water
+5,Coast_Column_Water
+6,Surface_Freshwater
+7,Bulk_FreshWater
+8,Sediment
+9,Urban_Soil_Surface
+10,Urban_Soil
+11,Background_Soil_Surface
+12,Background_Soil
+13,Agricultural_Soil_Surface
+14,Agricultural_Soil
+15,Air

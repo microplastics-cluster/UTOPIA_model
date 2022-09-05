@@ -1,0 +1,301 @@
+modelBox,Compartment,MPform,sizeBin,thalf_deg_d,tfrag_gen_d,tbiof_growth_d,tbiof_degrade_d,alpha_heter
+Utopia,Ocean Surface Water,freeMP,mp5,5000,73,10,NAN,0.01
+Utopia,Ocean Surface Water,freeMP,mp4,5000,73,10,NAN,0.01
+Utopia,Ocean Surface Water,freeMP,mp3,5000,73,10,NAN,0.01
+Utopia,Ocean Surface Water,freeMP,mp2,5000,73,10,NAN,0.01
+Utopia,Ocean Surface Water,freeMP,mp1,5000,73,10,NAN,0.01
+Utopia,Ocean Surface Water,heterMP,mp5,50000,73,10,NAN,NAN
+Utopia,Ocean Surface Water,heterMP,mp4,50000,73,10,NAN,NAN
+Utopia,Ocean Surface Water,heterMP,mp3,50000,73,10,NAN,NAN
+Utopia,Ocean Surface Water,heterMP,mp2,50000,73,10,NAN,NAN
+Utopia,Ocean Surface Water,heterMP,mp1,50000,73,10,NAN,NAN
+Utopia,Ocean Surface Water,biofMP,mp5,25000,73,NAN,NAN,0.02
+Utopia,Ocean Surface Water,biofMP,mp4,25000,73,NAN,NAN,0.02
+Utopia,Ocean Surface Water,biofMP,mp3,25000,73,NAN,NAN,0.02
+Utopia,Ocean Surface Water,biofMP,mp2,25000,73,NAN,NAN,0.02
+Utopia,Ocean Surface Water,biofMP,mp1,25000,73,NAN,NAN,0.02
+Utopia,Ocean Surface Water,heterBiofMP,mp5,100000,73,NAN,NAN,NAN
+Utopia,Ocean Surface Water,heterBiofMP,mp4,100000,73,NAN,NAN,NAN
+Utopia,Ocean Surface Water,heterBiofMP,mp3,100000,73,NAN,NAN,NAN
+Utopia,Ocean Surface Water,heterBiofMP,mp2,100000,73,NAN,NAN,NAN
+Utopia,Ocean Surface Water,heterBiofMP,mp1,100000,73,NAN,NAN,NAN
+Utopia,Ocean Mixed Water,freeMP,mp5,5000,365,30,NAN,0.01
+Utopia,Ocean Mixed Water,freeMP,mp4,5000,NAN,30,NAN,0.01
+Utopia,Ocean Mixed Water,freeMP,mp3,5000,NAN,30,NAN,0.01
+Utopia,Ocean Mixed Water,freeMP,mp2,5000,NAN,30,NAN,0.01
+Utopia,Ocean Mixed Water,freeMP,mp1,5000,NAN,30,NAN,0.01
+Utopia,Ocean Mixed Water,heterMP,mp5,50000,NAN,30,NAN,NAN
+Utopia,Ocean Mixed Water,heterMP,mp4,50000,NAN,30,NAN,NAN
+Utopia,Ocean Mixed Water,heterMP,mp3,50000,NAN,30,NAN,NAN
+Utopia,Ocean Mixed Water,heterMP,mp2,50000,NAN,30,NAN,NAN
+Utopia,Ocean Mixed Water,heterMP,mp1,50000,NAN,30,NAN,NAN
+Utopia,Ocean Mixed Water,biofMP,mp5,25000,730,NAN,NAN,0.02
+Utopia,Ocean Mixed Water,biofMP,mp4,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Mixed Water,biofMP,mp3,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Mixed Water,biofMP,mp2,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Mixed Water,biofMP,mp1,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Mixed Water,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Mixed Water,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Mixed Water,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Mixed Water,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Mixed Water,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Column Water,freeMP,mp5,5000,365,300,NAN,0.01
+Utopia,Ocean Column Water,freeMP,mp4,5000,NAN,300,NAN,0.01
+Utopia,Ocean Column Water,freeMP,mp3,5000,NAN,300,NAN,0.01
+Utopia,Ocean Column Water,freeMP,mp2,5000,NAN,300,NAN,0.01
+Utopia,Ocean Column Water,freeMP,mp1,5000,NAN,300,NAN,0.01
+Utopia,Ocean Column Water,heterMP,mp5,50000,NAN,300,NAN,NAN
+Utopia,Ocean Column Water,heterMP,mp4,50000,NAN,300,NAN,NAN
+Utopia,Ocean Column Water,heterMP,mp3,50000,NAN,300,NAN,NAN
+Utopia,Ocean Column Water,heterMP,mp2,50000,NAN,300,NAN,NAN
+Utopia,Ocean Column Water,heterMP,mp1,50000,NAN,300,NAN,NAN
+Utopia,Ocean Column Water,biofMP,mp5,25000,730,NAN,NAN,0.02
+Utopia,Ocean Column Water,biofMP,mp4,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Column Water,biofMP,mp3,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Column Water,biofMP,mp2,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Column Water,biofMP,mp1,25000,NAN,NAN,NAN,0.02
+Utopia,Ocean Column Water,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Column Water,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Column Water,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Column Water,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Ocean Column Water,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Coast Surface Water,freeMP,mp5,5000,73,10,NAN,0.01
+Utopia,Coast Surface Water,freeMP,mp4,5000,73,10,NAN,0.01
+Utopia,Coast Surface Water,freeMP,mp3,5000,73,10,NAN,0.01
+Utopia,Coast Surface Water,freeMP,mp2,5000,73,10,NAN,0.01
+Utopia,Coast Surface Water,freeMP,mp1,5000,73,10,NAN,0.01
+Utopia,Coast Surface Water,heterMP,mp5,50000,73,10,NAN,NAN
+Utopia,Coast Surface Water,heterMP,mp4,50000,73,10,NAN,NAN
+Utopia,Coast Surface Water,heterMP,mp3,50000,73,10,NAN,NAN
+Utopia,Coast Surface Water,heterMP,mp2,50000,73,10,NAN,NAN
+Utopia,Coast Surface Water,heterMP,mp1,50000,73,10,NAN,NAN
+Utopia,Coast Surface Water,biofMP,mp5,25000,73,NAN,NAN,0.02
+Utopia,Coast Surface Water,biofMP,mp4,25000,73,NAN,NAN,0.02
+Utopia,Coast Surface Water,biofMP,mp3,25000,73,NAN,NAN,0.02
+Utopia,Coast Surface Water,biofMP,mp2,25000,73,NAN,NAN,0.02
+Utopia,Coast Surface Water,biofMP,mp1,25000,73,NAN,NAN,0.02
+Utopia,Coast Surface Water,heterBiofMP,mp5,100000,73,NAN,NAN,NAN
+Utopia,Coast Surface Water,heterBiofMP,mp4,100000,73,NAN,NAN,NAN
+Utopia,Coast Surface Water,heterBiofMP,mp3,100000,73,NAN,NAN,NAN
+Utopia,Coast Surface Water,heterBiofMP,mp2,100000,73,NAN,NAN,NAN
+Utopia,Coast Surface Water,heterBiofMP,mp1,100000,73,NAN,NAN,NAN
+Utopia,Coast Column Water,freeMP,mp5,5000,365,30,NAN,0.01
+Utopia,Coast Column Water,freeMP,mp4,5000,NAN,30,NAN,0.01
+Utopia,Coast Column Water,freeMP,mp3,5000,NAN,30,NAN,0.01
+Utopia,Coast Column Water,freeMP,mp2,5000,NAN,30,NAN,0.01
+Utopia,Coast Column Water,freeMP,mp1,5000,NAN,30,NAN,0.01
+Utopia,Coast Column Water,heterMP,mp5,50000,NAN,30,NAN,NAN
+Utopia,Coast Column Water,heterMP,mp4,50000,NAN,30,NAN,NAN
+Utopia,Coast Column Water,heterMP,mp3,50000,NAN,30,NAN,NAN
+Utopia,Coast Column Water,heterMP,mp2,50000,NAN,30,NAN,NAN
+Utopia,Coast Column Water,heterMP,mp1,50000,NAN,30,NAN,NAN
+Utopia,Coast Column Water,biofMP,mp5,25000,730,NAN,NAN,0.02
+Utopia,Coast Column Water,biofMP,mp4,25000,NAN,NAN,NAN,0.02
+Utopia,Coast Column Water,biofMP,mp3,25000,NAN,NAN,NAN,0.02
+Utopia,Coast Column Water,biofMP,mp2,25000,NAN,NAN,NAN,0.02
+Utopia,Coast Column Water,biofMP,mp1,25000,NAN,NAN,NAN,0.02
+Utopia,Coast Column Water,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Coast Column Water,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Coast Column Water,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Coast Column Water,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Coast Column Water,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Surface Freshwater,freeMP,mp5,5000,NAN,10,NAN,0.01
+Utopia,Surface Freshwater,freeMP,mp4,5000,NAN,10,NAN,0.01
+Utopia,Surface Freshwater,freeMP,mp3,5000,NAN,10,NAN,0.01
+Utopia,Surface Freshwater,freeMP,mp2,5000,NAN,10,NAN,0.01
+Utopia,Surface Freshwater,freeMP,mp1,5000,NAN,10,NAN,0.01
+Utopia,Surface Freshwater,heterMP,mp5,50000,NAN,10,NAN,NAN
+Utopia,Surface Freshwater,heterMP,mp4,50000,NAN,10,NAN,NAN
+Utopia,Surface Freshwater,heterMP,mp3,50000,NAN,10,NAN,NAN
+Utopia,Surface Freshwater,heterMP,mp2,50000,NAN,10,NAN,NAN
+Utopia,Surface Freshwater,heterMP,mp1,50000,NAN,10,NAN,NAN
+Utopia,Surface Freshwater,biofMP,mp5,25000,NAN,NAN,NAN,0.02
+Utopia,Surface Freshwater,biofMP,mp4,25000,NAN,NAN,NAN,0.02
+Utopia,Surface Freshwater,biofMP,mp3,25000,NAN,NAN,NAN,0.02
+Utopia,Surface Freshwater,biofMP,mp2,25000,NAN,NAN,NAN,0.02
+Utopia,Surface Freshwater,biofMP,mp1,25000,NAN,NAN,NAN,0.02
+Utopia,Surface Freshwater,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Surface Freshwater,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Surface Freshwater,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Surface Freshwater,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Surface Freshwater,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Bulk Freshwater,freeMP,mp5,5000,365,30,NAN,0.01
+Utopia,Bulk Freshwater,freeMP,mp4,5000,NAN,30,NAN,0.01
+Utopia,Bulk Freshwater,freeMP,mp3,5000,NAN,30,NAN,0.01
+Utopia,Bulk Freshwater,freeMP,mp2,5000,NAN,30,NAN,0.01
+Utopia,Bulk Freshwater,freeMP,mp1,5000,NAN,30,NAN,0.01
+Utopia,Bulk Freshwater,heterMP,mp5,50000,NAN,30,NAN,NAN
+Utopia,Bulk Freshwater,heterMP,mp4,50000,NAN,30,NAN,NAN
+Utopia,Bulk Freshwater,heterMP,mp3,50000,NAN,30,NAN,NAN
+Utopia,Bulk Freshwater,heterMP,mp2,50000,NAN,30,NAN,NAN
+Utopia,Bulk Freshwater,heterMP,mp1,50000,NAN,30,NAN,NAN
+Utopia,Bulk Freshwater,biofMP,mp5,25000,730,NAN,NAN,0.02
+Utopia,Bulk Freshwater,biofMP,mp4,25000,NAN,NAN,NAN,0.02
+Utopia,Bulk Freshwater,biofMP,mp3,25000,NAN,NAN,NAN,0.02
+Utopia,Bulk Freshwater,biofMP,mp2,25000,NAN,NAN,NAN,0.02
+Utopia,Bulk Freshwater,biofMP,mp1,25000,NAN,NAN,NAN,0.02
+Utopia,Bulk Freshwater,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Bulk Freshwater,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Bulk Freshwater,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Bulk Freshwater,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Bulk Freshwater,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Sediment,freeMP,mp5,5000,3650,NAN,NAN,NAN
+Utopia,Sediment,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Sediment,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Sediment,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Sediment,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Sediment,biofMP,mp5,25000,NAN,NAN,NAN,NAN
+Utopia,Sediment,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Sediment,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Sediment,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Sediment,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Sediment,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,freeMP,mp5,5000,365,NAN,NAN,NAN
+Utopia,Urban Soil Surface,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,biofMP,mp5,25000,730,NAN,NAN,NAN
+Utopia,Urban Soil Surface,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil Surface,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,freeMP,mp5,5000,3650,NAN,NAN,NAN
+Utopia,Urban Soil,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,biofMP,mp5,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Urban Soil,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,freeMP,mp5,5000,365,NAN,NAN,NAN
+Utopia,Background Soil Surface,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,biofMP,mp5,25000,730,NAN,NAN,NAN
+Utopia,Background Soil Surface,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil Surface,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,freeMP,mp5,5000,3650,NAN,NAN,NAN
+Utopia,Background Soil,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,biofMP,mp5,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Background Soil,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,freeMP,mp5,5000,365,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,biofMP,mp5,25000,730,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil Surface,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,freeMP,mp5,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,biofMP,mp5,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Agricultural Soil,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
+Utopia,Air,freeMP,mp5,5000,365,NAN,NAN,NAN
+Utopia,Air,freeMP,mp4,5000,NAN,NAN,NAN,NAN
+Utopia,Air,freeMP,mp3,5000,NAN,NAN,NAN,NAN
+Utopia,Air,freeMP,mp2,5000,NAN,NAN,NAN,NAN
+Utopia,Air,freeMP,mp1,5000,NAN,NAN,NAN,NAN
+Utopia,Air,heterMP,mp5,50000,NAN,NAN,NAN,NAN
+Utopia,Air,heterMP,mp4,50000,NAN,NAN,NAN,NAN
+Utopia,Air,heterMP,mp3,50000,NAN,NAN,NAN,NAN
+Utopia,Air,heterMP,mp2,50000,NAN,NAN,NAN,NAN
+Utopia,Air,heterMP,mp1,50000,NAN,NAN,NAN,NAN
+Utopia,Air,biofMP,mp5,25000,730,NAN,NAN,NAN
+Utopia,Air,biofMP,mp4,25000,NAN,NAN,NAN,NAN
+Utopia,Air,biofMP,mp3,25000,NAN,NAN,NAN,NAN
+Utopia,Air,biofMP,mp2,25000,NAN,NAN,NAN,NAN
+Utopia,Air,biofMP,mp1,25000,NAN,NAN,NAN,NAN
+Utopia,Air,heterBiofMP,mp5,100000,NAN,NAN,NAN,NAN
+Utopia,Air,heterBiofMP,mp4,100000,NAN,NAN,NAN,NAN
+Utopia,Air,heterBiofMP,mp3,100000,NAN,NAN,NAN,NAN
+Utopia,Air,heterBiofMP,mp2,100000,NAN,NAN,NAN,NAN
+Utopia,Air,heterBiofMP,mp1,100000,NAN,NAN,NAN,NAN
