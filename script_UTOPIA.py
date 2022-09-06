@@ -45,7 +45,10 @@ oceanSurfaceWater = compartment_oceanWater(
     Cdepth_m=10,
 )
 # Establish connexions: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
-oceanSurfaceWater.connexions = ["Ocean Mixed Water", "Air"]
+oceanSurfaceWater.connexions = {
+    "Ocean Mixed Water": "settling",
+    "Air": "sea_spray_aerosol",
+}
 
 oceanMixedWater = compartment_oceanWater(
     Cname="Ocean Mixed Water",
@@ -57,7 +60,10 @@ oceanMixedWater = compartment_oceanWater(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-oceanMixedWater.connexions = ["Ocean Surface Water", "Ocean Column Water"]
+oceanMixedWater.connexions = {
+    "Ocean Surface Water": "rising",
+    "Ocean Column Water": "settling",
+}
 
 oceanColumnWater = compartment_oceanWater(
     Cname="Ocean Column Water",
@@ -69,7 +75,7 @@ oceanColumnWater = compartment_oceanWater(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-oceanColumnWater.connexions = ["Ocean Mixed Water", "Sediment"]
+oceanColumnWater.connexions = {"Ocean Mixed Water": "rising", "Sediment": "settling"}
 
 coastSurfaceWater = compartment_water(
     Cname="Coast Surface Water",
@@ -81,7 +87,11 @@ coastSurfaceWater = compartment_water(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-coastSurfaceWater.connexions = ["Air", "Ocean Surface Water", "Coast Column Water"]
+coastSurfaceWater.connexions = {
+    "Air": "sea_spray_aerosol",
+    "Ocean Surface Water": "advective_transport",
+    "Coast Column Water": "settling",
+}
 
 
 coastColumnWater = compartment_water(
@@ -94,7 +104,11 @@ coastColumnWater = compartment_water(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-coastColumnWater.connexions = ["Coast Surface Water", "Ocean Mixed Water", "Sediment"]
+coastColumnWater.connexions = {
+    "Coast Surface Water": "rising",
+    "Ocean Mixed Water": "advective_transport",
+    "Sediment": "settling",
+}
 
 freshWaterSurface = compartment_water(
     Cname="Surface Freshwater",
@@ -106,7 +120,11 @@ freshWaterSurface = compartment_water(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-freshWaterSurface.connexions = ["Air", "Coast Surface Water", "Bulk Freshwater"]
+freshWaterSurface.connexions = {
+    "Air": "?",
+    "Coast Surface Water": "advective_transport",
+    "Bulk Freshwater": "settling",
+}
 
 freshWaterBulk = compartment_water(
     Cname="Bulk Freshwater",
@@ -118,10 +136,18 @@ freshWaterBulk = compartment_water(
     Cvolume_m3=100,
     Cdepth_m=10,
 )
-freshWaterBulk.connexions = ["Surface Freshwater", "Coast Column Water", "Sediment"]
+freshWaterBulk.connexions = {
+    "Surface Freshwater": "rising",
+    "Coast Column Water": "advective_transport",
+    "Sediment": "settling",
+}
 
 sediment = compartment_sediment(Cname="Sediment", Cvolume_m3=100, Cdepth_m=10)
-sediment.connexions = ["Bulk Freshwater", "Coast Column Water", "Ocean Column Water"]
+sediment.connexions = {
+    "Bulk Freshwater": "sediment_resuspension",
+    "Coast Column Water": "sediment_resuspension",
+    "Ocean Column Water": "sediment_resuspension",
+}
 
 urbanSoilSurface = compartment_soil_surface(
     Cname="Urban Soil Surface",
@@ -132,13 +158,13 @@ urbanSoilSurface = compartment_soil_surface(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-urbanSoilSurface.connexions = [
-    "Air",
-    "Urban Soil",
-    "Surface Freshwater",
-    "Coast Surface Water",
-    "Background Soil Surface",
-]
+urbanSoilSurface.connexions = {
+    "Air": "soil_air_resuspension",
+    "Urban Soil": ["percolation", "tillage"],
+    "Surface Freshwater": "runoff_transport",
+    "Coast Surface Water": "runoff_transport",
+    "Background Soil Surface": "?",
+}
 
 urbanSoil = compartment_soil(
     Cname="Urban Soil",
@@ -147,7 +173,7 @@ urbanSoil = compartment_soil(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-urbanSoil.connexions = ["Urban Soil Surface"]
+urbanSoil.connexions = {"Urban Soil Surface": "tillage"}
 
 backgroundSoilSurface = compartment_soil_surface(
     Cname="Background Soil Surface",
@@ -158,12 +184,12 @@ backgroundSoilSurface = compartment_soil_surface(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-backgroundSoilSurface.connexions = [
-    "Air",
-    "Surface Freshwater",
-    "Coast Surface Water",
-    "Background Soil",
-]
+backgroundSoilSurface.connexions = {
+    "Air": "soil_air_resuspension",
+    "Surface Freshwater": "runoff_transport",
+    "Coast Surface Water": "runoff_transport",
+    "Background Soil": ["percolation", "tillage"],
+}
 
 backgroundSoil = compartment_soil(
     Cname="Background Soil",
@@ -172,7 +198,7 @@ backgroundSoil = compartment_soil(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-backgroundSoil.connexions = ["Background Soil Surface"]
+backgroundSoil.connexions = {"Background Soil Surface": ["percolation", "tillage"]}
 
 agriculturalSoilSurface = compartment_soil_surface(
     Cname="Agricultural Soil Surface",
@@ -183,13 +209,13 @@ agriculturalSoilSurface = compartment_soil_surface(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-agriculturalSoilSurface.connexions = [
-    "Air",
-    "Surface Freshwater",
-    "Coast Surface Water",
-    "Background Soil",
-    "Agricultural Soil",
-]
+agriculturalSoilSurface.connexions = {
+    "Air": "soil_air_resuspension",
+    "Surface Freshwater": "runoff_transport",
+    "Coast Surface Water": "runoff_transport",
+    "Background Soil": "runoff_transport",
+    "Agricultural Soil": ["percolation", "tillage"],
+}
 
 agriculturalSoil = compartment_soil(
     Cname="Agricultural Soil",
@@ -198,19 +224,19 @@ agriculturalSoil = compartment_soil(
     soilPore_waterVolume_m3=0,
     Cdepth_m=10,
 )
-agriculturalSoil.connexions = ["Agricultural Soil Surface"]
+agriculturalSoil.connexions = {"Agricultural Soil Surface": "tillage"}
 
 air = compartment_air(
     Cname="Air", T_K=278, wind_speed_m_s=5, I_rainfall_mm=0, Cvolume_m3=100, Cdepth_m=10
 )
-air.connexions = [
-    "Agricultural Soil Surface",
-    "Background Soil Surface",
-    "Urban Soil Surface",
-    "Surface Freshwater",
-    "Coast Surface Water",
-    "Ocean Surface Water",
-]
+air.connexions = {
+    "Agricultural Soil Surface": ["dry_depossition, wet_depossition"],
+    "Background Soil Surface": ["dry_depossition, wet_depossition"],
+    "Urban Soil Surface": ["dry_depossition, wet_depossition"],
+    "Surface Freshwater": ["dry_depossition, wet_depossition"],
+    "Coast Surface Water": ["dry_depossition, wet_depossition"],
+    "Ocean Surface Water": ["dry_depossition, wet_depossition"],
+}
 
 
 compartments = [
@@ -406,7 +432,9 @@ rate_constants_df = create_rateConstants_table(system_particle_object_list, file
 
 # Build Matrix of interactions
 
-interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
+interactions_df = fillInteractions_fun_OOP(
+    system_particle_object_list, SpeciesList, inputs_path
+)
 
 # """SOLVE SYSTEM OF ODES"""
 
