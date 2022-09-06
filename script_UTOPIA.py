@@ -232,10 +232,10 @@ air = compartment_air(
 air.connexions = {
     "Agricultural Soil Surface": ["dry_depossition, wet_depossition"],
     "Background Soil Surface": ["dry_depossition, wet_depossition"],
-    "Urban Soil Surface": ["dry_depossition, wet_depossition"],
-    "Surface Freshwater": ["dry_depossition, wet_depossition"],
-    "Coast Surface Water": ["dry_depossition, wet_depossition"],
-    "Ocean Surface Water": ["dry_depossition, wet_depossition"],
+    "Urban Soil Surface": ["dry_depossition", "wet_depossition"],
+    "Surface Freshwater": ["dry_depossition", "wet_depossition"],
+    "Coast Surface Water": ["dry_depossition", "wet_depossition"],
+    "Ocean Surface Water": ["dry_depossition", "wet_depossition"],
 }
 
 
@@ -431,10 +431,9 @@ rate_constants_df = create_rateConstants_table(system_particle_object_list, file
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
 
 # Build Matrix of interactions
+from functions.fillInteractions_df_fun_OOP import *
 
-interactions_df = fillInteractions_fun_OOP(
-    system_particle_object_list, SpeciesList, inputs_path
-)
+interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
 
 # """SOLVE SYSTEM OF ODES"""
 
