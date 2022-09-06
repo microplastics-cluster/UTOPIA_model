@@ -498,7 +498,7 @@ def dry_depossition(particle):
     return k_dry_depossition
 
 
-def wet_deposition(particle):
+def wet_depossition(particle):
     # particles depossition from air to soil or water compartments via rainfall
     # to be formulated as function of rainfall intensity??
     k_wet_depossition = 0
