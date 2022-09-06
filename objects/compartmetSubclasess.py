@@ -15,7 +15,7 @@ for one per compartment listed above for the UTOPIA model?"""
 # listOfProcessess=['k_discorporation','k_fragmentation','k_heteroaggregation',
 # 'k_heteroaggregate_breackup','k_biofouling', 'k_defouling', 'k_advective_transport',
 #  'k_settling', 'k_rising', "k_sea_spray_aerosol", "k_wind_trasport",
-#  "k_wet_deposition", "k_dry_deposition", "k_sediment_resuspension",
+#  "k_wet_depossition", "k_dry_deposition", "k_sediment_resuspension",
 #  "k_burial", "k_percolation", "k_runoff_transport", "k_tillage"]
 
 
@@ -229,7 +229,7 @@ class compartment_air(Compartment):
             "fragmentation",
             "wind_trasport",
             "dry_depossition",
-            "wet_deposition",
+            "wet_depossition",
         ]
         # shall we also include heteroaggregation/heteroaggegrate break-up processess in the air compartment?
 
