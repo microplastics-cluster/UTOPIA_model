@@ -1,20 +1,22 @@
-#compartments:
-#ID : integer number of the compartment         
-# name : a description  must be valid Python dictionary key (no spaces etc.) 
-
-ID,name
-1,Ocean_Surface_Water
-2,Ocean_Mixed_Water
-3,Ocean_Column_Water
-4,Coast_Surface_Water
-5,Coast_Column_Water
-6,Surface_Freshwater
-7,Bulk_FreshWater
-8,Sediment
-9,Urban_Soil_Surface
-10,Urban_Soil
-11,Background_Soil_Surface
-12,Background_Soil
-13,Agricultural_Soil_Surface
-14,Agricultural_Soil
-15,Air
+#compartments:,,,,
+#ID : integer number of the compartment         ,,,,
+# name : a description  must be valid Python dictionary key (no spaces etc.) ,,,,
+# conexions: compartments to wich there is transport of particles,,,,
+# processes: processess under wich the trasport occurs,,,,
+,,,,
+ID,name,connexions,processess,connexions
+1,Ocean_Surface_Water,"2,15","settling, sea_spray_aerosol","Ocean_Mixed_Water,Air"
+2,Ocean_Mixed_Water,"1,3","rising,settling","Ocean_Surface_Water,Ocean_Column_Water"
+3,Ocean_Column_Water,"2,8","rising,settling",
+4,Coast_Surface_Water,"1,5,15","advective_transport,settling,sea_spray_aerosol",
+5,Coast_Column_Water,"4,2,8","rising,advective_transport,settling",
+6,Surface_Freshwater,"4,7,15","advective_transport,settling,sea_spray_aerosol",
+7,Bulk_FreshWater,"6,5,8","rising,advective_transport,settling",
+8,Sediment,"7,5,3","sediment_resuspension,sediment_resuspension,sediment_resuspension",
+9,Urban_Soil_Surface,"15,10,6,4,11","soil_air_resuspension,percolation",
+10,Urban_Soil,9,,
+11,Background_Soil_Surface,"15,6,4,12",,
+12,Background_Soil,11,,
+13,Agricultural_Soil_Surface,"15,6,4,12,14",,
+14,Agricultural_Soil,13,,
+15,Air,"11,9,6,4,1",,

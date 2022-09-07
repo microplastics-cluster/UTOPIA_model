@@ -127,12 +127,7 @@ class compartment_soil(Compartment):
         Cvolume_m3=None,
     ):
         super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
-        self.processess = [
-            "discorporation",
-            "fragmentation",
-            "sequestration_deep_soils",
-            "percolation",
-        ]
+        self.processess = ["discorporation", "fragmentation", "percolation", "tillage"]
         self.infiltration_capacity = infiltration_capacity
         self.precipitation_rate = (precipitation_rate,)
         self.soilPore_waterVolume_m3 = soilPore_waterVolume_m3
@@ -200,12 +195,14 @@ class compartment_deep_soil(compartment_soil):
             "discorporation",
             "fragmentation",
             "retention_in_soil",
-            "burial",
+            "sequestration_deep_soils",
         ]
 
 
 # retention_in_soil (straining?) of the particles in soil following heteroaggregation with geocolloids?
 # shall we also include heteroaggregation/heteroaggegrate break-up processess in the soil compartment? In SimpleBox for Nano they do account for aggregation and attachment
+
+# Difference between retention in soil and sequestration deep soil: sequestrations deep soil is like burial in deep sediments (elemination process-->out of the system)
 
 
 class compartment_air(Compartment):

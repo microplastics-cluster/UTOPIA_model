@@ -77,7 +77,7 @@ oceanColumnWater = compartment_oceanWater(
 )
 oceanColumnWater.connexions = {"Ocean Mixed Water": "rising", "Sediment": "settling"}
 
-coastSurfaceWater = compartment_water(
+coastSurfaceWater = compartment_oceanWater(
     Cname="Coast Surface Water",
     SPM_mgL=7,
     T_K=278,
@@ -94,7 +94,7 @@ coastSurfaceWater.connexions = {
 }
 
 
-coastColumnWater = compartment_water(
+coastColumnWater = compartment_oceanWater(
     Cname="Coast Column Water",
     SPM_mgL=7,
     T_K=278,
@@ -121,7 +121,6 @@ freshWaterSurface = compartment_water(
     Cdepth_m=10,
 )
 freshWaterSurface.connexions = {
-    "Air": "?",
     "Coast Surface Water": "advective_transport",
     "Bulk Freshwater": "settling",
 }
@@ -163,7 +162,6 @@ urbanSoilSurface.connexions = {
     "Urban Soil": ["percolation", "tillage"],
     "Surface Freshwater": "runoff_transport",
     "Coast Surface Water": "runoff_transport",
-    "Background Soil Surface": "?",
 }
 
 urbanSoil = compartment_soil(
@@ -230,8 +228,8 @@ air = compartment_air(
     Cname="Air", T_K=278, wind_speed_m_s=5, I_rainfall_mm=0, Cvolume_m3=100, Cdepth_m=10
 )
 air.connexions = {
-    "Agricultural Soil Surface": ["dry_depossition, wet_depossition"],
-    "Background Soil Surface": ["dry_depossition, wet_depossition"],
+    "Agricultural Soil Surface": ["dry_depossition", "wet_depossition"],
+    "Background Soil Surface": ["dry_depossition", "wet_depossition"],
     "Urban Soil Surface": ["dry_depossition", "wet_depossition"],
     "Surface Freshwater": ["dry_depossition", "wet_depossition"],
     "Coast Surface Water": ["dry_depossition", "wet_depossition"],

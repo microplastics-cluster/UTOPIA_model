@@ -7,6 +7,33 @@ Created on Fri Jul  2 11:19:34 2021
 import numpy as np
 import pandas as pd
 
+
+def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
+
+    # Asign loose rates
+    elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
+
+    interactions_df = pd.DataFrame(
+        np.diag(elimination_rates), index=SpeciesList, columns=SpeciesList
+    )
+
+    # Asign interactions rates
+    interactions_df_rows = []
+
+    for sp1 in system_particle_object_list:
+        interactions_df_rows.append(
+            interactionProcess(sp1, interactions_df, system_particle_object_list)
+        )
+
+    # interact3(sp1) for sp1 in interactions_df.index.to_list()]
+    array = np.column_stack(
+        interactions_df_rows
+    )  # vstack it was set as column stack and was wrong!!
+    interactions_df_sol = pd.DataFrame(array, index=SpeciesList, columns=SpeciesList)
+
+    return interactions_df_sol
+
+
 def eliminationProcesses(system_particle_object_list, SpeciesList):
     # Estimate losses (diagonal):the diagonal of the dataframe corresponds to the losses of each species
 
@@ -45,13 +72,14 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
     """Revisit losses!!"""
     return diag_list
 
-def inboxProcess(sp1,sp2):
-    
-    #If same compartment (compartment processes)
+
+def inboxProcess(sp1, sp2):
+
+    # If same compartment (compartment processes)
     if sp1.Pcode[2:] == sp2.Pcode[2:]:
-        
-        # Only different size bins --> Fragmentation 
-        
+
+        # Only different size bins --> Fragmentation
+
         if sp1.Pcode[1:] == sp2.Pcode[1:] and sp1.Pcode[0] != sp2.Pcode[0]:
 
             # fragmentation only will occur from bigger to smaller and in consecutive sieBins Sizebin = sp[-3]
@@ -60,7 +88,7 @@ def inboxProcess(sp1,sp2):
                 or (sp2.Pcode[0] == "c" and sp1.Pcode[0] == "b")
                 or (sp2.Pcode[0] == "d" and sp1.Pcode[0] == "c")
                 or (sp2.Pcode[0] == "e" and sp1.Pcode[0] == "d")
-            ):  
+            ):
 
                 if type(sp2.RateConstants["k_fragmentation"]) is tuple:
                     frag = sp2.RateConstants["k_fragmentation"]
@@ -70,82 +98,77 @@ def inboxProcess(sp1,sp2):
                     sol = sp2.RateConstants["k_fragmentation"]
             else:
                 sol = 0
-        
-        #Different aggergation states (same size)--> heteroagg, biofouling,defouling and agg-breackup
-        
+
+        # Different aggergation states (same size)--> heteroagg, biofouling,defouling and agg-breackup
+
         elif sp1.Pcode[0] == sp2.Pcode[0] and sp1.Pcode[1] != sp2.Pcode[1]:
 
             # heteroaggregation from A-->B or from C-->D
             if (sp2.Pcode[1] == "A" and sp1.Pcode[1] == "B") or (
                 sp2.Pcode[1] == "C" and sp1.Pcode[1] == "D"
             ):
-                sol = sp2.RateConstants["k_heteroaggregation"]
+                process = "heteroaggregation"
+                if process in sp2.Pcompartment.processess:
+                    sol = sp2.RateConstants["k_" + process]
+                else:
+                    sol = 0
 
             # heteroaggregate breackup from B-->A and from D-->C
             elif (sp2.Pcode[1] == "B" and sp1.Pcode[1] == "A") or (
                 sp2.Pcode[1] == "D" and sp1.Pcode[1] == "C"
             ):
-                sol = sp2.RateConstants["k_heteroaggregate_breackup"]
+                process = "heteroaggregate_breackup"
+                if process in sp2.Pcompartment.processess:
+                    sol = sp2.RateConstants["k_" + process]
+                else:
+                    sol = 0
 
             # Biofouling from A-->C or from B-->D
             elif (sp2.Pcode[1] == "A" and sp1.Pcode[1] == "C") or (
                 sp2.Pcode[1] == "B" and sp1.Pcode[1] == "D"
             ):
-                sol = sp2.RateConstants["k_biofouling"]
+                process = "biofouling"
+                if process in sp2.Pcompartment.processess:
+                    sol = sp2.RateConstants["k_" + process]
+                else:
+                    sol = 0
 
             # Defouling from C-->A or from D-->B
             elif (sp2.Pcode[1] == "C" and sp1.Pcode[1] == "A") or (
-                sp2.sp1.Pcode[1] == "D" and sp1.sp1.Pcode[1] == "B"
+                sp2.Pcode[1] == "D" and sp1.Pcode[1] == "B"
             ):
-                sol = sp2.RateConstants["k_defouling"]
+                process = "defouling"
+                if process in sp2.Pcompartment.processess:
+                    sol = sp2.RateConstants["k_" + process]
+                else:
+                    sol = 0
 
             else:
                 sol = 0
         else:
-            sol=0
+            sol = 0
 
     # Different compartments--> Transport processess
     # settling, rising, mixing, resusp, advective transport, difussion, runoff, percolation?
-    
-    """Check compartments connexions"""
-    
-    #if compartments are in the list of compartment connexions select process of connexion for compartment and assign rate constant, else process has rate of 0
-    
-    
+
+    # if compartments are in the list of compartment connexions select process of connexion for compartment and assign rate constant, else process has rate of 0
+
     elif sp1.Pcompartment.Cname in sp2.Pcompartment.connexions:
-
-        # Downwards movement between water compartments (settling and mixing)
-        if (sp2[-3] == "1" and sp1[-3] == "2") or (
-            sp2[-3] == "2" and sp1[-3] == "3"
-        ):
-            if type(RC_df[sp2]["mixing"]) == tuple:
-                sol = RC_df[sp2]["settling"] + RC_df[sp2]["mixing"][1]
-            else:
-                sol = RC_df[sp2]["settling"] + RC_df[sp2]["mixing"]
-
-        # Downwards movement with sediment (only sttling)
-        elif sp2[-3] == "3" and sp1[-3] == "4":
-            sol = RC_df[sp2]["settling"]
-
-        # Upwards movement water compartments (rising and mixing)
-        elif (sp2[-3] == "3" and sp1[-3] == "2") or (
-            sp2[-3] == "2" and sp1[-3] == "1"
-        ):
-            if type(RC_df[sp2]["mixing"]) == tuple:
-                sol = RC_df[sp2]["rising"] + RC_df[sp2]["mixing"][0]
-            else:
-                sol = RC_df[sp2]["rising"] + RC_df[sp2]["mixing"]
-        # Upwards movement from the sediment
-        elif sp2[-3] == "4" and sp1[-3] == "3":
-            sol = RC_df[sp2]["resusp"]
+        process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
+        if type(process) == list:
+            sol2 = []
+            for p in process:
+                sol2.append(sp2.RateConstants["k_" + p])
+            sol = sum(sol2)
         else:
-            sol = 0
+            sol = sp2.RateConstants["k_" + process]
     else:
         sol = 0
+
     return sol
 
 
-def interactionProcess(sp1, interactions_df,system_particle_object_list):
+def interactionProcess(sp1, interactions_df, system_particle_object_list):
     sol = []
     for sp2 in system_particle_object_list:
 
@@ -157,18 +180,20 @@ def interactionProcess(sp1, interactions_df,system_particle_object_list):
         else:
 
             # Same box (i.e. river section RS)--> In box processes
-            
+
             if sp1.Pcode.split("_")[1] == sp2.Pcode.split("_")[1]:
                 sol.append(inboxProcess(sp1, sp2))
 
             # Different Box but same particle in same compartment (Full Multi version where more than 1 box (i.e. river sections)) -->Transport (advection or sediment transport determined by flow_connectivity file)
-            
+
             elif sp2.Pcode.split("_")[0] == sp1.Pcode.split("_")[0]:
-                sol.append(transportProcess(sp1, sp2, river_flows))"""Pending work on transport for The Full Multi"""
+                sol.append(transportProcess(sp1, sp2, river_flows))
+                # """Pending work on transport for The Full Multi"""
             else:
                 sol.append(0)
 
     return sol
+
 
 def transportProcess(sp1, sp2, RC_df, river_flows):
     J = int(sp1[:-3]) + 1
@@ -188,20 +213,20 @@ def transportProcess(sp1, sp2, RC_df, river_flows):
 
     return solution
 
-def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
-    
-    #Asign loose rates
-    elimination_rates=eliminationProcesses(system_particle_object_list, SpeciesList)
-    
+    # Asign loose rates
+    elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
+
     interactions_df = pd.DataFrame(
         np.diag(elimination_rates), index=SpeciesList, columns=SpeciesList
-    )  
-    
+    )
+
     # Asign interactions rates
     interactions_df_rows = []
 
     for sp1 in system_particle_object_list:
-        interactions_df_rows.append(interactionProcess(sp1, interactions_df,system_particle_object_list))
+        interactions_df_rows.append(
+            interactionProcess(sp1, interactions_df, system_particle_object_list)
+        )
 
     # interact3(sp1) for sp1 in interactions_df.index.to_list()]
     array = np.column_stack(
