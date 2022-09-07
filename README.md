@@ -2,7 +2,7 @@
 
 A multimedia unit world open-source model for microplastics 
 
-The model comprises 15 compartments (Fig. 1) and tracks the fate of multiple sizes (5 size bins covering the a size range from nano- to milimeters in size) and four different speciation states of microplastic (Fig. 2) though solving an overall mass balance that is defined by a system of coupled first-order differential equations.  The masses, m (kg), and or particle number (N) of the different microplastic forms and sizes are obtained as the steady-state solutions of the mass balance equations for all compartments.
+The model comprises 15 compartments and tracks the fate of multiple sizes (5 size bins covering the a size range from nano- to milimeters in size) and four different speciation states of microplastic though solving an overall mass balance that is defined by a system of coupled first-order differential equations.  The masses, m (kg), and or particle number (N) of the different microplastic forms and sizes are obtained as the steady-state solutions of the mass balance equations for all compartments.
 
 ![image](https://user-images.githubusercontent.com/58487662/188823913-03dd5f50-2b2c-445d-914a-913637d7bf5b.png)
 
@@ -10,7 +10,7 @@ The model comprises 15 compartments (Fig. 1) and tracks the fate of multiple siz
 
 The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems. Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (although pending of definition).
 
-![image](https://user-images.githubusercontent.com/58487662/188827272-62a34924-24e2-4670-9fa4-ae27ea7a8f1a.png)
+![image](https://user-images.githubusercontent.com/58487662/188827636-eeab9b13-f9e1-4e3e-91aa-8041f5b31ba9.png)
 
 1.1. Advective transport 
 1.2. Settling 
@@ -31,6 +31,8 @@ The UTOPIA model is being developed based on experiences and knowledge acquired 
 
 ## Model Workflow
 
+Description of the workflow followed to develope UTOPIA
+
 ### 1- Select input parameters through interactive voila dashboards to generate input csv files 
 (to be done)
 
@@ -38,7 +40,7 @@ The UTOPIA model is being developed based on experiences and knowledge acquired 
 
   -Model boxes (only one box for UTOPIA)
   
-  -Model compartments (16 compartments for UTOPIA)
+  -Model compartments (15 compartments for UTOPIA)
   
   -Particles (one object per MPform (e.g. freeMP, heteroaggregated, biofouled and heteroaggregted and biofouled) and per size fraction (defined 5 size fractions in the range of 0.5 um to 5mm separated by a factor of 10))
 
