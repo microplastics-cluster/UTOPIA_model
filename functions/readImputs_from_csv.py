@@ -85,17 +85,22 @@ def read_connexions_inputs(inputs_path, input_file, compartmentNames_list):
 
 
 def instantiate_compartments_from_csv(inputs_path_file):
-    class Record:
-        pass
-        """Hold a record of data."""
 
+    compartments = {}
     with open(inputs_path_file, "r") as f:
-        dictReader_obj = csv.DictReader(f)
-        compartments = list(dictReader_obj)
-        compartmentsObj_list = []
-        for item in compartments:
-            particle_record = Record()
-            for field, value in item.items():
-                setattr(particle_record, field, value)
-            compartmentsObj_list.append(particle_record)
-    return compartmentsObj_list
+        reader = csv.DictReader(f)
+        for item in reader:
+            compartments[item["Cname"].replace(" ", "")] = dict(item)
+
+    return compartments
+
+def add_compartments_connexions(connexions_path_file,compartments):
+    comp_connex_df= pd.read_csv(connexions_path_file)
+    #find a way to add conexions as a dictionary attribute to the compartments. Maybe via indexing into the dataframe of conexions
+    
+    for comp in compartments:
+        dict_of_conexions={}
+        #extract keys as the conecting compartment and corresponding values as the conecting process
+        =comp_connex_df[compartments[comp]["Cname"]]
+        
+        compartments[comp]["connexions"]=dict_of_conexions
