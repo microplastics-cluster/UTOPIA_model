@@ -9,7 +9,6 @@ from functions.create_inputsTable_UTOPIA import *
 from functions.readImputs_from_csv import *
 from helpers.helpers import *
 from objects.box import *
-from objects.compartment import Compartment
 from objects.compartmetSubclasess import *
 from objects.particulates import *
 from objects.particulatesBF import *
