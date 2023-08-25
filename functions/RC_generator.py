@@ -80,7 +80,7 @@ def fragmentation(particle):
                 (1 / (float(t_frag_d) * 24 * 60 * 60)) * particle.diameter_um / 1000
             )
 
-    return (k_frag, fragments_formed)
+    return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when needed (for Mass Balance?))
 
     # NOTE: to be modified by ECO59
 
@@ -343,14 +343,16 @@ def heteroaggregate_breackup(particle, spm):
 
 
 def advective_transport(particle):
-    if particle.Pcompartment.waterFlow_m3_s != "nan":
-        k_adv = particle.Pcompartment.waterFlow_m3_s / particle.Pcompartment.Cvolume_m3
-    else:
-        k_adv = particle.Pcompartment.flowVelocity_m_s * (
-            particle.Pcompartment.Cdepth_m
-            * particle.Pcompartment.Cwidth_m
-            / particle.Pcompartment.Cvolume_m3
-        )
+    k_adv = particle.Pcompartment.waterFlow_m3_s / particle.Pcompartment.Cvolume_m3
+
+    # if particle.Pcompartment.waterFlow_m3_s != "nan":
+    #     k_adv = particle.Pcompartment.waterFlow_m3_s / particle.Pcompartment.Cvolume_m3
+    # else:
+    #     k_adv = particle.Pcompartment.flowVelocity_m_s * (
+    #         particle.Pcompartment.Cdepth_m
+    #         * particle.Pcompartment.Cwidth_m
+    #         / particle.Pcompartment.Cvolume_m3
+    #     )
     # advective transport
 
     # Based on Praetorius et al. 2012: Kflow = v_riv_flow*(Aw1/Vw1)

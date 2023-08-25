@@ -9,13 +9,20 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 
 class Compartment:
     def __init__(
-        self, Cname, Cdepth_m=None, Clength_m=None, Cwidth_m=None, Cvolume_m3=None
+        self,
+        Cname,
+        Cdepth_m=None,
+        Clength_m=None,
+        Cwidth_m=None,
+        Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
         self.Cname = Cname
         self.Cdepth_m = Cdepth_m
         self.Clength_m = Clength_m
         self.Cwidth_m = Cwidth_m
         self.Cvolume_m3 = Cvolume_m3
+        self.CsurfaceArea_m2 = CsurfaceArea_m2
         self.particles = {
             "freeMP": [],
             "heterMP": [],

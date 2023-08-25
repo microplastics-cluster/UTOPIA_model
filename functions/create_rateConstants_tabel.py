@@ -20,7 +20,7 @@ processList = [
 ]
 
 
-def create_rateConstants_table(system_particle_object_list, fileName):
+def create_rateConstants_table(system_particle_object_list):
     df_dict = {
         "River Section": [],
         "Compartment": [],
@@ -40,8 +40,5 @@ def create_rateConstants_table(system_particle_object_list, fileName):
     df2 = df["Rate Constants"].apply(pd.Series)
     df = df.drop(columns="Rate Constants")
     df3 = pd.concat([df, df2], axis=1)
-    df4 = df3.fillna(0)
-
-    df4.to_csv(fileName, index=False)
 
     return df3

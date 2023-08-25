@@ -66,3 +66,36 @@ def parameteriseRiverSections_from_csv(temp_RS_properties, riverSections):
         riverSect.conexions = RSproperties.loc[
             RSproperties["Bname"] == riverSect.Bname, "DOC_mg_L"
         ].item()
+
+
+def read_connexions_inputs(inputs_path, input_file, compartmentNames_list):
+    df = pd.read_csv(inputs_path + input_file)
+    dicts = []
+    for i in range(len(compartmentNames_list)):
+        df_sub = df[df.Compartment == compartmentNames_list[i]]
+        dicts.append(
+            {
+                compartmentNames_list[i]: [
+                    {df_sub.Connexion[x]: df_sub.Process[x]} for x in df_sub.index
+                ]
+            }
+        )
+    connexions_dict = {k: v for d in dicts for k, v in d.items()}
+    return connexions_dict
+
+
+def instantiate_compartments_from_csv(inputs_path_file):
+    class Record:
+        pass
+        """Hold a record of data."""
+
+    with open(inputs_path_file, "r") as f:
+        dictReader_obj = csv.DictReader(f)
+        compartments = list(dictReader_obj)
+        compartmentsObj_list = []
+        for item in compartments:
+            particle_record = Record()
+            for field, value in item.items():
+                setattr(particle_record, field, value)
+            compartmentsObj_list.append(particle_record)
+    return compartmentsObj_list

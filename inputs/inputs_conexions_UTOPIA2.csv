@@ -1,0 +1,16 @@
+Compartment,Connexion,Process
+Ocean Surface Water,"Ocean Mixed Water,Air","settling,sea_spray_aerosol"
+Ocean Mixed Water,"Ocean Surface Water,Ocean Column Water","rising,settling"
+Ocean Column Water,"Ocean Mixed Water,Sediment","rising,settling"
+Coast Surface Water,"Ocean Surface Water,Coast Column Water,Air","advective_transport,settling,sea_spray_aerosol"
+Coast Column Water,"Coast Surface Water,Ocean Mixed Water,Sediment","rising,advective_transport,settling"
+Surface Freshwater,"Coast Surface Water,Bulk Freshwater,Air","advective_transport,settling,?"
+Bulk Freshwater,"Surface Freshwater,Coast Column Water,Sediment","rising,advective_transport,settling"
+Sediment,"Bulk Freshwater,Coast Column Water,Ocean Column Water","sediment_resuspension,sediment_resuspension,sediment_resuspension"
+Urban Soil Surface,"Air,Urban Soil,Surface Freshwater,Coast Surface Water,Background Soil Surface","soil_air_resuspension,(percolation,tillage),runoff_transport,runoff_transport,?"
+Urban Soil,Urban Soil Surface,tillage
+Background Soil Surface,"Air,Surface Freshwater,Coast Surface Water,Background Soil","soil_air_resuspension,runoff_transport,runoff_transport,(percolation,tillage),"
+Background Soil,Background Soil Surface,"percolation,tillage"
+Agricultural Soil Surface,"Air,Surface Freshwater,Coast Surface Water,Background Soil,Agricultural Soil","soil_air_resuspension,runoff_transport,runoff_transport,runoff_transport,(percolation,tillage)"
+Agricultural Soil,Agricultural Soil Surface,tillage
+Air,"Agricultural Soil Surface,Background Soil Surface,Urban Soil Surface,Surface Freshwater,Coast Surface Water,Ocean Surface Water","(dry_depossition, wet_depossition),(dry_depossition, wet_depossition),(dry_depossition, wet_depossition),(dry_depossition, wet_depossition),(dry_depossition, wet_depossition),(dry_depossition, wet_depossition)"

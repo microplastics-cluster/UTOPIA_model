@@ -33,9 +33,12 @@ class compartment_water(Compartment):
         Clength_m=None,
         Cwidth_m=None,
         Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
 
-        super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
+        super().__init__(
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
+        )
         self.SPM_mgL = SPM_mgL
         self.flowVelocity_m_s = flowVelocity_m_s
         self.waterFlow_m3_s = waterFlow_m3_s
@@ -103,9 +106,17 @@ class compartment_oceanWater(compartment_water):
 
 class compartment_sediment(Compartment):
     def __init__(
-        self, Cname, Cdepth_m=None, Clength_m=None, Cwidth_m=None, Cvolume_m3=None
+        self,
+        Cname,
+        Cdepth_m=None,
+        Clength_m=None,
+        Cwidth_m=None,
+        Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
-        super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
+        super().__init__(
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
+        )
         self.processess = [
             "discorporation",
             "fragmentation",
@@ -125,8 +136,11 @@ class compartment_soil(Compartment):
         Clength_m=None,
         Cwidth_m=None,
         Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
-        super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
+        super().__init__(
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
+        )
         self.processess = ["discorporation", "fragmentation", "percolation", "tillage"]
         self.infiltration_capacity = infiltration_capacity
         self.precipitation_rate = (precipitation_rate,)
@@ -216,8 +230,11 @@ class compartment_air(Compartment):
         Clength_m=None,
         Cwidth_m=None,
         Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
-        super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
+        super().__init__(
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
+        )
         self.T_K = T_K
         self.wind_speed_m_s = wind_speed_m_s
         self.I_rainfall_mm = I_rainfall_mm
@@ -233,9 +250,17 @@ class compartment_air(Compartment):
 
 class compartment_FullMulti_water(Compartment):
     def __init__(
-        self, Cname, Cdepth_m=None, Clength_m=None, Cwidth_m=None, Cvolume_m3=None
+        self,
+        Cname,
+        Cdepth_m=None,
+        Clength_m=None,
+        Cwidth_m=None,
+        Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
-        super().__init__(Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3)
+        super().__init__(
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
+        )
 
 
 # distinguish between dissolution and discorporation (agein?) and add as an extra process?

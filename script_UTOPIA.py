@@ -33,6 +33,10 @@ boxNames_list = [b.Bname for b in modelBoxes]
 # Compartmets
 """Call read imput file function for compartments same way as for MPs"""
 
+compartments = instantiate_compartments_from_csv(
+    inputs_path + "\inputs_compartments.csv"
+)
+
 
 oceanSurfaceWater = compartment_oceanWater(
     Cname="Ocean Surface Water",
@@ -41,7 +45,7 @@ oceanSurfaceWater = compartment_oceanWater(
     T_K=278,
     flowVelocity_m_s=0,
     G=1,
-    Cvolume_m3=100,
+    Cvolume_m3=3.8e15,  # Value taken from SimpleBox4nano parameterization as volume of ocean water compartments surface layer
     Cdepth_m=10,
 )
 # Establish connexions: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
@@ -57,8 +61,8 @@ oceanMixedWater = compartment_oceanWater(
     flowVelocity_m_s=0,
     T_K=278,
     G=1,
-    Cvolume_m3=100,
-    Cdepth_m=10,
+    Cvolume_m3=1e16,
+    Cdepth_m=100,
 )
 oceanMixedWater.connexions = {
     "Ocean Surface Water": "rising",
@@ -72,8 +76,8 @@ oceanColumnWater = compartment_oceanWater(
     flowVelocity_m_s=0,
     T_K=278,
     G=1,
-    Cvolume_m3=100,
-    Cdepth_m=10,
+    Cvolume_m3=1e18,
+    Cdepth_m=1000,
 )
 oceanColumnWater.connexions = {"Ocean Mixed Water": "rising", "Sediment": "settling"}
 
@@ -83,8 +87,8 @@ coastSurfaceWater = compartment_oceanWater(
     T_K=278,
     G=10,
     flowVelocity_m_s=2.5,
-    waterFlow_m3_s=0,
-    Cvolume_m3=100,
+    waterFlow_m3_s=6840000000,
+    Cvolume_m3=3.8e15,
     Cdepth_m=10,
 )
 coastSurfaceWater.connexions = {
@@ -100,8 +104,8 @@ coastColumnWater = compartment_oceanWater(
     T_K=278,
     G=1,
     waterFlow_m3_s=6840000000,
-    flowVelocity_m_s=0,
-    Cvolume_m3=100,
+    flowVelocity_m_s=2.5,
+    Cvolume_m3=1e17,
     Cdepth_m=10,
 )
 coastColumnWater.connexions = {
@@ -116,8 +120,8 @@ freshWaterSurface = compartment_water(
     T_K=278,
     G=10,
     flowVelocity_m_s=1.3,
-    waterFlow_m3_s=0,
-    Cvolume_m3=100,
+    waterFlow_m3_s=10000,  # placeholder
+    Cvolume_m3=1.7e13,
     Cdepth_m=10,
 )
 freshWaterSurface.connexions = {
@@ -131,9 +135,10 @@ freshWaterBulk = compartment_water(
     T_K=278,
     G=10,
     flowVelocity_m_s=1.3,
-    waterFlow_m3_s=0,
-    Cvolume_m3=100,
-    Cdepth_m=10,
+    waterFlow_m3_s=10000,  # placeholder
+    Cvolume_m3=1.6e14,
+    Cdepth_m=30,
+    Cwidth_m=50,
 )
 freshWaterBulk.connexions = {
     "Surface Freshwater": "rising",
@@ -421,10 +426,53 @@ for particle in system_particle_object_list:
 
 # create rate constants table:
 
-fileName = "rateConstantsUTOPIA_temporal.csv"
+fileName = "rateConstantsUTOPIA_Test230619.csv"
 
-rate_constants_df = create_rateConstants_table(system_particle_object_list, fileName)
+rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
+# "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
+
+rate_constants_df.loc[
+    rate_constants_df["k_heteroaggregation"] > 0.000556, "k_heteroaggregation"
+] = 0.000556
+
+rate_constants_df.loc[
+    rate_constants_df["k_heteroaggregate_breackup"] > 0.000556,
+    "k_heteroaggregate_breackup",
+] = 0.000556
+
+# Save rate contants dataframe as csv file
+
+df4 = rate_constants_df.fillna(0)
+df4.to_csv(fileName, index=False)
+
+# Plot rate constat values for comparison
+
+processList = [
+    "k_discorporation",
+    "k_fragmentation",
+    "k_heteroaggregation",
+    "k_heteroaggregate_breackup",
+    "k_settling",
+    "k_rising",
+    "k_advective_transport",
+    "k_mixing",
+    "k_biofouling",
+    "k_sediment_resuspension",
+    "k_burial",
+    "k_defouling",
+]
+
+df_RC = df4[processList]
+
+df_RC.plot(
+    title="Rate constant values (s-1)",
+    subplots=True,
+    figsize=(10, 15),
+    sharex=True,
+    fontsize=12,
+    stacked=True,
+)
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
 
@@ -437,3 +485,46 @@ interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesL
 
 
 """I have removed the BOX from the compartments option so that when you assign compartments to a box it automatically assignes the box to that compartment...but to be fixed with the copy function!!"""
+
+# """SOLVE SYSTEM OF ODES"""
+
+# # Initial number of particles in the system
+
+# Set number of particles for all particles in the system as zero
+N_t0 = []
+for p in system_particle_object_list:
+    p.Pnumber = 0
+    N_t0.append(p.Pnumber)
+
+# dataframe of number of particles at time 0
+PartNum_t0 = pd.DataFrame({"species": SpeciesList, "number_of_particles": N_t0})
+PartNum_t0 = PartNum_t0.set_index("species")
+
+# Set values !=0
+
+PartNum_t0.at["eA1_Utopia", "number_of_particles"] = 100
+
+
+# Input vector
+
+inputVector = PartNum_t0["number_of_particles"].to_list()
+
+matrix = interactions_df.to_numpy()
+
+SteadyStateResults = np.linalg.solve(matrix, inputVector)
+
+Results = pd.DataFrame(
+    {"species": SpeciesList, "number_of_particles": SteadyStateResults}
+)
+
+# Check the result is correct
+
+np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
+##I change the sign of Steady state results because our ODES: 0=M*C+I --> C=-I*M^(-1)
+
+# # Vector of volumes corresponding to the compartments of the river
+# dilution_vol_m3 = volumesVector(Clist, compartments_prop)
+
+# ConcFinal_num_m3 = pd.DataFrame(data=0, index=t_span, columns=Clist)
+# for ind in range(len(NFinal_num)):
+#     ConcFinal_num_m3.iloc[ind] = NFinal_num.iloc[ind]/dilution_vol_m3

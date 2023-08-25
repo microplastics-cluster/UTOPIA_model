@@ -1,0 +1,14 @@
+ID,Cname,SPM_mgL,waterFlow_m3_s,T_K,flowVelocity_m_s,G,Cvolume_m3,Cdepth_m,CsurfaceArea_m2,infiltration_capacity,Qrunoff_m3,earthworm_density_in_m3,soilPore_waterVolume_m3
+1,Ocean_Surface_Water,1,22100000,278,nan,1,3.80E+15,10,nan,nan,nan,nan,nan
+2,Ocean_Mixed_Water,1,22100000,278,nan,1,1.00E+16,100,nan,nan,nan,nan,nan
+3,Ocean_Column_Water,1,22100000,278,nan,1,1.00E+17,1000,nan,nan,nan,nan,nan
+4,Coast_Surface_Water,7,nan,278,2.5,10,3.80E+15,10,?,nan,nan,nan,nan
+5,Coast_Column_Water,7,6840000000,278,nan,1,1.00E+17,10,nan,nan,nan,nan,nan
+6,Surface_Freshwater,30,nan,278,1.3,10,nan,3,?,nan,nan,nan,nan
+7,Bulk_Freshwater,30,nan,278,1.3,10,nan,30,?,nan,nan,nan,nan
+8,Sediment,nan,nan,nan,nan,nan,?,?,?,,,,
+9,Background_Soil_Surface,nan,nan,nan,nan,nan,?,?,?,,,,
+10,Background_Soil,nan,nan,nan,nan,nan,?,?,?,,,,
+11,Agricultural_Soil_Surface,nan,nan,nan,nan,nan,?,?,?,,,,
+12,Agricultural_Soil,nan,nan,nan,nan,nan,?,?,?,,,,
+13,Air,nan,nan,nan,nan,nan,?,?,?,,,,
