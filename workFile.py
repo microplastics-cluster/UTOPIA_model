@@ -50,3 +50,16 @@ with open(inputs_path + compFile, "r") as f:
         for field, value in item.items():
             setattr(particle_record, field, value)
         particlesObj_list.append(particle_record)
+
+
+##########
+# Create connexions attributes as dictionaries for the different #compartments from the compartmentsInteractions file
+def set_interactions(compartments, connexions_path_file="compartmentsInteractions.csv"):
+    comp_connex_df = pd.read_csv(connexions_path_file)
+
+    for c in compartments:
+        df_c = comp_connex_df[["Compartments", c.Cname]].dropna()
+        c.connexions = dict(zip(df_c["Compartments"], df_c[c.Cname]))
+
+
+dict([(key, value) for key, value in data])

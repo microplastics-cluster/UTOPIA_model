@@ -3,9 +3,6 @@ from objects.compartment import *
 # Subclasses (inheritances) of the class compartment add extra attributes to the compatment that define the type of compartment
 
 
-"""Would it be useful to have one class per specific compartment already parameterised to buil the model?
-for one per compartment listed above for the UTOPIA model?"""
-
 # UTOPIA_compartments = ["Ocean Surface Water","Ocean Mixed Water",
 # "Ocean Column Water","Coast Surface Water","Coast Column Water","Surface Freshwater ",
 # "Bulk FreshWater","Sediment","Urban Soil Surface","Urban Soil","Background Soil Surface",
@@ -25,7 +22,6 @@ class compartment_water(Compartment):
         self,
         Cname,
         SPM_mgL,
-        flowVelocity_m_s,
         waterFlow_m3_s,
         T_K,
         G,
@@ -34,6 +30,7 @@ class compartment_water(Compartment):
         Cwidth_m=None,
         Cvolume_m3=None,
         CsurfaceArea_m2=None,
+        flowVelocity_m_s=None,
     ):
 
         super().__init__(
@@ -56,10 +53,10 @@ class compartment_water(Compartment):
             "rising",
             "mixing",
         ]
-        if flowVelocity_m_s == "nan":
-            self.flowVelocity_m_s = self.waterFlow_m3_s / (
-                self.Cdepth_m * self.Cwidth_m
-            )
+        # if waterFlow_m3_s == "nan":
+        #     waterFlow_m3_s = self.flowVelocity_m * self.Cdepth_m * self.Cwidth_m
+        # else:
+        #     pass
 
 
 class compartment_oceanWater(compartment_water):
@@ -68,7 +65,6 @@ class compartment_oceanWater(compartment_water):
         self,
         Cname,
         SPM_mgL,
-        flowVelocity_m_s,
         waterFlow_m3_s,
         T_K,
         G,
@@ -80,7 +76,6 @@ class compartment_oceanWater(compartment_water):
         super().__init__(
             Cname,
             SPM_mgL,
-            flowVelocity_m_s,
             waterFlow_m3_s,
             T_K,
             G,
@@ -129,9 +124,9 @@ class compartment_soil(Compartment):
     def __init__(
         self,
         Cname,
-        soilPore_waterVolume_m3,
         infiltration_capacity=0.25,  # from SimpleBox(4plastics)
         precipitation_rate=2.22 * 1**-8,  # from SimpleBox(4plastics)
+        soilPore_waterVolume_m3=None,
         Cdepth_m=None,
         Clength_m=None,
         Cwidth_m=None,
@@ -143,7 +138,7 @@ class compartment_soil(Compartment):
         )
         self.processess = ["discorporation", "fragmentation", "percolation", "tillage"]
         self.infiltration_capacity = infiltration_capacity
-        self.precipitation_rate = (precipitation_rate,)
+        self.precipitation_rate = precipitation_rate
         self.soilPore_waterVolume_m3 = soilPore_waterVolume_m3
 
 
@@ -223,9 +218,9 @@ class compartment_air(Compartment):
     def __init__(
         self,
         Cname,
-        T_K,
-        wind_speed_m_s,
-        I_rainfall_mm,
+        T_K=None,
+        wind_speed_m_s=None,
+        I_rainfall_mm=None,
         Cdepth_m=None,
         Clength_m=None,
         Cwidth_m=None,

@@ -1,16 +1,16 @@
-,OceanSurfaceWater,OceanMixedWater,OceanColumnWater,CoastSurfaceWater,CoastColumnWater,SurfaceFreshwater,BulkFreshwater,Sediment,Urbansoilsurface,UrbanSoil,BackgroundSoilSurface,BackgroundSoil,AgriculturalSoilSurface,AgriculturalSoil,Air
+Compartments,Ocean Surface Water,Ocean Mixed Water,Ocean Column Water,Coast Surface Water,Coast Column Water,Surface Freshwater,Bulk Freshwater,Sediment,Urban Soil Surface,Urban Soil,Background Soil Surface,Background Soil,Agricultural Soil Surface,Agricultural Soil,Air
 OceanSurfaceWater,,settling,,advective_transport,,,,,,,,,,,sea_spray_aerosol
-OceanMixedWater,rising,,settling,,,,,,,,,,,,
-OceanColumnWater,,rising,,,,,,settling,,,,,,,
-CoastSurfaceWater,advective_transport,,,,settling,,,,,,,,,,sea_spray_aerosol
-CoastColumnWater,,advective_transport,,,rising,,,settling,,,,,,,
-SurfaceFreshwater,,,,advective_transport,,,settling,,,,,,,,
-BulkFreshwater,,,,,advective_transport,rising,,settling,,,,,,,
+Ocean Mixed Water,rising,,settling,,,,,,,,,,,,
+Ocean Column Water,,rising,,,,,,settling,,,,,,,
+Coast Surface Water,advective_transport,,,,settling,,,,,,,,,,sea_spray_aerosol
+Coast Column Water,,advective_transport,,,rising,,,settling,,,,,,,
+Surface Freshwater,,,,advective_transport,,,settling,,,,,,,,
+Bulk Freshwater,,,,,advective_transport,rising,,settling,,,,,,,
 Sediment,,,sediment_resuspension,,sediment_resuspension,,sediment_resuspension,,,,,,,,
-Urbansoilsurface,,,,runoff_transport,,runoff_transport,,,,"percolation, tillage",,,,,soil_air_resuspension
-UrbanSoil,,,,,,,,,tillage,,,,,,
-BackgroundSoilSurface,,,,runoff_transport,,runoff_transport,,,,,,"percolation, tillage",,,soil_air_resuspension
-BackgroundSoil,,,,,,,,,,,"percolation, tillage",,,,
-AgriculturalSoilSurface,,,,runoff_transport,,runoff_transport,,,,,,,,,soil_air_resuspension
-AgriculturalSoil,,,,,,,,,,,,,tillage,,
+Urban Soil Surface,,,,runoff_transport,,runoff_transport,,,,"percolation, tillage",,,,,soil_air_resuspension
+Urban Soil,,,,,,,,,tillage,,,,,,
+Background Soil Surface,,,,runoff_transport,,runoff_transport,,,,,,"percolation, tillage",,,soil_air_resuspension
+Background Soil,,,,,,,,,,,"percolation, tillage",,,,
+Agricultural Soil Surface,,,,runoff_transport,,runoff_transport,,,,,,,,,soil_air_resuspension
+Agricultural Soil,,,,,,,,,,,,,tillage,,
 Air,"dry_depossition, wet_depossition",,,"dry_depossition, wet_depossition",,"dry_depossition, wet_depossition",,,"dry_depossition, wet_depossition",,"dry_depossition, wet_depossition",,"dry_depossition, wet_depossition",,

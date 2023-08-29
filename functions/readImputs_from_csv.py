@@ -1,6 +1,7 @@
 # Instantiate class from csv file: each line in the csv will generate one particle object
 from objects.particulates import Particulates
 from objects.box import Box
+from objects.compartmetSubclasess import *
 import csv
 import pandas as pd
 
@@ -84,23 +85,75 @@ def read_connexions_inputs(inputs_path, input_file, compartmentNames_list):
     return connexions_dict
 
 
+def instantiate_compartments(inputs_path_file):
+    with open(inputs_path_file, "r") as f:
+        reader = csv.DictReader(f)
+        compartments = list(reader)
+
+    waterComp_objects = []
+    soilComp_objects = []
+    airComp_objects = []
+    for c in compartments:
+        if "Water" in c["Cname"] or "water" in c["Cname"]:
+            waterComp_objects.append(
+                compartment_water(
+                    Cname=c.get("Cname"),
+                    SPM_mgL=c.get("SPM_mgL"),
+                    flowVelocity_m_s=c.get("flowVelocity_m_s"),
+                    waterFlow_m3_s=c.get("waterFlow_m3_s"),
+                    T_K=c.get("T_K"),
+                    G=c.get("G"),
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                )
+            )
+        elif "Soil" in c["Cname"]:
+            soilComp_objects.append(compartment_soil(Cname=c.get("Cname")))
+
+        elif "Air" in c["Cname"]:
+            airComp_objects.append(compartment_air(Cname=c.get("Cname")))
+
+        else:
+            pass
+
+    Comp_objects = waterComp_objects + soilComp_objects + airComp_objects
+
+    return Comp_objects
+
+
 def instantiate_compartments_from_csv(inputs_path_file):
 
+    # Read csv as dictionarys for each line
     compartments = {}
     with open(inputs_path_file, "r") as f:
         reader = csv.DictReader(f)
         for item in reader:
             compartments[item["Cname"].replace(" ", "")] = dict(item)
+    # transform nested dictionaries to objects with attributes
+    comp_objects_list = []
+    for c in compartments:
+        obj = Struct(**compartments[c])
+        comp_objects_list.append(obj)
 
-    return compartments
+    return comp_objects_list
 
-def add_compartments_connexions(connexions_path_file,compartments):
-    comp_connex_df= pd.read_csv(connexions_path_file)
-    #find a way to add conexions as a dictionary attribute to the compartments. Maybe via indexing into the dataframe of conexions
-    
-    for comp in compartments:
-        dict_of_conexions={}
-        #extract keys as the conecting compartment and corresponding values as the conecting process
-        =comp_connex_df[compartments[comp]["Cname"]]
-        
-        compartments[comp]["connexions"]=dict_of_conexions
+
+# define a class to convert a nested dictionary to an Object
+class Struct:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            if isinstance(value, dict):
+                self.__dict__[key] = Struct(**value)
+            else:
+                self.__dict__[key] = value
+
+
+# Create connexions attributes as dictionaries for the different #compartments from the compartmentsInteractions file
+def set_interactions(compartments, connexions_path_file):
+    comp_connex_df = pd.read_csv(connexions_path_file)
+
+    for c in compartments:
+        df_c = comp_connex_df[["Compartments", c.Cname]].dropna()
+        c.connexions = dict(zip(df_c["Compartments"], df_c[c.Cname]))
+
+    print("Connexions have been added")

@@ -32,112 +32,22 @@ boxNames_list = [b.Bname for b in modelBoxes]
 # Compartmets
 """Call read imput file function for compartments same way as for MPs"""
 
-compartments = instantiate_compartments_from_csv(
-    inputs_path + "\inputs_compartments.csv"
-)
+compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
 
+# compartments = instantiate_compartments_from_csv(
+#     inputs_path + "\inputs_compartments.csv"
+# )
 
-# Establish connexions: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
+# Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
-compartments["OceanSurfaceWater"]["connexions"] = {
-    "Ocean Mixed Water": "settling",
-    "Air": "sea_spray_aerosol",
-}
-
-
-compartments["OceanMixedWater"]["connexions"] = {
-    "Ocean Surface Water": "rising",
-    "Ocean Column Water": "settling",
-}
-
-compartments["OceanColumnWater"]["connexions"] = {
-    "Ocean Mixed Water": "rising",
-    "Sediment": "settling",
-}
-
-
-compartments["CoastSurfaceWater"]["connexions"] = {
-    "Air": "sea_spray_aerosol",
-    "Ocean Surface Water": "advective_transport",
-    "Coast Column Water": "settling",
-}
-
-
-compartments["CoastColumnWater"]["connexions"] = {
-    "Coast Surface Water": "rising",
-    "Ocean Mixed Water": "advective_transport",
-    "Sediment": "settling",
-}
-
-
-compartments["SurfaceFreshwater"]["connexions"] = {
-    "Coast Surface Water": "advective_transport",
-    "Bulk Freshwater": "settling",
-}
-
-compartments["BulkFreshwater"]["connexions"] = {
-    "Surface Freshwater": "rising",
-    "Coast Column Water": "advective_transport",
-    "Sediment": "settling",
-}
-
-compartments["Sediment"]["connexions"] = {
-    "Bulk Freshwater": "sediment_resuspension",
-    "Coast Column Water": "sediment_resuspension",
-    "Ocean Column Water": "sediment_resuspension",
-}
-
-compartments["UrbanSoilSurface"]["connexions"] = {
-    "Air": "soil_air_resuspension",
-    "Urban Soil": ["percolation", "tillage"],
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-}
-
-compartments["UrbanSoil"]["connexions"] = {"Urban Soil Surface": "tillage"}
-
-compartments["BackgroundSoilSurface"]["connexions"] = {
-    "Air": "soil_air_resuspension",
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-    "Background Soil": ["percolation", "tillage"],
-}
-
-
-compartments["BackgroundSoil"]["connexions"] = {
-    "Background Soil Surface": ["percolation", "tillage"]
-}
-
-
-compartments["AgriculturalSoilSurface"]["connexions"] = {
-    "Air": "soil_air_resuspension",
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-    "Background Soil": "runoff_transport",
-    "Agricultural Soil": ["percolation", "tillage"],
-}
-
-
-compartments["AgriculturalSoil"]["connexions"] = {
-    "Agricultural Soil Surface": "tillage"
-}
-
-compartments["Air"]["connexions"] = {
-    "Agricultural Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Background Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Urban Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Surface Freshwater": ["dry_depossition", "wet_depossition"],
-    "Coast Surface Water": ["dry_depossition", "wet_depossition"],
-    "Ocean Surface Water": ["dry_depossition", "wet_depossition"],
-}
-
+set_interactions(compartments, connexions_path_file="compartmentsInteractions.csv")
 
 # Assign modelling code to compartmanes
 for c in range(len(compartments)):
     compartments[c].Ccode = c + 1
 
-
 print(f"The compartments {[c.Cname for c in compartments]} have been generated")
+
 ##Calculate compartments volume
 for c in compartments:
     c.calc_volume()
