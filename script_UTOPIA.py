@@ -202,49 +202,30 @@ fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
+plot_rate_constants(rate_constants_df)
+
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
-rate_constants_df.loc[
-    rate_constants_df["k_heteroaggregation"] > 0.000556, "k_heteroaggregation"
-] = 0.000556
+RC_df_timeLim = timeLimit_RC(rate_constants_df, k=0.000556)
 
-rate_constants_df.loc[
-    rate_constants_df["k_heteroaggregate_breackup"] > 0.000556,
-    "k_heteroaggregate_breackup",
-] = 0.000556
+plot_rate_constants(RC_df_timeLim)
+
+# rate_constants_df.loc[
+#     rate_constants_df["k_heteroaggregation"] > 0.000556, "k_heteroaggregation"
+# ] = 0.000556
+
+# rate_constants_df.loc[
+#     rate_constants_df["k_heteroaggregate_breackup"] > 0.000556,
+#     "k_heteroaggregate_breackup",
+# ] = 0.000556
 
 # Save rate contants dataframe as csv file
 
-df4 = rate_constants_df.fillna(0)
+df4 = RC_df_timeLim.fillna(0)
 df4.to_csv(fileName, index=False)
 
 # Plot rate constat values for comparison
 
-processList = [
-    "k_discorporation",
-    "k_fragmentation",
-    "k_heteroaggregation",
-    "k_heteroaggregate_breackup",
-    "k_settling",
-    "k_rising",
-    "k_advective_transport",
-    "k_mixing",
-    "k_biofouling",
-    "k_sediment_resuspension",
-    "k_burial",
-    "k_defouling",
-]
-
-df_RC = df4[processList]
-
-df_RC.plot(
-    title="Rate constant values (s-1)",
-    subplots=True,
-    figsize=(10, 15),
-    sharex=True,
-    fontsize=12,
-    stacked=True,
-)
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
 

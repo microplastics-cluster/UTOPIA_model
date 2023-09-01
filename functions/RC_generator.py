@@ -170,7 +170,7 @@ def rising(particle):
         k_rise = 0
 
     elif vSet_m_s < 0:
-        k_rise = -vSet_m_s / particle.Pcompartment.Cdepth_m
+        k_rise = -vSet_m_s / float(particle.Pcompartment.Cdepth_m)
 
     else:
         k_rise = 0
