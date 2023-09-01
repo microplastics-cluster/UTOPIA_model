@@ -68,16 +68,20 @@ def fragmentation(particle):
             particle.Pname[2:3] == "mp1"
         ):  # print("Smallest sizeBin, fragments formed will be considered losses")
             k_frag = k_frag = (
-                (1 / (float(t_frag_d) * 24 * 60 * 60)) * particle.diameter_um / 1000
+                (1 / (float(t_frag_d) * 24 * 60 * 60))
+                * float(particle.diameter_um)
+                / 1000
             )
             fragments_formed = 0
         else:
             volume_fragment = (
-                4 / 3 * math.pi * (particle.radius_m / 10) ** 3
+                4 / 3 * math.pi * (float(particle.radius_m) / 10) ** 3
             )  #!!!only works for bins 10 times smaller!!!
-            fragments_formed = particle.Pvolume_m3 / volume_fragment
+            fragments_formed = float(particle.Pvolume_m3) / volume_fragment
             k_frag = (
-                (1 / (float(t_frag_d) * 24 * 60 * 60)) * particle.diameter_um / 1000
+                (1 / (float(t_frag_d) * 24 * 60 * 60))
+                * float(particle.diameter_um)
+                / 1000
             )
 
     return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when needed (for Mass Balance?))
@@ -102,10 +106,10 @@ def settling(particle):
         vSet_m_s = (
             2
             / 9
-            * (particle.Pdensity_kg_m3 - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
-            * (particle.radius_m) ** 2
+            * (float(particle.radius_m)) ** 2
         )
     else:
         print("Error: cannot calculate settling other than Stokes yet")
@@ -115,7 +119,7 @@ def settling(particle):
     # for the water and surface water compartments:
     # settling and rising rate constants for free MP
     if vSet_m_s > 0:
-        k_set = vSet_m_s / particle.Pcompartment.Cdepth_m
+        k_set = vSet_m_s / float(particle.Pcompartment.Cdepth_m)
 
     elif vSet_m_s < 0:
         k_set = 0
@@ -149,10 +153,10 @@ def rising(particle):
             vSet_m_s = (
                 2
                 / 9
-                * (particle.Pdensity_kg_m3 - density_w_21C_kg_m3)
+                * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
                 / mu_w_21C_kg_ms
                 * g_m_s2
-                * (particle.radius_m) ** 2
+                * (float(particle.radius_m)) ** 2
             )
         else:
             print("Error: cannot calculate settling other than Stokes yet")
@@ -192,25 +196,28 @@ def heteroaggregation(particle, spm):
 
         # first the different collision mechanisms are calculated
         k_peri = (
-            (2 * k_B_J_K * particle.Pcompartment.T_K)
+            (2 * k_B_J_K * float(particle.Pcompartment.T_K))
             / (3 * mu_w_21C_kg_ms)
-            * (particle.radius_m + spm.radius_m) ** 2
-            / (particle.radius_m * spm.radius_m)
+            * (float(particle.radius_m) + spm.radius_m) ** 2
+            / (float(particle.radius_m) * spm.radius_m)
         )
         # perikinetic contributions to collision rate constant (Brownian motion)
 
         k_ortho = (
-            4 / 3 * particle.Pcompartment.G * (particle.radius_m + spm.radius_m) ** 3
+            4
+            / 3
+            * float(particle.Pcompartment.G)
+            * (float(particle.radius_m) + spm.radius_m) ** 3
         )
         # orthokinetic contributions to collision rate constant (caused by fluid motion)
 
         MP_vSet_m_s = (
             2
             / 9
-            * (particle.Pdensity_kg_m3 - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
-            * (particle.radius_m) ** 2
+            * (float(particle.radius_m)) ** 2
         )
 
         SPM_vSet_m_s = (
@@ -225,7 +232,7 @@ def heteroaggregation(particle, spm):
 
         k_diffSettling = (
             math.pi
-            * (particle.radius_m + spm.radius_m) ** 2
+            * (float(particle.radius_m) + spm.radius_m) ** 2
             * abs(MP_vSet_m_s - SPM_vSet_m_s)
         )
 
@@ -245,7 +252,7 @@ def heteroaggregation(particle, spm):
             k_hetAgg = 0
         else:
             spm.calc_numConc(
-                concMass_mg_L=particle.Pcompartment.SPM_mgL, concNum_part_L=0
+                concMass_mg_L=float(particle.Pcompartment.SPM_mgL), concNum_part_L=0
             )
             SPM_concNum_part_m3 = spm.concNum_part_m3
             k_hetAgg = float(alpha) * k_coll * SPM_concNum_part_m3
@@ -269,25 +276,28 @@ def heteroaggregate_breackup(particle, spm):
         # first the different collision mechanisms are calculated
 
         k_peri = (
-            (2 * k_B_J_K * particle.Pcompartment.T_K)
+            (2 * k_B_J_K * float(particle.Pcompartment.T_K))
             / (3 * mu_w_21C_kg_ms)
-            * (particle.radius_m + spm.radius_m) ** 2
-            / (particle.radius_m * spm.radius_m)
+            * (float(particle.radius_m) + spm.radius_m) ** 2
+            / (float(particle.radius_m) * spm.radius_m)
         )
         # perikinetic contributions to collision rate constant (Brownian motion)
 
         k_ortho = (
-            4 / 3 * particle.Pcompartment.G * (particle.radius_m + spm.radius_m) ** 3
+            4
+            / 3
+            * float(particle.Pcompartment.G)
+            * (float(particle.radius_m) + spm.radius_m) ** 3
         )
         # orthokinetic contributions to collision rate constant (caused by fluid motion)
 
         MP_vSet_m_s = (
             2
             / 9
-            * (particle.Pdensity_kg_m3 - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
-            * (particle.radius_m) ** 2
+            * (float(particle.radius_m)) ** 2
         )
         SPM_vSet_m_s = (
             2
@@ -301,7 +311,7 @@ def heteroaggregate_breackup(particle, spm):
 
         k_diffSettling = (
             math.pi
-            * (particle.radius_m + spm.radius_m) ** 2
+            * (float(particle.radius_m) + spm.radius_m) ** 2
             * abs(MP_vSet_m_s - SPM_vSet_m_s)
         )
         # differential settling contributions to collision rate constant
@@ -329,7 +339,7 @@ def heteroaggregate_breackup(particle, spm):
             k_aggBreakup = 0
         else:
             spm.calc_numConc(
-                concMass_mg_L=particle.Pcompartment.SPM_mgL, concNum_part_L=0
+                concMass_mg_L=float(particle.Pcompartment.SPM_mgL), concNum_part_L=0
             )
             SPM_concNum_part_m3 = spm.concNum_part_m3
             k_hetAgg = float(alpha) * k_coll * SPM_concNum_part_m3
@@ -343,15 +353,17 @@ def heteroaggregate_breackup(particle, spm):
 
 
 def advective_transport(particle):
-    k_adv = particle.Pcompartment.waterFlow_m3_s / particle.Pcompartment.Cvolume_m3
+    k_adv = float(particle.Pcompartment.waterFlow_m3_s) / float(
+        particle.Pcompartment.Cvolume_m3
+    )
 
     # if particle.Pcompartment.waterFlow_m3_s != "nan":
-    #     k_adv = particle.Pcompartment.waterFlow_m3_s / particle.Pcompartment.Cvolume_m3
+    #     k_adv = float(particle.Pcompartment.waterFlow_m3_s) / float(particle.Pcompartment.Cvolume_m3)
     # else:
-    #     k_adv = particle.Pcompartment.flowVelocity_m_s * (
-    #         particle.Pcompartment.Cdepth_m
-    #         * particle.Pcompartment.Cwidth_m
-    #         / particle.Pcompartment.Cvolume_m3
+    #     k_adv = float(particle.Pcompartment.flowVelocity_m_s) * (
+    #         float(particle.Pcompartment.Cdepth_m)
+    #         * float(particle.Pcompartment.Cwidth_m)
+    #         / float(particle.Pcompartment.Cvolume_m3)
     #     )
     # advective transport
 
@@ -373,11 +385,13 @@ def mixing(particle, dict_comp):
         k_mix = (k_mix_up, k_mix_down)
     elif particle.Pcompartment.Cname == "Surface Water":
         k_mix = (10**-10) * (
-            dict_comp["Flowing Water"].Cvolume_m3 / particle.Pcompartment.Cvolume_m3
+            dict_comp["Flowing Water"].Cvolume_m3
+            / float(particle.Pcompartment.Cvolume_m3)
         )
     elif particle.Pcompartment.Cname == "Stagnant Water":
         k_mix = (10**-13) * (
-            dict_comp["Flowing Water"].Cvolume_m3 / particle.Pcompartment.Cvolume_m3
+            dict_comp["Flowing Water"].Cvolume_m3
+            / float(particle.Pcompartment.Cvolume_m3)
         )
     else:
         k_mix = 0
@@ -433,21 +447,24 @@ def defouling(particle):
 
 def sediment_resuspension(particle):
 
-    k_resusp = 2.3 * 10**-7 / particle.Pcompartment.Cdepth_m
+    k_resusp = 2.3 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
 
     return k_resusp
 
 
 def burial(particle):
 
-    k_burial = 5.6 * 10**-7 / particle.Pcompartment.Cdepth_m
+    k_burial = 5.6 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
 
     return k_burial
 
 
 def sediment_transport(particle):
     m_sed_kg = (
-        (1 - sed_porosity) * sed_density * 10**3 * particle.Pcompartment.Cvolume_m3
+        (1 - sed_porosity)
+        * sed_density
+        * 10**3
+        * float(particle.Pcompartment.Cvolume_m3)
     )
     k_sed_trans = v_sed_trans / m_sed_kg
 
@@ -472,7 +489,7 @@ def percolation(particle):
     # downwards movement of particles in soil via infiltrated water
     # to be formulated
 
-    # k_percol = particle.Pcompartment.infiltration_capacity*particle.Pcompartment.precipitation_rate*(particle.Pcompartment.Cvolume_m3/particle.Pcompartment.Cdepth_m)/particle.Pcompartment.soilPore_waterVolume_m3
+    # k_percol = particle.Pcompartment.infiltration_capacity*particle.Pcompartment.precipitation_rate*(float(particle.Pcompartment.Cvolume_m3)/float(particle.Pcompartment.Cdepth_m))/float(particle.Pcompartment.soilPore_waterVolume_m3)
 
     k_percol = 0
 

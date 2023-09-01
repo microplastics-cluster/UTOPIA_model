@@ -3,10 +3,27 @@ from objects.compartment import *
 # Subclasses (inheritances) of the class compartment add extra attributes to the compatment that define the type of compartment
 
 
-# UTOPIA_compartments = ["Ocean Surface Water","Ocean Mixed Water",
-# "Ocean Column Water","Coast Surface Water","Coast Column Water","Surface Freshwater ",
-# "Bulk FreshWater","Sediment","Urban Soil Surface","Urban Soil","Background Soil Surface",
-# "Background Soil","Agricultural Soil Surface","Agricultural Soil","Air"]
+UTOPIA_water_compartments = [
+    "Ocean Surface Water",
+    "Ocean Mixed Water",
+    "Ocean Column Water",
+    "Coast Surface Water",
+    "Coast Column Water",
+    "Surface Freshwater",
+    "Bulk Freshwater",
+]
+
+UTOPIA_soil_compartments = [
+    "Sediment",
+    "Urban Soil Surface",
+    "Urban Soil",
+    "Background Soil Surface",
+    "Background Soil",
+    "Agricultural Soil Surface",
+    "Agricultural Soil",
+]
+
+UTOPIA_air_compartments = ["Air"]
 
 
 # listOfProcessess=['k_discorporation','k_fragmentation','k_heteroaggregation',

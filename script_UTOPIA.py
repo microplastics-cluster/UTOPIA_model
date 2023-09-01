@@ -14,12 +14,10 @@ from objects.particulates import *
 from objects.particulatesBF import *
 from objects.particulatesSPM import *
 
-# Generate objects
-
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
+# Generate objects
 # Boxes
-"""Call read imput file function for model boxes (if more than one) in the same way as for MPs"""
 
 boxName = "Utopia"
 UTOPIA = Box(boxName)
@@ -30,7 +28,7 @@ modelBoxes = [UTOPIA]
 boxNames_list = [b.Bname for b in modelBoxes]
 
 # Compartmets
-"""Call read imput file function for compartments same way as for MPs"""
+"""Call read imput file function for compartments"""
 
 compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
 
@@ -45,8 +43,6 @@ set_interactions(compartments, connexions_path_file="compartmentsInteractions.cs
 # Assign modelling code to compartmanes
 for c in range(len(compartments)):
     compartments[c].Ccode = c + 1
-
-print(f"The compartments {[c.Cname for c in compartments]} have been generated")
 
 ##Calculate compartments volume
 for c in compartments:
@@ -64,9 +60,6 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 ##Free microplastics (freeMP)
 MP_freeParticles = instantiateParticles_from_csv(
     inputs_path + "\inputs_microplastics.csv"
-)
-print(
-    f"The free MP particles {[p.Pname for p in MP_freeParticles]} have been generated"
 )
 
 ###Calculate freeMP volume
@@ -158,19 +151,16 @@ print(
     f"The compartments {[comp.Cname for comp in UTOPIA.compartments]} have been assigned to {UTOPIA.Bname } model box"
 )
 
+# Estimate volume of UTOPIA box by adding volumes of the compartments addedd
+# UTOPIA.calc_Bvolume_m3() #currently volume of soil and air boxess are missing, to be added to csv file
 
-# Check if compartments and boxes (river sections) are consistent in dimensions (i.e. sum of volumes of the different compartments can not exceed the volume of the box)
-
-"""To be implemented for UTOPIA"""
 
 # Add particles to compartments
 for b in modelBoxes:
     for c in b.compartments:
         for p in particles:
             c.add_particles(copy.deepcopy(p))
-    print(
-        f"The particles have been added to the compartments of the river section {b.Bname}"
-    )
+    print(f"The particles have been added to the compartments of {b.Bname}")
 
 
 # Based on the given model structure (created model boxes, compartments and particles)
@@ -208,7 +198,7 @@ for particle in system_particle_object_list:
 
 # create rate constants table:
 
-fileName = "rateConstantsUTOPIA_Test230619.csv"
+fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 

@@ -26,6 +26,10 @@ def instantiateParticles_from_csv(compFile):
             )
         )
 
+    print(
+        f"The free MP particles {[p.Pname for p in particlesObj_list]} have been generated"
+    )
+
     return particlesObj_list
 
 
@@ -94,7 +98,7 @@ def instantiate_compartments(inputs_path_file):
     soilComp_objects = []
     airComp_objects = []
     for c in compartments:
-        if "Water" in c["Cname"] or "water" in c["Cname"]:
+        if c["Cname"] in UTOPIA_water_compartments:
             waterComp_objects.append(
                 compartment_water(
                     Cname=c.get("Cname"),
@@ -107,16 +111,18 @@ def instantiate_compartments(inputs_path_file):
                     Cvolume_m3=c.get("Cvolume_m3"),
                 )
             )
-        elif "Soil" in c["Cname"]:
+        elif c["Cname"] in UTOPIA_soil_compartments:
             soilComp_objects.append(compartment_soil(Cname=c.get("Cname")))
 
-        elif "Air" in c["Cname"]:
+        elif c["Cname"] in UTOPIA_air_compartments:
             airComp_objects.append(compartment_air(Cname=c.get("Cname")))
 
         else:
             pass
 
     Comp_objects = waterComp_objects + soilComp_objects + airComp_objects
+
+    print(f"The compartments {[c.Cname for c in Comp_objects]} have been generated")
 
     return Comp_objects
 
