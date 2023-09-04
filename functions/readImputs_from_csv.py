@@ -4,6 +4,7 @@ from objects.box import Box
 from objects.compartmetSubclasess import *
 import csv
 import pandas as pd
+import numpy as np
 
 
 def instantiateParticles_from_csv(compFile):
@@ -156,10 +157,28 @@ class Struct:
 
 # Create connexions attributes as dictionaries for the different #compartments from the compartmentsInteractions file
 def set_interactions(compartments, connexions_path_file):
-    comp_connex_df = pd.read_csv(connexions_path_file)
+
+    with open(connexions_path_file, "r") as infile:
+        reader = csv.reader(infile)
+        array = []
+        for row in reader:
+            r = []
+            for ele in row:
+                if "," in ele:
+                    r.append(ele.split(","))
+                else:
+                    r.append(ele)
+            array.append(r)
+        comp_connex_df = pd.DataFrame(array)
+        comp_connex_df.columns = comp_connex_df[0]
+        # comp_connex_df = comp_connex_df.set_index("Compartments")
+        comp_connex_df = comp_connex_df.drop(index=[0])
+        comp_connex_df.replace("", np.nan, inplace=True)
+
+    # comp_connex_df = pd.read_csv(connexions_path_file)
 
     for c in compartments:
-        df_c = comp_connex_df[["Compartments", c.Cname]].dropna()
-        c.connexions = dict(zip(df_c["Compartments"], df_c[c.Cname]))
+        df_comp = comp_connex_df[["Compartments", c.Cname]].dropna()
+        c.connexions = dict(zip(df_comp["Compartments"], df_comp[c.Cname]))
 
     print("Connexions have been added")

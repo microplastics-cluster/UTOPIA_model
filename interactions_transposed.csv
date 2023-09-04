@@ -1,0 +1,16 @@
+,Ocean Surface Water,Ocean Mixed Water,Ocean Column Water,Coast Surface Water,Coast Column Water,Surface Freshwater,Bulk Freshwater,Sediment,Urban Soil Surface,Urban Soil,Background Soil Surface,Background Soil,Agricultural Soil Surface,Agricultural Soil,Air,Compartments
+0,,rising,,advective_transport,,,,,,,,,,,"dry_depossition, wet_depossition",Ocean Surface Water
+1,settling,,rising,,advective_transport,,,,,,,,,,,Ocean Mixed Water
+2,,settling,,,,,,sediment_resuspension,,,,,,,,Ocean Column Water
+3,advective_transport,,,,,advective_transport,,,runoff_transport,,runoff_transport,,runoff_transport,,"dry_depossition, wet_depossition",Coast Surface Water
+4,,,,settling,rising,,advective_transport,sediment_resuspension,,,,,,,,Coast Column Water
+5,,,,,,,rising,,runoff_transport,,runoff_transport,,runoff_transport,,"dry_depossition, wet_depossition",Surface Freshwater
+6,,,,,,settling,,sediment_resuspension,,,,,,,,Bulk Freshwater
+7,,,settling,,settling,,settling,,,,,,,,,Sediment
+8,,,,,,,,,,tillage,,,,,"dry_depossition, wet_depossition",Urban Soil Surface
+9,,,,,,,,,"percolation, tillage",,,,,,,Urban Soil
+10,,,,,,,,,,,,"percolation, tillage",,,"dry_depossition, wet_depossition",Background Soil Surface
+11,,,,,,,,,,,"percolation, tillage",,,,,Background Soil
+12,,,,,,,,,,,,,,tillage,"dry_depossition, wet_depossition",Agricultural Soil Surface
+13,,,,,,,,,,,,,,,,Agricultural Soil
+14,sea_spray_aerosol,,,sea_spray_aerosol,,,,,soil_air_resuspension,,soil_air_resuspension,,soil_air_resuspension,,,Air

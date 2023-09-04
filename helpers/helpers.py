@@ -79,3 +79,16 @@ def timeLimit_RC(RC_df, k):
     RC_df = pd.DataFrame(frame, columns=processList)
 
     return RC_df
+
+
+def timeLimit_particles_RC(system_particle_object_list, lim):
+    for particle in system_particle_object_list:
+        for k in particle.RateConstants:
+            if (
+                particle.RateConstants[k] is not None
+                and particle.RateConstants[k] > lim
+            ):
+                particle.RateConstants[k] = lim
+            else:
+                pass
+    return system_particle_object_list

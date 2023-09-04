@@ -202,29 +202,22 @@ fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
-plot_rate_constants(rate_constants_df)
+# plot_rate_constants(rate_constants_df)
 
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
-RC_df_timeLim = timeLimit_RC(rate_constants_df, k=0.000556)
+particles_updated = timeLimit_particles_RC(system_particle_object_list, 0.000556)
+
+RC_df_timeLim = create_rateConstants_table(particles_updated)
+# Has to be done on the particles attributr for rate constants not on the rc table!!
 
 plot_rate_constants(RC_df_timeLim)
 
-# rate_constants_df.loc[
-#     rate_constants_df["k_heteroaggregation"] > 0.000556, "k_heteroaggregation"
-# ] = 0.000556
-
-# rate_constants_df.loc[
-#     rate_constants_df["k_heteroaggregate_breackup"] > 0.000556,
-#     "k_heteroaggregate_breackup",
-# ] = 0.000556
 
 # Save rate contants dataframe as csv file
 
 df4 = RC_df_timeLim.fillna(0)
 df4.to_csv(fileName, index=False)
-
-# Plot rate constat values for comparison
 
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
@@ -233,6 +226,10 @@ df4.to_csv(fileName, index=False)
 from functions.fillInteractions_df_fun_OOP import *
 
 interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
+
+###We currently have an issue with the interactions matrix and how it is built based on the defined conexions fro the compartment objects...when building interactions I have to look up into the rate constants from with of the connected compartments!?
+
+##Also Issue when more than one process is listed in the connexion (they should be written as a list not as one string with two elements)
 
 # """SOLVE SYSTEM OF ODES"""
 

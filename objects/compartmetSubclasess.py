@@ -4,23 +4,23 @@ from objects.compartment import *
 
 
 UTOPIA_water_compartments = [
-    "Ocean Surface Water",
-    "Ocean Mixed Water",
-    "Ocean Column Water",
-    "Coast Surface Water",
-    "Coast Column Water",
-    "Surface Freshwater",
-    "Bulk Freshwater",
+    "Ocean_Surface_Water",
+    "Ocean_Mixed_Water",
+    "Ocean_Column_Water",
+    "Coast_Surface_Water",
+    "Coast_Column_Water",
+    "Surface_Freshwater",
+    "Bulk_Freshwater",
 ]
 
 UTOPIA_soil_compartments = [
     "Sediment",
-    "Urban Soil Surface",
-    "Urban Soil",
-    "Background Soil Surface",
-    "Background Soil",
-    "Agricultural Soil Surface",
-    "Agricultural Soil",
+    "Urban_Soil_Surface",
+    "Urban_Soil",
+    "Background_Soil_Surface",
+    "Background_Soil",
+    "Agricultural_Soil_Surface",
+    "Agricultural_Soil",
 ]
 
 UTOPIA_air_compartments = ["Air"]
