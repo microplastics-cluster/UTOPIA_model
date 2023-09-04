@@ -69,6 +69,7 @@ class compartment_water(Compartment):
             "settling",
             "rising",
             "mixing",
+            "sea_spray_aerosol",
         ]
         # if waterFlow_m3_s == "nan":
         #     waterFlow_m3_s = self.flowVelocity_m * self.Cdepth_m * self.Cwidth_m
@@ -153,7 +154,15 @@ class compartment_soil(Compartment):
         super().__init__(
             Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
         )
-        self.processess = ["discorporation", "fragmentation", "percolation", "tillage"]
+        self.processess = [
+            "discorporation",
+            "fragmentation",
+            "percolation",
+            "tillage",
+            "sediment_resuspension",
+            "runoff_transport",
+            "soil_air_resuspension",
+        ]
         self.infiltration_capacity = infiltration_capacity
         self.precipitation_rate = precipitation_rate
         self.soilPore_waterVolume_m3 = soilPore_waterVolume_m3

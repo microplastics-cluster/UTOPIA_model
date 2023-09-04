@@ -446,15 +446,19 @@ def defouling(particle):
 
 
 def sediment_resuspension(particle):
-
-    k_resusp = 2.3 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
+    if particle.Pcompartment.Cdepth_m is None:
+        k_resusp = 0
+    else:
+        k_resusp = 2.3 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
 
     return k_resusp
 
 
 def burial(particle):
-
-    k_burial = 5.6 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
+    if particle.Pcompartment.Cdepth_m is None:
+        k_burial = 0
+    else:
+        k_burial = 5.6 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
 
     return k_burial
 
