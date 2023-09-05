@@ -66,9 +66,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     # Assumptions to be revisited for UTOPIA!!
 
     cond_frag = (
-        (dataFrame_inputs["Compartment"] == "Ocean Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Surface FreshWater")
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Surface_FreshWater")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         & (dataFrame_inputs["MPform"] == "freeMP")
     )
@@ -76,9 +76,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     dataFrame_inputs.loc[cond_frag, "tfrag_gen_d"] = 36.5
 
     cond_frag1 = (
-        (dataFrame_inputs["Compartment"] == "Ocean Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Surface FreshWater")
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Surface_FreshWater")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -86,13 +86,13 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
 
     cond_frag2 = (
         (
-            (dataFrame_inputs["Compartment"] == "Ocean Mixed Water")
-            | (dataFrame_inputs["Compartment"] == "Ocean Column Water")
-            | (dataFrame_inputs["Compartment"] == "Coast Column Water")
-            | (dataFrame_inputs["Compartment"] == "Bulk Freshwater")
-            | (dataFrame_inputs["Compartment"] == "Urban Soil Surface")
-            | (dataFrame_inputs["Compartment"] == "Agricultural Soil Surface")
-            | (dataFrame_inputs["Compartment"] == "Background Soil Surface")
+            (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+            | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+            | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+            | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
+            | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+            | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+            | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
             | (dataFrame_inputs["Compartment"] == "Air")
         )
         & (dataFrame_inputs["MPform"] == "freeMP")
@@ -103,13 +103,13 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
 
     cond_frag1 = (
         (
-            (dataFrame_inputs["Compartment"] == "Ocean Mixed Water")
-            | (dataFrame_inputs["Compartment"] == "Ocean Column Water")
-            | (dataFrame_inputs["Compartment"] == "Coast Column Water")
-            | (dataFrame_inputs["Compartment"] == "Bulk Freshwater")
-            | (dataFrame_inputs["Compartment"] == "Urban Soil Surface")
-            | (dataFrame_inputs["Compartment"] == "Agricultural Soil Surface")
-            | (dataFrame_inputs["Compartment"] == "Background Soil Surface")
+            (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+            | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+            | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+            | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
+            | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+            | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+            | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
             | (dataFrame_inputs["Compartment"] == "Air")
         )
         & (dataFrame_inputs["MPform"] == "biofMP")
@@ -120,9 +120,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     cond_frag3 = (
         (
             (dataFrame_inputs["Compartment"] == "Sediment")
-            | (dataFrame_inputs["Compartment"] == "Urban Soil")
-            | (dataFrame_inputs["Compartment"] == "Background Soil")
-            | (dataFrame_inputs["Compartment"] == "Agricultural soil")
+            | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+            | (dataFrame_inputs["Compartment"] == "Background_Soil")
+            | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
         )
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
@@ -132,9 +132,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     cond_frag4 = (
         (
             (dataFrame_inputs["Compartment"] == "Sediment")
-            | (dataFrame_inputs["Compartment"] == "Urban Soil")
-            | (dataFrame_inputs["Compartment"] == "Background Soil")
-            | (dataFrame_inputs["Compartment"] == "Agricultural soil")
+            | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+            | (dataFrame_inputs["Compartment"] == "Background_Soil")
+            | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
         )
         & (dataFrame_inputs["MPform"] == "boiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
@@ -151,9 +151,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         (dataFrame_inputs["MPform"] == "freeMP")
         | (dataFrame_inputs["MPform"] == "heterMP")
     ) & (
-        (dataFrame_inputs["Compartment"] == "Surface Freshwater")
-        | (dataFrame_inputs["Compartment"] == "Ocean Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Surface Water")
+        (dataFrame_inputs["Compartment"] == "Surface_Freshwater")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
     )
 
     dataFrame_inputs.loc[cond_biof1, "tbiof_growth_d"] = 10
@@ -162,16 +162,16 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         (dataFrame_inputs["MPform"] == "freeMP")
         | (dataFrame_inputs["MPform"] == "heterMP")
     ) & (
-        (dataFrame_inputs["Compartment"] == "Ocean Mixed Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Column Water")
-        | (dataFrame_inputs["Compartment"] == "Bulk Freshwater")
+        (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+        | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
     )
     dataFrame_inputs.loc[cond_biof2, "tbiof_growth_d"] = 30
 
     cond_biof3 = (
         (dataFrame_inputs["MPform"] == "freeMP")
         | (dataFrame_inputs["MPform"] == "heterMP")
-    ) & (dataFrame_inputs["Compartment"] == "Ocean Column Water")
+    ) & (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
 
     dataFrame_inputs.loc[cond_biof3, "tbiof_growth_d"] = 300
 
@@ -185,24 +185,24 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     # REF value: Besseling et al. 2017
 
     cond_alpha1 = (dataFrame_inputs["MPform"] == "freeMP") & (
-        (dataFrame_inputs["Compartment"] == "Ocean Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Ocean Mixed Water")
-        | (dataFrame_inputs["Compartment"] == "Ocean Column Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Column Water")
-        | (dataFrame_inputs["Compartment"] == "Surface Freshwater")
-        | (dataFrame_inputs["Compartment"] == "Bulk Freshwater")
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+        | (dataFrame_inputs["Compartment"] == "Surface_Freshwater")
+        | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
     )
     dataFrame_inputs.loc[cond_alpha1, "alpha_heter"] = 0.01
 
     cond_alpha2 = (dataFrame_inputs["MPform"] == "biofMP") & (
-        (dataFrame_inputs["Compartment"] == "Ocean Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Ocean Mixed Water")
-        | (dataFrame_inputs["Compartment"] == "Ocean Column Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Surface Water")
-        | (dataFrame_inputs["Compartment"] == "Coast Column Water")
-        | (dataFrame_inputs["Compartment"] == "Surface Freshwater")
-        | (dataFrame_inputs["Compartment"] == "Bulk Freshwater")
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+        | (dataFrame_inputs["Compartment"] == "Surface_Freshwater")
+        | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
     )
     dataFrame_inputs.loc[cond_alpha2, "alpha_heter"] = 0.02
 

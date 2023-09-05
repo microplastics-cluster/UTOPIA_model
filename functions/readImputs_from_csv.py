@@ -1,8 +1,10 @@
 # Instantiate class from csv file: each line in the csv will generate one particle object
 from objects.particulates import Particulates
 from objects.box import Box
+from objects.compartmetSubclasess import *
 import csv
 import pandas as pd
+import numpy as np
 
 
 def instantiateParticles_from_csv(compFile):
@@ -24,6 +26,10 @@ def instantiateParticles_from_csv(compFile):
                 PdimensionZ_um=float(p.get("dimensionZ_um")),
             )
         )
+
+    print(
+        f"The free MP particles {[p.Pname for p in particlesObj_list]} have been generated"
+    )
 
     return particlesObj_list
 
@@ -84,18 +90,95 @@ def read_connexions_inputs(inputs_path, input_file, compartmentNames_list):
     return connexions_dict
 
 
-def instantiate_compartments_from_csv(inputs_path_file):
-    class Record:
-        pass
-        """Hold a record of data."""
-
+def instantiate_compartments(inputs_path_file):
     with open(inputs_path_file, "r") as f:
-        dictReader_obj = csv.DictReader(f)
-        compartments = list(dictReader_obj)
-        compartmentsObj_list = []
-        for item in compartments:
-            particle_record = Record()
-            for field, value in item.items():
-                setattr(particle_record, field, value)
-            compartmentsObj_list.append(particle_record)
-    return compartmentsObj_list
+        reader = csv.DictReader(f)
+        compartments = list(reader)
+
+    waterComp_objects = []
+    soilComp_objects = []
+    airComp_objects = []
+    for c in compartments:
+        if c["Cname"] in UTOPIA_water_compartments:
+            waterComp_objects.append(
+                compartment_water(
+                    Cname=c.get("Cname"),
+                    SPM_mgL=c.get("SPM_mgL"),
+                    flowVelocity_m_s=c.get("flowVelocity_m_s"),
+                    waterFlow_m3_s=c.get("waterFlow_m3_s"),
+                    T_K=c.get("T_K"),
+                    G=c.get("G"),
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                )
+            )
+        elif c["Cname"] in UTOPIA_soil_compartments:
+            soilComp_objects.append(compartment_soil(Cname=c.get("Cname")))
+
+        elif c["Cname"] in UTOPIA_air_compartments:
+            airComp_objects.append(compartment_air(Cname=c.get("Cname")))
+
+        else:
+            pass
+
+    Comp_objects = waterComp_objects + soilComp_objects + airComp_objects
+
+    print(f"The compartments {[c.Cname for c in Comp_objects]} have been generated")
+
+    return Comp_objects
+
+
+def instantiate_compartments_from_csv(inputs_path_file):
+
+    # Read csv as dictionarys for each line
+    compartments = {}
+    with open(inputs_path_file, "r") as f:
+        reader = csv.DictReader(f)
+        for item in reader:
+            compartments[item["Cname"].replace(" ", "")] = dict(item)
+    # transform nested dictionaries to objects with attributes
+    comp_objects_list = []
+    for c in compartments:
+        obj = Struct(**compartments[c])
+        comp_objects_list.append(obj)
+
+    return comp_objects_list
+
+
+# define a class to convert a nested dictionary to an Object
+class Struct:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            if isinstance(value, dict):
+                self.__dict__[key] = Struct(**value)
+            else:
+                self.__dict__[key] = value
+
+
+# Create connexions attributes as dictionaries for the different #compartments from the compartmentsInteractions file
+def set_interactions(compartments, connexions_path_file):
+
+    with open(connexions_path_file, "r") as infile:
+        reader = csv.reader(infile)
+        array = []
+        for row in reader:
+            r = []
+            for ele in row:
+                if "," in ele:
+                    r.append(ele.split(","))
+                else:
+                    r.append(ele)
+            array.append(r)
+        comp_connex_df = pd.DataFrame(array)
+        comp_connex_df.columns = comp_connex_df[0]
+        # comp_connex_df = comp_connex_df.set_index("Compartments")
+        comp_connex_df = comp_connex_df.drop(index=[0])
+        comp_connex_df.replace("", np.nan, inplace=True)
+
+    # comp_connex_df = pd.read_csv(connexions_path_file)
+
+    for c in compartments:
+        df_comp = comp_connex_df[["Compartments", c.Cname]].dropna()
+        c.connexions = dict(zip(df_comp["Compartments"], df_comp[c.Cname]))
+
+    print("Connexions have been added")

@@ -14,12 +14,10 @@ from objects.particulates import *
 from objects.particulatesBF import *
 from objects.particulatesSPM import *
 
-# Generate objects
-
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
+# Generate objects
 # Boxes
-"""Call read imput file function for model boxes (if more than one) in the same way as for MPs"""
 
 boxName = "Utopia"
 UTOPIA = Box(boxName)
@@ -30,241 +28,19 @@ modelBoxes = [UTOPIA]
 boxNames_list = [b.Bname for b in modelBoxes]
 
 # Compartmets
-"""Call read imput file function for compartments same way as for MPs"""
+"""Call read imput file function for compartments"""
 
-compartments = instantiate_compartments_from_csv(
-    inputs_path + "\inputs_compartments.csv"
-)
+compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
 
 
-oceanSurfaceWater = compartment_oceanWater(
-    Cname="Ocean Surface Water",
-    SPM_mgL=1,
-    waterFlow_m3_s=22100000,
-    T_K=278,
-    flowVelocity_m_s=0,
-    G=1,
-    Cvolume_m3=3.8e15,  # Value taken from SimpleBox4nano parameterization as volume of ocean water compartments surface layer
-    Cdepth_m=10,
-)
-# Establish connexions: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
-oceanSurfaceWater.connexions = {
-    "Ocean Mixed Water": "settling",
-    "Air": "sea_spray_aerosol",
-}
+# Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
-oceanMixedWater = compartment_oceanWater(
-    Cname="Ocean Mixed Water",
-    SPM_mgL=1,
-    waterFlow_m3_s=22100000,
-    flowVelocity_m_s=0,
-    T_K=278,
-    G=1,
-    Cvolume_m3=1e16,
-    Cdepth_m=100,
-)
-oceanMixedWater.connexions = {
-    "Ocean Surface Water": "rising",
-    "Ocean Column Water": "settling",
-}
-
-oceanColumnWater = compartment_oceanWater(
-    Cname="Ocean Column Water",
-    SPM_mgL=1,
-    waterFlow_m3_s=22100000,
-    flowVelocity_m_s=0,
-    T_K=278,
-    G=1,
-    Cvolume_m3=1e18,
-    Cdepth_m=1000,
-)
-oceanColumnWater.connexions = {"Ocean Mixed Water": "rising", "Sediment": "settling"}
-
-coastSurfaceWater = compartment_oceanWater(
-    Cname="Coast Surface Water",
-    SPM_mgL=7,
-    T_K=278,
-    G=10,
-    flowVelocity_m_s=2.5,
-    waterFlow_m3_s=6840000000,
-    Cvolume_m3=3.8e15,
-    Cdepth_m=10,
-)
-coastSurfaceWater.connexions = {
-    "Air": "sea_spray_aerosol",
-    "Ocean Surface Water": "advective_transport",
-    "Coast Column Water": "settling",
-}
-
-
-coastColumnWater = compartment_oceanWater(
-    Cname="Coast Column Water",
-    SPM_mgL=7,
-    T_K=278,
-    G=1,
-    waterFlow_m3_s=6840000000,
-    flowVelocity_m_s=2.5,
-    Cvolume_m3=1e17,
-    Cdepth_m=10,
-)
-coastColumnWater.connexions = {
-    "Coast Surface Water": "rising",
-    "Ocean Mixed Water": "advective_transport",
-    "Sediment": "settling",
-}
-
-freshWaterSurface = compartment_water(
-    Cname="Surface Freshwater",
-    SPM_mgL=30,
-    T_K=278,
-    G=10,
-    flowVelocity_m_s=1.3,
-    waterFlow_m3_s=10000,  # placeholder
-    Cvolume_m3=1.7e13,
-    Cdepth_m=10,
-)
-freshWaterSurface.connexions = {
-    "Coast Surface Water": "advective_transport",
-    "Bulk Freshwater": "settling",
-}
-
-freshWaterBulk = compartment_water(
-    Cname="Bulk Freshwater",
-    SPM_mgL=30,
-    T_K=278,
-    G=10,
-    flowVelocity_m_s=1.3,
-    waterFlow_m3_s=10000,  # placeholder
-    Cvolume_m3=1.6e14,
-    Cdepth_m=30,
-    Cwidth_m=50,
-)
-freshWaterBulk.connexions = {
-    "Surface Freshwater": "rising",
-    "Coast Column Water": "advective_transport",
-    "Sediment": "settling",
-}
-
-sediment = compartment_sediment(Cname="Sediment", Cvolume_m3=100, Cdepth_m=10)
-sediment.connexions = {
-    "Bulk Freshwater": "sediment_resuspension",
-    "Coast Column Water": "sediment_resuspension",
-    "Ocean Column Water": "sediment_resuspension",
-}
-
-urbanSoilSurface = compartment_soil_surface(
-    Cname="Urban Soil Surface",
-    earthworm_density_in_m3=0,
-    infiltration_capacity=0,
-    Qrunoff_m3=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-urbanSoilSurface.connexions = {
-    "Air": "soil_air_resuspension",
-    "Urban Soil": ["percolation", "tillage"],
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-}
-
-urbanSoil = compartment_soil(
-    Cname="Urban Soil",
-    infiltration_capacity=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-urbanSoil.connexions = {"Urban Soil Surface": "tillage"}
-
-backgroundSoilSurface = compartment_soil_surface(
-    Cname="Background Soil Surface",
-    earthworm_density_in_m3=0,
-    infiltration_capacity=0,
-    Qrunoff_m3=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-backgroundSoilSurface.connexions = {
-    "Air": "soil_air_resuspension",
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-    "Background Soil": ["percolation", "tillage"],
-}
-
-backgroundSoil = compartment_soil(
-    Cname="Background Soil",
-    infiltration_capacity=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-backgroundSoil.connexions = {"Background Soil Surface": ["percolation", "tillage"]}
-
-agriculturalSoilSurface = compartment_soil_surface(
-    Cname="Agricultural Soil Surface",
-    earthworm_density_in_m3=0,
-    infiltration_capacity=0,
-    Qrunoff_m3=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-agriculturalSoilSurface.connexions = {
-    "Air": "soil_air_resuspension",
-    "Surface Freshwater": "runoff_transport",
-    "Coast Surface Water": "runoff_transport",
-    "Background Soil": "runoff_transport",
-    "Agricultural Soil": ["percolation", "tillage"],
-}
-
-agriculturalSoil = compartment_soil(
-    Cname="Agricultural Soil",
-    infiltration_capacity=0,
-    Cvolume_m3=100,
-    soilPore_waterVolume_m3=0,
-    Cdepth_m=10,
-)
-agriculturalSoil.connexions = {"Agricultural Soil Surface": "tillage"}
-
-air = compartment_air(
-    Cname="Air", T_K=278, wind_speed_m_s=5, I_rainfall_mm=0, Cvolume_m3=100, Cdepth_m=10
-)
-air.connexions = {
-    "Agricultural Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Background Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Urban Soil Surface": ["dry_depossition", "wet_depossition"],
-    "Surface Freshwater": ["dry_depossition", "wet_depossition"],
-    "Coast Surface Water": ["dry_depossition", "wet_depossition"],
-    "Ocean Surface Water": ["dry_depossition", "wet_depossition"],
-}
-
-
-compartments = [
-    oceanSurfaceWater,
-    oceanMixedWater,
-    oceanColumnWater,
-    coastSurfaceWater,
-    coastColumnWater,
-    freshWaterSurface,
-    freshWaterBulk,
-    sediment,
-    urbanSoilSurface,
-    urbanSoil,
-    backgroundSoilSurface,
-    backgroundSoil,
-    agriculturalSoilSurface,
-    agriculturalSoil,
-    air,
-]
+set_interactions(compartments, connexions_path_file= inputs_path +"\compartment_interactions.csv")
 
 # Assign modelling code to compartmanes
 for c in range(len(compartments)):
     compartments[c].Ccode = c + 1
 
-
-print(f"The compartments {[c.Cname for c in compartments]} have been generated")
 ##Calculate compartments volume
 for c in compartments:
     c.calc_volume()
@@ -281,9 +57,6 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 ##Free microplastics (freeMP)
 MP_freeParticles = instantiateParticles_from_csv(
     inputs_path + "\inputs_microplastics.csv"
-)
-print(
-    f"The free MP particles {[p.Pname for p in MP_freeParticles]} have been generated"
 )
 
 ###Calculate freeMP volume
@@ -375,19 +148,16 @@ print(
     f"The compartments {[comp.Cname for comp in UTOPIA.compartments]} have been assigned to {UTOPIA.Bname } model box"
 )
 
+# Estimate volume of UTOPIA box by adding volumes of the compartments addedd
+# UTOPIA.calc_Bvolume_m3() #currently volume of soil and air boxess are missing, to be added to csv file
 
-# Check if compartments and boxes (river sections) are consistent in dimensions (i.e. sum of volumes of the different compartments can not exceed the volume of the box)
-
-"""To be implemented for UTOPIA"""
 
 # Add particles to compartments
 for b in modelBoxes:
     for c in b.compartments:
         for p in particles:
             c.add_particles(copy.deepcopy(p))
-    print(
-        f"The particles have been added to the compartments of the river section {b.Bname}"
-    )
+    print(f"The particles have been added to the compartments of {b.Bname}")
 
 
 # Based on the given model structure (created model boxes, compartments and particles)
@@ -425,53 +195,27 @@ for particle in system_particle_object_list:
 
 # create rate constants table:
 
-fileName = "rateConstantsUTOPIA_Test230619.csv"
+fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
+# plot_rate_constants(rate_constants_df)
+
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
-rate_constants_df.loc[
-    rate_constants_df["k_heteroaggregation"] > 0.000556, "k_heteroaggregation"
-] = 0.000556
+particles_updated = timeLimit_particles_RC(system_particle_object_list, 0.000556)
 
-rate_constants_df.loc[
-    rate_constants_df["k_heteroaggregate_breackup"] > 0.000556,
-    "k_heteroaggregate_breackup",
-] = 0.000556
+RC_df_timeLim = create_rateConstants_table(particles_updated)
+# Has to be done on the particles attributr for rate constants not on the rc table!!
+
+plot_rate_constants(RC_df_timeLim)
+
 
 # Save rate contants dataframe as csv file
 
-df4 = rate_constants_df.fillna(0)
+df4 = RC_df_timeLim.fillna(0)
 df4.to_csv(fileName, index=False)
 
-# Plot rate constat values for comparison
-
-processList = [
-    "k_discorporation",
-    "k_fragmentation",
-    "k_heteroaggregation",
-    "k_heteroaggregate_breackup",
-    "k_settling",
-    "k_rising",
-    "k_advective_transport",
-    "k_mixing",
-    "k_biofouling",
-    "k_sediment_resuspension",
-    "k_burial",
-    "k_defouling",
-]
-
-df_RC = df4[processList]
-
-df_RC.plot(
-    title="Rate constant values (s-1)",
-    subplots=True,
-    figsize=(10, 15),
-    sharex=True,
-    fontsize=12,
-    stacked=True,
-)
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
 
@@ -479,6 +223,10 @@ df_RC.plot(
 from functions.fillInteractions_df_fun_OOP import *
 
 interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
+
+###We currently have an issue with the interactions matrix and how it is built based on the defined conexions fro the compartment objects...when building interactions I have to look up into the rate constants from with of the connected compartments!?
+
+##Also Issue when more than one process is listed in the connexion (they should be written as a list not as one string with two elements)
 
 # """SOLVE SYSTEM OF ODES"""
 

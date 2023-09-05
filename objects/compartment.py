@@ -87,7 +87,7 @@ class Compartment:
                 attr is None for attr in [self.Cdepth_m, self.Clength_m, self.Cwidth_m]
             ):
                 print(
-                    "Missing parameters needded to calculate compratment volume --> Try calc_vol_fromBox or add missing values to compartment dimensions"
+                    "Missing parameters needded to calculate compartment volume --> Try calc_vol_fromBox or add missing values to compartment dimensions"
                 )
 
             else:
