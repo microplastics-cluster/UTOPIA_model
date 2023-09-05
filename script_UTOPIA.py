@@ -32,13 +32,10 @@ boxNames_list = [b.Bname for b in modelBoxes]
 
 compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
 
-# compartments = instantiate_compartments_from_csv(
-#     inputs_path + "\inputs_compartments.csv"
-# )
 
 # Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
-set_interactions(compartments, connexions_path_file="interactions_transposed.csv")
+set_interactions(compartments, connexions_path_file= inputs_path +"\compartment_interactions.csv")
 
 # Assign modelling code to compartmanes
 for c in range(len(compartments)):
