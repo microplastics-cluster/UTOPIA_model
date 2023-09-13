@@ -1,27 +1,28 @@
 # UTOPIA documentation (to be translated to markdown)
-Model Structure
-OBJECTS
+## Model Structure
+### OBJECTS
 •	Model box (UTOPIA)
-Attributes:
-Bname
-Bdepth_m
-Blength_m
-Bwidth_m
-Bvolume_m3
-Bconexions
-Compartments =[]
+##### Attributes:
+Bname   
+Bdepth_m    
+Blength_m   
+Bwidth_m    
+Bvolume_m3  
+Bconexions  
+Compartments =[]    
 
 •	Model compartments
-Shared compartment class attributes:
-Cname
-Cdepth_m
-Clength_m
-Cwidth_m
-Cvolume_m3
-CsurfaceArea_m2
-particles = {"freeMP": [],"heterMP": [],"biofMP": [],"heterBiofMP":[]}  
-Each key corresponds to another dicttionary of size bins
-connexions = []
+
+##### Shared compartment class attributes:
+
+Cname   
+Cdepth_m    
+Clength_m   
+Cwidth_m    
+Cvolume_m3  
+CsurfaceArea_m2 
+particles = {"freeMP": [],"heterMP": [],"biofMP": [],"heterBiofMP":[]}Each key corresponds to another dicttionary of size bins    
+connexions = [] 
 
 UTOPIA_water_compartments = [
     "Ocean Surface Water",
@@ -33,13 +34,13 @@ UTOPIA_water_compartments = [
     "Bulk Freshwater",
 ]
 
-Subclass specific attributes:
-SPM_mgL
-waterFlow_m3_s
-T_K
-G
-flowVelocity_m_s
-processess = ["discorporation","fragmentation","heteroaggregation","heteroaggregate_breackup","biofouling","defouling","advective_transport","settling","rising","mixing"]
+##### Subclass specific attributes:
+SPM_mgL 
+waterFlow_m3_s  
+T_K 
+G   
+flowVelocity_m_s    
+processess = ["discorporation","fragmentation","heteroaggregation","heteroaggregate_breackup","biofouling","defouling","advective_transport","settling","rising","mixing"]  
 
 
 UTOPIA_soil_compartments = [
@@ -52,19 +53,19 @@ UTOPIA_soil_compartments = [
     "Agricultural Soil",
 ]
 
-Subclass specific attributes:
-infiltration_capacity=0.25,  # from SimpleBox(4plastics)
-precipitation_rate=2.22 * 1**-8,  # from SimpleBox(4plastics)
-soilPore_waterVolume_m3
-processess = ["discorporation","fragmentation","runoff_transport","tillage","percolation", "soil_air_resuspension"]
+##### Subclass specific attributes:
+infiltration_capacity=0.25,  # from SimpleBox(4plastics)    
+precipitation_rate=2.22 * 1**-8,  # from SimpleBox(4plastics)   
+soilPore_waterVolume_m3 
+processess = ["discorporation","fragmentation","runoff_transport","tillage","percolation", "soil_air_resuspension"] 
 
 
 UTOPIA_air_compartments = ["Air"]
 
-Subclass specific attributes:
-wind_speed_m_s
-I_rainfall_mm 
-processess = ["discorporation","fragmentation","wind_trasport","dry_depossition","wet_depossition"]
+##### Subclass specific attributes:
+wind_speed_m_s  
+I_rainfall_mm   
+processess = ["discorporation","fragmentation","wind_trasport","dry_depossition","wet_depossition"] 
 
 •	Particles
 
@@ -72,12 +73,14 @@ processess = ["discorporation","fragmentation","wind_trasport","dry_depossition"
 -	ParticulatesBF
 -	ParticulatesSPM
 
-MODEL MODIFICATIONS
+## MODEL MODIFICATIONS
 
-•	COMPARTMENTS
+•	COMPARTMENTS    
+
 To add/change UTOPIA compartments go to compartments subclasses python file and add new compartment to the compartment list or water, soil or air compartment.
 Add the compartment to the imput_compartments.csv file
 If new attributes are added to the class this have to also be added in the class definition in the compartmentsSubclassess.py file as None attribute.
-•	INPUTS
-o	
+
+•	INPUTS  
+
 
