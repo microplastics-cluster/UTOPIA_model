@@ -81,6 +81,10 @@ To add/change UTOPIA compartments go to compartments subclasses python file and 
 Add the compartment to the imput_compartments.csv file
 If new attributes are added to the class this have to also be added in the class definition in the compartmentsSubclassess.py file as None attribute.
 
-•	INPUTS  
+•	Rate constants
+
+If we want to change rate constant values directly on the model these have to be changed at the particle level (not on the output table of Rate constants) so that the changes are reflected in the interactions matrix and model
+
+Time limit can be included in the rate constants using the function timeLimit_particles_RC(system_particle_object_list, k), where k is the maximum value that k can take corresponding to it time limit 1/tlim (currently 30min on the processes that exceeds that speed (k > 0.000556)))
 
 
