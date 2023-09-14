@@ -1,0 +1,4 @@
+Cname,SPM_mgL,waterFlow_m3_s,T_K,flowVelocity_m_s,G,Cvolume_m3,Cdepth_m
+Ocean_Surface_Water,1,22100000,278,nan,1,3.80E+15,10
+Ocean_Mixed_Water,1,22100000,278,nan,1,1.00E+16,100
+Ocean_Column_Water,1,22100000,278,nan,1,1.00E+18,1000
