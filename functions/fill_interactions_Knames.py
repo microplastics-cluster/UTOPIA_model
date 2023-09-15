@@ -124,14 +124,18 @@ def inboxProcess_knames(sp1, sp2):
     # if compartments are in the list of compartment connexions select process of connexion for compartment and assign rate constant, else process has rate of 0
 
     elif sp1.Pcompartment.Cname in sp2.Pcompartment.connexions:
-        process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
-        if type(process) == list:
-            sol2 = []
-            for p in process:
-                sol2.append("k_" + p)
-            sol = "+".join(sol2)
+        #transport between compartments only for same aggregation state and same particle size
+        if sp1.Pcode[:2] == sp2.Pcode[:2]:
+            process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
+            if type(process) == list:
+                sol2 = []
+                for p in process:
+                    sol2.append("k_" + p)
+                sol = "+".join(sol2)
+            else:
+                sol = "k_" + process
         else:
-            sol = "k_" + process
+            sol=0
     else:
         sol=0
 
