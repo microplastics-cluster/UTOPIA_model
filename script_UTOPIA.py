@@ -260,8 +260,9 @@ PartNum_t0 = pd.DataFrame({"species": SpeciesList, "number_of_particles": N_t0})
 PartNum_t0 = PartNum_t0.set_index("species")
 
 # Set values !=0
+q=100
 
-PartNum_t0.at["eA1_Utopia", "number_of_particles"] = 100
+PartNum_t0.at["aA1_Utopia", "number_of_particles"] = -q
 
 
 # Input vector
@@ -275,6 +276,11 @@ SteadyStateResults = np.linalg.solve(matrix, inputVector)
 Results = pd.DataFrame(
     {"species": SpeciesList, "number_of_particles": SteadyStateResults}
 )
+
+from functions.extract_results import*
+
+Results_comp_dict=extract_by_comp(Results,compartmentNames_list)
+Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
 
 # Check the result is correct
 

@@ -238,6 +238,15 @@ from functions.fillInteractions_df_fun_OOP import *
 
 interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
 
+
+#Check interactions dataframe by process:
+
+from functions.fill_interactions_Knames import*
+
+interactions_df_Knames=fillInteractions_Knames(
+system_particle_object_list,SpeciesList
+)
+
 ###We currently have an issue with the interactions matrix and how it is built based on the defined conexions fro the compartment objects...when building interactions I have to look up into the rate constants from with of the connected compartments!?
 
 ##Also Issue when more than one process is listed in the connexion (they should be written as a list not as one string with two elements)
