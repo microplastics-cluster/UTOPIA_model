@@ -249,7 +249,9 @@ PartNum_t0 = PartNum_t0.set_index("species")
 
 # Set values !=0
 
-PartNum_t0.at["eA1_Utopia", "number_of_particles"] = 100
+q=100 #imput value
+
+PartNum_t0.at["eA1_Utopia", "number_of_particles"] = -q
 
 
 # Input vector
