@@ -32,13 +32,9 @@ boxNames_list = [b.Bname for b in modelBoxes]
 
 compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
 
-# compartments = instantiate_compartments_from_csv(
-#     inputs_path + "\inputs_compartments.csv"
-# )
-
 # Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
-set_interactions(compartments, connexions_path_file="interactions_transposed.csv")
+set_interactions(compartments, connexions_path_file= inputs_path +"\compartment_interactions.csv")
 
 # Assign modelling code to compartmanes
 for c in range(len(compartments)):
@@ -202,7 +198,6 @@ fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
-# plot_rate_constants(rate_constants_df)
 
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
@@ -228,7 +223,7 @@ from functions.fillInteractions_df_fun_OOP import *
 interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
 
 
-#Check interactions dataframe by process:
+#Optional Check interactions dataframe by process:
 
 from functions.fill_interactions_Knames import*
 
@@ -236,14 +231,6 @@ interactions_df_Knames=fillInteractions_Knames(
 system_particle_object_list,SpeciesList
 )
 
-###We currently have an issue with the interactions matrix and how it is built based on the defined conexions fro the compartment objects...when building interactions I have to look up into the rate constants from with of the connected compartments!?
-
-##Also Issue when more than one process is listed in the connexion (they should be written as a list not as one string with two elements)
-
-# """SOLVE SYSTEM OF ODES"""
-
-
-"""I have removed the BOX from the compartments option so that when you assign compartments to a box it automatically assignes the box to that compartment...but to be fixed with the copy function!!"""
 
 # """SOLVE SYSTEM OF ODES"""
 

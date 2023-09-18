@@ -22,8 +22,8 @@ def extract_by_comp(Results,compartmentNames_list):
 def extract_by_aggSt(Results_comp_dict,MPforms_list):
     particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
     Results_comp_organiced={}
-    Results_aggSt_dict={}
     for comp in Results_comp_dict:
+        Results_aggSt_dict={}
         key1=comp
         df=Results_comp_dict[comp]
         for aggst in particle_forms_coding:
