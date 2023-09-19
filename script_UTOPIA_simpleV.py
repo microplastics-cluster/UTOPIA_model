@@ -1,3 +1,17 @@
+# Simplified version of UTOPIA:Test version with only the ocean compartment to test the sover
+
+# - Only two particle SPECIES are defined:
+#   Free plastic particles
+#   Surface Modified particles (corresponding to particles that have been   aggregated with SPM and or biofouled)
+
+# - List of COMPARTMENTS:
+#   Ocean_Surface_Water,
+#   Ocean_Mixed_Water,
+#   Ocean_Column_Water,
+
+
+# -Run model for different size bins as series of consecutive steps (from bigger to smaller size bins)
+
 import copy
 import os
 import pandas as pd
@@ -30,9 +44,10 @@ boxNames_list = [b.Bname for b in modelBoxes]
 # Compartmets
 """Call read imput file function for compartments"""
 
-compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
+compartments = instantiate_compartments(inputs_path + "\inputs_compartments_simple.csv")
 
-# Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
+
+# Establish connexions between compartments 
 
 set_interactions(compartments, connexions_path_file= inputs_path +"\compartment_interactions.csv")
 
@@ -52,30 +67,32 @@ dict_comp = {
 compartmentNames_list = [item.Cname for item in compartments]
 
 # PARTICLES
-MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
+
+#I will only have free and heteroaggregated particles in this simplified version of the model
+
+MPforms_list = ["freeMP", "heterMP"]#, "biofMP", "heterBiofMP"]
 ##Free microplastics (freeMP)
 MP_freeParticles = instantiateParticles_from_csv(
-    inputs_path + "\inputs_microplastics.csv"
+    inputs_path + "\inputs_microplastics_oneSize.csv"
 )
 
 ###Calculate freeMP volume
 for i in MP_freeParticles:
     i.calc_volume()
-    # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
 
 
 ##Biofouled microplastics (biofMP)
-MP_biofouledParticles = []
-for i in MP_freeParticles:
-    MP_biofouledParticles.append(ParticulatesBF(parentMP=i))
-print(
-    f"The biofouled MP particles {[p.Pname for p in MP_biofouledParticles]} have been generated"
-)
+# MP_biofouledParticles = []
+# for i in MP_freeParticles:
+#     MP_biofouledParticles.append(ParticulatesBF(parentMP=i))
+# print(
+#     f"The biofouled MP particles {[p.Pname for p in MP_biofouledParticles]} have been generated"
+# )
 
-###Calculate biofMP volume
-for i in MP_biofouledParticles:
-    i.calc_volume()
-    # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
+# ###Calculate biofMP volume
+# for i in MP_biofouledParticles:
+#     i.calc_volume()
+#     # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
 
 ##Heteroaggregated microplastics (heterMP)
 spm = Particulates(
@@ -105,24 +122,22 @@ for i in MP_heteroaggregatedParticles:
     # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
 
 ##Biofouled and Heteroaggregated microplastics (biofHeterMP)
-MP_biofHeter = []
-for i in MP_biofouledParticles:
-    MP_biofHeter.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
-# for i in MP_biofHeter:
-#     print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-print(
-    f"The biofouled and heteroaggregated MP particles {[p.Pname for p in MP_biofHeter]} have been generated"
-)
+# MP_biofHeter = []
+# for i in MP_biofouledParticles:
+#     MP_biofHeter.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
+# # for i in MP_biofHeter:
+# #     print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
+# print(
+#     f"The biofouled and heteroaggregated MP particles {[p.Pname for p in MP_biofHeter]} have been generated"
+# )
 
-###Calculate biofHeterMP volume
-for i in MP_biofHeter:
-    i.calc_volume_heter(i.parentMP, spm)
+# ###Calculate biofHeterMP volume
+# for i in MP_biofHeter:
+#     i.calc_volume_heter(i.parentMP, spm)
 
 particles = (
     MP_freeParticles
-    + MP_biofouledParticles
     + MP_heteroaggregatedParticles
-    + MP_biofHeter
 )
 
 particles_properties = {
@@ -134,8 +149,8 @@ particles_properties = {
 }
 
 particles_df = pd.DataFrame(data=particles_properties)
-# print(particles_df)
-particles_df.to_csv("Particles_properties_output.csv", index=False)
+print(particles_df)
+
 
 
 # Assign compartmets to UTOPIA
@@ -198,6 +213,7 @@ fileName = "rateConstantsUTOPIA_Test.csv"
 
 rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
+# plot_rate_constants(rate_constants_df)
 
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
@@ -223,7 +239,7 @@ from functions.fillInteractions_df_fun_OOP import *
 interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
 
 
-#Optional Check interactions dataframe by process:
+#Check interactions dataframe by process:
 
 from functions.fill_interactions_Knames import*
 
@@ -231,6 +247,14 @@ interactions_df_Knames=fillInteractions_Knames(
 system_particle_object_list,SpeciesList
 )
 
+###We currently have an issue with the interactions matrix and how it is built based on the defined conexions fro the compartment objects...when building interactions I have to look up into the rate constants from with of the connected compartments!?
+
+##Also Issue when more than one process is listed in the connexion (they should be written as a list not as one string with two elements)
+
+# """SOLVE SYSTEM OF ODES"""
+
+
+"""I have removed the BOX from the compartments option so that when you assign compartments to a box it automatically assignes the box to that compartment...but to be fixed with the copy function!!"""
 
 # """SOLVE SYSTEM OF ODES"""
 
@@ -247,9 +271,7 @@ PartNum_t0 = pd.DataFrame({"species": SpeciesList, "number_of_particles": N_t0})
 PartNum_t0 = PartNum_t0.set_index("species")
 
 # Set values !=0
-q=100
-
-q=100 #imput value
+q=100#imput
 
 PartNum_t0.at["eA1_Utopia", "number_of_particles"] = -q
 
@@ -266,11 +288,6 @@ Results = pd.DataFrame(
     {"species": SpeciesList, "number_of_particles": SteadyStateResults}
 )
 
-from functions.extract_results import*
-
-Results_comp_dict=extract_by_comp(Results,compartmentNames_list)
-Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
-
 # Check the result is correct
 
 np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
@@ -282,3 +299,4 @@ np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
 # ConcFinal_num_m3 = pd.DataFrame(data=0, index=t_span, columns=Clist)
 # for ind in range(len(NFinal_num)):
 #     ConcFinal_num_m3.iloc[ind] = NFinal_num.iloc[ind]/dilution_vol_m3
+
