@@ -192,6 +192,7 @@ SpeciesList = generate_system_species_list(
 for particle in system_particle_object_list:
     generate_rateConstants(particle, spm, dict_comp)
 
+
 # create rate constants table:
 
 fileName = "rateConstantsUTOPIA_Test.csv"
@@ -201,7 +202,7 @@ rate_constants_df = create_rateConstants_table(system_particle_object_list)
 
 # "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
 
-particles_updated = timeLimit_particles_RC(system_particle_object_list, 0.000556)
+particles_updated = timeLimit_particles_RC(system_particle_object_list,0.000556)
 
 RC_df_timeLim = create_rateConstants_table(particles_updated)
 # Has to be done on the particles attributr for rate constants not on the rc table!!
@@ -211,8 +212,8 @@ plot_rate_constants(RC_df_timeLim)
 
 # Save rate contants dataframe as csv file
 
-df4 = RC_df_timeLim.fillna(0)
-df4.to_csv(fileName, index=False)
+#df4 = RC_df_timeLim.fillna(0)
+#df4.to_csv(fileName, index=False)
 
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
@@ -220,7 +221,7 @@ df4.to_csv(fileName, index=False)
 # Build Matrix of interactions
 from functions.fillInteractions_df_fun_OOP import *
 
-interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
+interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)#should I be using particles_updated instead of system_particle_object_list??
 
 
 #Optional Check interactions dataframe by process:
@@ -251,7 +252,7 @@ q=100
 
 q=100 #imput value
 
-PartNum_t0.at["eA1_Utopia", "number_of_particles"] = -q
+PartNum_t0.at["aA0_Utopia", "number_of_particles"] = -q
 
 
 # Input vector
@@ -276,9 +277,9 @@ Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
 np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
 ##I change the sign of Steady state results because our ODES: 0=M*C+I --> C=-I*M^(-1)
 
-# # Vector of volumes corresponding to the compartments of the river
-# dilution_vol_m3 = volumesVector(Clist, compartments_prop)
+#Plot results
 
-# ConcFinal_num_m3 = pd.DataFrame(data=0, index=t_span, columns=Clist)
-# for ind in range(len(NFinal_num)):
-#     ConcFinal_num_m3.iloc[ind] = NFinal_num.iloc[ind]/dilution_vol_m3
+from functions.plot_results import*
+
+for comp in Results_comp_organiced:
+    plot_bySize(Results_comp_organiced,comp)

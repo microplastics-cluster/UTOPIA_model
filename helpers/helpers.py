@@ -70,16 +70,6 @@ import numpy as np
 import pandas as pd
 
 
-def timeLimit_RC(RC_df, k):
-    processList = processList = [k for k in RC_df.columns if "k" in k]
-
-    frame = np.asarray(RC_df[processList])
-    frame[frame > k] = k
-
-    RC_df = pd.DataFrame(frame, columns=processList)
-
-    return RC_df
-
 
 def timeLimit_particles_RC(system_particle_object_list, lim):
     for particle in system_particle_object_list:
@@ -89,6 +79,16 @@ def timeLimit_particles_RC(system_particle_object_list, lim):
                 and particle.RateConstants[k] > lim
             ):
                 particle.RateConstants[k] = lim
+            else:
+                pass
+    return system_particle_object_list
+
+
+def change_RC_value(system_particle_object_list,rc_name,rc_val):
+    for p in system_particle_object_list:
+        for k in p.RateConstants:
+            if k== rc_name:
+                p.RateConstants[k]=rc_val
             else:
                 pass
     return system_particle_object_list
