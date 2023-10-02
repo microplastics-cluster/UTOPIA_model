@@ -20,7 +20,7 @@ class Particulates:
         PdimensionY_um,
         PdimensionZ_um,
         t_half_d=5000,
-        Pnumber=None,
+        Pnumber_t0=None,
     ):
         self.Pname = Pname
         self.Pform = Pform  # Pform has to be in the particles type list: ["freeMP",""heterMP","biofMP","heterBiofMP"]
@@ -33,7 +33,7 @@ class Particulates:
         self.PdimensionX_m = PdimensionX_um / 1000000  # shortest size
         self.PdimensionY_m = PdimensionY_um / 1000000  # longest size
         self.PdimensionZ_m = PdimensionZ_um / 1000000  # intermediate size
-        self.Pnumber = Pnumber  # to be objetained from emissions and background concentration of the compartment
+        self.Pnumber_t0 = Pnumber_t0  # to be objetained from emissions and background concentration of the compartment
         self.radius_m = (
             self.PdimensionX_um / 1e6
         )  # In spherical particles from MP radius (x dimension)

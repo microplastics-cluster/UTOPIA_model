@@ -53,10 +53,13 @@ compartmentNames_list = [item.Cname for item in compartments]
 
 # PARTICLES
 MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
+
 ##Free microplastics (freeMP)
 MP_freeParticles = instantiateParticles_from_csv(
     inputs_path + "\inputs_microplastics.csv"
 )
+
+dict_size_coding=dict(zip([p.Pname for p in MP_freeParticles],[p.diameter_um for p in MP_freeParticles]))
 
 ###Calculate freeMP volume
 for i in MP_freeParticles:
@@ -212,8 +215,8 @@ plot_rate_constants(RC_df_timeLim)
 
 # Save rate contants dataframe as csv file
 
-#df4 = RC_df_timeLim.fillna(0)
-#df4.to_csv(fileName, index=False)
+df4 = RC_df_timeLim.fillna(0)
+df4.to_csv(fileName, index=False)
 
 
 # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
@@ -221,12 +224,13 @@ plot_rate_constants(RC_df_timeLim)
 # Build Matrix of interactions
 from functions.fillInteractions_df_fun_OOP import *
 
-interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)#should I be using particles_updated instead of system_particle_object_list??
+interactions_df = fillInteractions_fun_OOP(particles_updated, SpeciesList)#should I be using particles_updated instead of system_particle_object_list??
 
 
 #Optional Check interactions dataframe by process:
 
 from functions.fill_interactions_Knames import*
+
 
 interactions_df_Knames=fillInteractions_Knames(
 system_particle_object_list,SpeciesList
@@ -247,12 +251,42 @@ for p in system_particle_object_list:
 PartNum_t0 = pd.DataFrame({"species": SpeciesList, "number_of_particles": N_t0})
 PartNum_t0 = PartNum_t0.set_index("species")
 
-# Set values !=0
-q=100
+# Set emissions
 
-q=100 #imput value
+q_mass_g_s=1
+sp="aA0_Utopia"
+q_num_s=0# set initially to 0 if the emissions are given in mass
 
-PartNum_t0.at["aA0_Utopia", "number_of_particles"] = -q
+if q_mass_g_s !=0:
+    for s in system_particle_object_list:
+        if sp== s.Pcode:
+            s.Pmass_t0_g=q_mass_g_s
+            p=s
+        else:
+            s.Pmass_t0_g=0
+            
+    q_num_s = mass_to_num(mass_g=q_mass_g_s,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
+    
+    PartNum_t0.at[sp, "number_of_particles"] = -q_num_s
+
+
+    
+else:
+    
+    q=100 #imput value in number of particles per second
+
+    PartNum_t0.at[sp, "number_of_particles"] = -q
+    
+    #Transform to mass and add to particle objects
+    
+    for p in system_particle_object_list:
+        p.Pmass_t0_g=num_to_mass(number=p.Pnumber_t0,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
+
+#Asign inputs to particle objects:
+for s in system_particle_object_list:
+    s.Pnumber_t0=-PartNum_t0.at[s.Pcode, "number_of_particles"]
+    
+    
 
 
 # Input vector
@@ -266,6 +300,24 @@ SteadyStateResults = np.linalg.solve(matrix, inputVector)
 Results = pd.DataFrame(
     {"species": SpeciesList, "number_of_particles": SteadyStateResults}
 )
+
+#Assign steady state (SS) results to paticles
+#In particle number
+
+R=Results.set_index("species")
+for p in system_particle_object_list:
+    p.Pnum_SS=R.loc[p.Pcode]["number_of_particles"]
+    
+#Convert results in particle number to mass and add to the particle objects
+for p in system_particle_object_list:
+    p.Pmass_SS_g=num_to_mass(number=p.Pnum_SS,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
+
+
+#Add to Results dataframe
+
+for p in system_particle_object_list:
+    R.loc[p.Pcode,"mass_g"]=p.Pmass_SS_g
+      
 
 from functions.extract_results import*
 
@@ -282,4 +334,4 @@ np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
 from functions.plot_results import*
 
 for comp in Results_comp_organiced:
-    plot_bySize(Results_comp_organiced,comp)
+    plot_bySize(Results_comp_organiced,comp,dict_size_coding)

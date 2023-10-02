@@ -47,7 +47,7 @@ def discorporation(particle):
 def fragmentation(particle):
     # estimate fragmentation relation between size bins (all except smallest size bin)
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
-    # for fragmentation of pristine particles in the largest (1000 μm=mp5) size class.
+    # for fragmentation of pristine particles in the largest (x=500μm => mp1 => e) size class.
 
     # Fragmentation of heteroaggregated particles is assumed negligible in the default model formulation
 
@@ -55,7 +55,7 @@ def fragmentation(particle):
         (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
         & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
-        & (process_inputs_df["sizeBin"] == "mp5")
+        & (process_inputs_df["sizeBin"] == "mp1")
     )
     t_frag_d = process_inputs_df.loc[cond, "tfrag_gen_d"].item()
 
@@ -65,8 +65,8 @@ def fragmentation(particle):
         fragments_formed = 0
     else:
         if (
-            particle.Pname[2:3] == "mp1"
-        ):  # print("Smallest sizeBin, fragments formed will be considered losses")
+            particle.Pname[2:3] == "mp5"
+        ):  # print("Smallest sizeBin mp5(0.05um), fragments formed will be considered losses")
             k_frag = k_frag = (
                 (1 / (float(t_frag_d) * 24 * 60 * 60))
                 * float(particle.diameter_um)
@@ -86,7 +86,6 @@ def fragmentation(particle):
 
     return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when needed (for Mass Balance?))
 
-    # NOTE: to be modified by ECO59
 
 
 def settling(particle):
@@ -144,10 +143,10 @@ def rising(particle):
     # "Ocean Column Water","Coast Column Water","Bulk FreshWater"]
 
     if particle.Pcompartment.Cname in [
-        "Ocean Mixed Water",
-        "Ocean Column Water",
-        "Coast Column Water",
-        "Bulk FreshWater",
+        "Ocean_Mixed_Water",
+        "Ocean_Column_Water",
+        "Coast_Column_Water",
+        "Bulk_Freshwater",
     ]:
         if settlingMethod == "Stokes":
             vSet_m_s = (
@@ -377,18 +376,19 @@ def advective_transport(particle):
 
 
 def mixing(particle, dict_comp):
-    # Taken from the Full Multi Model, should be adapted to UTOPIA
+    # Taken from the Full Multi Model, should be adapted to UTOPIA 
+    # Mixing has not jet been included in UTOPIA
 
-    if particle.Pcompartment.Cname == "Flowing Water":
+    if particle.Pcompartment.Cname == "Flowing_Water":
         k_mix_up = 10**-10
         k_mix_down = 10**-13
         k_mix = (k_mix_up, k_mix_down)
-    elif particle.Pcompartment.Cname == "Surface Water":
+    elif particle.Pcompartment.Cname == "Surface_Water":
         k_mix = (10**-10) * (
             dict_comp["Flowing Water"].Cvolume_m3
             / float(particle.Pcompartment.Cvolume_m3)
         )
-    elif particle.Pcompartment.Cname == "Stagnant Water":
+    elif particle.Pcompartment.Cname == "Stagnant_Water":
         k_mix = (10**-13) * (
             dict_comp["Flowing Water"].Cvolume_m3
             / float(particle.Pcompartment.Cvolume_m3)

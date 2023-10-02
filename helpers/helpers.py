@@ -92,3 +92,14 @@ def change_RC_value(system_particle_object_list,rc_name,rc_val):
             else:
                 pass
     return system_particle_object_list
+
+#function to convert mass to number
+def mass_to_num(mass_g, volume_m3, density_kg_m3):
+    number = mass_g/1000/density_kg_m3/volume_m3
+    return number
+
+
+#function to convert number to mass
+def num_to_mass(number, volume_m3, density_kg_m3):
+    mass_g = number*volume_m3*density_kg_m3*1000
+    return mass_g
