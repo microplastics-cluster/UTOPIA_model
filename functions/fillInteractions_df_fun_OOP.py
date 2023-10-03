@@ -31,7 +31,7 @@ def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
     )  # vstack it was set as column stack and was wrong!!
     interactions_df_sol = pd.DataFrame(array, index=SpeciesList, columns=SpeciesList)
 
-    return interactions_df_sol
+    return interactions_df_sol.transpose()
 
 
 def eliminationProcesses(system_particle_object_list, SpeciesList):
@@ -107,7 +107,7 @@ def inboxProcess(sp1, sp2):
             if (sp2.Pcode[1] == "A" and sp1.Pcode[1] == "B") or (
                 sp2.Pcode[1] == "C" and sp1.Pcode[1] == "D"
             ):
-                process = "heteroaggregation"
+                process ="heteroaggregation"
                 if process in sp2.Pcompartment.processess:
                     sol = sp2.RateConstants["k_" + process]
                 else:
@@ -217,26 +217,3 @@ def transportProcess(sp1, sp2, RC_df, river_flows):
         solution = 0
 
     return solution
-
-    # Asign loose rates
-    elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
-
-    interactions_df = pd.DataFrame(
-        np.diag(elimination_rates), index=SpeciesList, columns=SpeciesList
-    )
-
-    # Asign interactions rates
-    interactions_df_rows = []
-
-    for sp1 in system_particle_object_list:
-        interactions_df_rows.append(
-            interactionProcess(sp1, interactions_df, system_particle_object_list)
-        )
-
-    # interact3(sp1) for sp1 in interactions_df.index.to_list()]
-    array = np.column_stack(
-        interactions_df_rows
-    )  # vstack it was set as column stack and was wrong!!
-    interactions_df_sol = pd.DataFrame(array, index=list_sp1, columns=list_sp1)
-
-    return interactions_df_sol

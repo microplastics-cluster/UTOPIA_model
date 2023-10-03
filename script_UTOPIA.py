@@ -4,214 +4,40 @@ import pandas as pd
 from functions import create_inputsTable_UTOPIA
 from functions.create_rateConstants_tabel import *
 
-from functions.create_inputsTable_UTOPIA import *
-
-from functions.readImputs_from_csv import *
-from helpers.helpers import *
-from objects.box import *
-from objects.compartmetSubclasess import *
-from objects.particulates import *
-from objects.particulatesBF import *
-from objects.particulatesSPM import *
+from functions.generate_modelObjects import*
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # Generate objects
-# Boxes
+## choose input files to load
 
-boxName = "Utopia"
-UTOPIA = Box(boxName)
-print(f"The model box {boxName} has been created")
-
-modelBoxes = [UTOPIA]
-# modelBoxes=instantiateBoxes_from_csv(boxFile)
-boxNames_list = [b.Bname for b in modelBoxes]
-
-# Compartmets
-"""Call read imput file function for compartments"""
-
-compartments = instantiate_compartments(inputs_path + "\inputs_compartments.csv")
-
-# Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
-
-set_interactions(compartments, connexions_path_file= inputs_path +"\compartment_interactions.csv")
-
-# Assign modelling code to compartmanes
-for c in range(len(compartments)):
-    compartments[c].Ccode = c + 1
-
-##Calculate compartments volume
-for c in compartments:
-    c.calc_volume()
-
-## Dictionary of compartments
-dict_comp = {
-    item.Cname: item for item in compartments
-}  # Before the compartments association to RS...migth need to come after to also reflect the CBox connexion
-
-compartmentNames_list = [item.Cname for item in compartments]
-
-# PARTICLES
-MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
-
-##Free microplastics (freeMP)
-MP_freeParticles = instantiateParticles_from_csv(
-    inputs_path + "\inputs_microplastics.csv"
-)
-
-dict_size_coding=dict(zip([p.Pname for p in MP_freeParticles],[p.diameter_um for p in MP_freeParticles]))
-
-###Calculate freeMP volume
-for i in MP_freeParticles:
-    i.calc_volume()
-    # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-
-
-##Biofouled microplastics (biofMP)
-MP_biofouledParticles = []
-for i in MP_freeParticles:
-    MP_biofouledParticles.append(ParticulatesBF(parentMP=i))
-print(
-    f"The biofouled MP particles {[p.Pname for p in MP_biofouledParticles]} have been generated"
-)
-
-###Calculate biofMP volume
-for i in MP_biofouledParticles:
-    i.calc_volume()
-    # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-
-##Heteroaggregated microplastics (heterMP)
-spm = Particulates(
-    Pname="spm1",
-    Pform="suspendedParticulates",
-    Pcomposition="Mixed",
-    Pdensity_kg_m3=2000,
-    Pshape="sphere",
-    PdimensionX_um=0.5 / 2,
-    PdimensionY_um=0,
-    PdimensionZ_um=0,
-)
-spm.calc_volume()
-print(f"spm Volume: {spm.Pvolume_m3} m3")
-print(f"Density of spm: {spm.Pdensity_kg_m3} kg_m3")
-
-MP_heteroaggregatedParticles = []
-for i in MP_freeParticles:
-    MP_heteroaggregatedParticles.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
-print(
-    f"The heteroaggregated MP particles {[p.Pname for p in MP_heteroaggregatedParticles]} have been generated"
-)
-
-###Calculate heterMP volume
-for i in MP_heteroaggregatedParticles:
-    i.calc_volume_heter(i.parentMP, spm)
-    # print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-
-##Biofouled and Heteroaggregated microplastics (biofHeterMP)
-MP_biofHeter = []
-for i in MP_biofouledParticles:
-    MP_biofHeter.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
-# for i in MP_biofHeter:
-#     print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-print(
-    f"The biofouled and heteroaggregated MP particles {[p.Pname for p in MP_biofHeter]} have been generated"
-)
-
-###Calculate biofHeterMP volume
-for i in MP_biofHeter:
-    i.calc_volume_heter(i.parentMP, spm)
-
-particles = (
-    MP_freeParticles
-    + MP_biofouledParticles
-    + MP_heteroaggregatedParticles
-    + MP_biofHeter
-)
-
-particles_properties = {
-    "Particle": ([p.Pname for p in particles]),
-    "Radius_m": ([p.radius_m for p in particles]),
-    "Volume_m3": ([p.Pvolume_m3 for p in particles]),
-    "Density_kg_m3": ([p.Pdensity_kg_m3 for p in particles]),
-    "Corey Shape Factor": ([p.CSF for p in particles]),
-}
-
-particles_df = pd.DataFrame(data=particles_properties)
-# print(particles_df)
-particles_df.to_csv("Particles_properties_output.csv", index=False)
-
-
-# Assign compartmets to UTOPIA
-
-for comp in compartments:
-    UTOPIA.add_compartment(copy.deepcopy(comp))  # Check if the use of copy is correct!!
-
-print(
-    f"The compartments {[comp.Cname for comp in UTOPIA.compartments]} have been assigned to {UTOPIA.Bname } model box"
-)
-
-# Estimate volume of UTOPIA box by adding volumes of the compartments addedd
-# UTOPIA.calc_Bvolume_m3() #currently volume of soil and air boxess are missing, to be added to csv file
-
-
-# Add particles to compartments
-for b in modelBoxes:
-    for c in b.compartments:
-        for p in particles:
-            c.add_particles(copy.deepcopy(p))
-    print(f"The particles have been added to the compartments of {b.Bname}")
-
-
-# Based on the given model structure (created model boxes, compartments and particles)
-# generate the process inputs table
-
-process_inputs_df = create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path)
-
-"""Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
+modelBoxes, system_particle_object_list, SpeciesList, process_inputs_df,spm, dict_comp,model_lists = generate_objects(inputs_path,boxName="Utopia", comp_impFile_name="\inputs_compartments.csv", comp_interactFile_name="\compartment_interactions.csv", mp_imputFile_name="\inputs_microplastics.csv")
 
 
 # Estimate rate constants per particle
 from functions.generateRateConstants_particles import *
 
-# List of particle objects in the system:
-system_particle_object_list = []
-
-for b in modelBoxes:
-    for c in b.compartments:
-        for freeMP in c.particles["freeMP"]:
-            system_particle_object_list.append(freeMP)
-        for heterMP in c.particles["heterMP"]:
-            system_particle_object_list.append(heterMP)
-        for biofMP in c.particles["biofMP"]:
-            system_particle_object_list.append(biofMP)
-        for heterBiofMP in c.particles["heterBiofMP"]:
-            system_particle_object_list.append(heterBiofMP)
-
-# Generate list of species names and add code name to object
-SpeciesList = generate_system_species_list(
-    system_particle_object_list, MPforms_list, compartmentNames_list, boxNames_list
-)
-
 for particle in system_particle_object_list:
     generate_rateConstants(particle, spm, dict_comp)
 
+
+###Modify rate constants by stablishing a time limit or chaging specific rate constant values using the change_RC_value function
+# "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
+
+# particles_updated= change_RC_value(system_particle_object_list,rc_name,rc_val)
+
+particles_updated = timeLimit_particles_RC(system_particle_object_list,0.000556)
+
+RC_df_timeLim = create_rateConstants_table(particles_updated)
+
+#Plot rate constants
+plot_rate_constants(RC_df_timeLim)
 
 # create rate constants table:
 
 fileName = "rateConstantsUTOPIA_Test.csv"
 
-rate_constants_df = create_rateConstants_table(system_particle_object_list)
-
-
-# "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
-
-particles_updated = timeLimit_particles_RC(system_particle_object_list,0.000556)
-
-RC_df_timeLim = create_rateConstants_table(particles_updated)
-# Has to be done on the particles attributr for rate constants not on the rc table!!
-
-plot_rate_constants(RC_df_timeLim)
-
+rate_constants_df = create_rateConstants_table(particles_updated)
 
 # Save rate contants dataframe as csv file
 
@@ -224,7 +50,7 @@ df4.to_csv(fileName, index=False)
 # Build Matrix of interactions
 from functions.fillInteractions_df_fun_OOP import *
 
-interactions_df = fillInteractions_fun_OOP(particles_updated, SpeciesList)#should I be using particles_updated instead of system_particle_object_list??
+interactions_df = fillInteractions_fun_OOP(particles_updated, SpeciesList)
 
 
 #Optional Check interactions dataframe by process:
@@ -239,99 +65,24 @@ system_particle_object_list,SpeciesList
 
 # """SOLVE SYSTEM OF ODES"""
 
-# # Initial number of particles in the system
-
-# Set number of particles for all particles in the system as zero
-N_t0 = []
-for p in system_particle_object_list:
-    p.Pnumber = 0
-    N_t0.append(p.Pnumber)
-
-# dataframe of number of particles at time 0
-PartNum_t0 = pd.DataFrame({"species": SpeciesList, "number_of_particles": N_t0})
-PartNum_t0 = PartNum_t0.set_index("species")
-
-# Set emissions
-
-q_mass_g_s=1
-sp="aA0_Utopia"
-q_num_s=0# set initially to 0 if the emissions are given in mass
-
-if q_mass_g_s !=0:
-    for s in system_particle_object_list:
-        if sp== s.Pcode:
-            s.Pmass_t0_g=q_mass_g_s
-            p=s
-        else:
-            s.Pmass_t0_g=0
-            
-    q_num_s = mass_to_num(mass_g=q_mass_g_s,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
-    
-    PartNum_t0.at[sp, "number_of_particles"] = -q_num_s
-
-
-    
-else:
-    
-    q=100 #imput value in number of particles per second
-
-    PartNum_t0.at[sp, "number_of_particles"] = -q
-    
-    #Transform to mass and add to particle objects
-    
-    for p in system_particle_object_list:
-        p.Pmass_t0_g=num_to_mass(number=p.Pnumber_t0,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
-
-#Asign inputs to particle objects:
-for s in system_particle_object_list:
-    s.Pnumber_t0=-PartNum_t0.at[s.Pcode, "number_of_particles"]
-    
-    
-
-
-# Input vector
-
-inputVector = PartNum_t0["number_of_particles"].to_list()
-
-matrix = interactions_df.to_numpy()
-
-SteadyStateResults = np.linalg.solve(matrix, inputVector)
-
-Results = pd.DataFrame(
-    {"species": SpeciesList, "number_of_particles": SteadyStateResults}
-)
-
-#Assign steady state (SS) results to paticles
-#In particle number
-
-R=Results.set_index("species")
-for p in system_particle_object_list:
-    p.Pnum_SS=R.loc[p.Pcode]["number_of_particles"]
-    
-#Convert results in particle number to mass and add to the particle objects
-for p in system_particle_object_list:
-    p.Pmass_SS_g=num_to_mass(number=p.Pnum_SS,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)
-
-
-#Add to Results dataframe
-
-for p in system_particle_object_list:
-    R.loc[p.Pcode,"mass_g"]=p.Pmass_SS_g
-      
-
+from functions.solver_SteadyState import*
 from functions.extract_results import*
-
-Results_comp_dict=extract_by_comp(Results,compartmentNames_list)
-Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
-
-# Check the result is correct
-
-np.allclose(np.dot(matrix, SteadyStateResults), inputVector)
-##I change the sign of Steady state results because our ODES: 0=M*C+I --> C=-I*M^(-1)
-
-#Plot results
-
 from functions.plot_results import*
 
+#Choose input flow (in g per second)
+q_mass_g_s=1
+
+Results, R = solve_ODES_SS(system_particle_object_list=particles_updated,q_mass_g_s=q_mass_g_s,q_num_s=0,sp_imput="eA0_Utopia",interactions_df=interactions_df)
+
+from functions.massBalance import*
+massBalance(R,system_particle_object_list, q_mass_g_s)
+
+Results_comp_dict=extract_by_comp(R.reset_index(),model_lists["compartmentNames_list"])
+Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
+
+#Plot results
+particle_sizes_coding = {"mp5": "a", "mp4": "b", "mp3": "c", "mp2": "d", "mp1": "e"}
+
+
 for comp in Results_comp_organiced:
-    plot_bySize(Results_comp_organiced,comp,dict_size_coding)
+    plot_bySize_total_number_particles(Results_comp_organiced,comp,model_lists["dict_size_coding"])
