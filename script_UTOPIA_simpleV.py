@@ -70,7 +70,7 @@ compartmentNames_list = [item.Cname for item in compartments]
 
 #I will only have free and heteroaggregated particles in this simplified version of the model
 
-MPforms_list = ["freeMP", "heterMP"]#, "biofMP", "heterBiofMP"]
+MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 ##Free microplastics (freeMP)
 MP_freeParticles = instantiateParticles_from_csv(
     inputs_path + "\inputs_microplastics_oneSize.csv"
@@ -81,7 +81,7 @@ for i in MP_freeParticles:
     i.calc_volume()
 
 
-##Biofouled microplastics (biofMP)
+# #Biofouled microplastics (biofMP)
 # MP_biofouledParticles = []
 # for i in MP_freeParticles:
 #     MP_biofouledParticles.append(ParticulatesBF(parentMP=i))
