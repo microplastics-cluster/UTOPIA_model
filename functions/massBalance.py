@@ -8,10 +8,10 @@ import numpy as np
 def massBalance(R,system_particle_object_list, q_mass_g_s):
     
     # Estimate looses: loss processess=[discorporation, burial]
+    loss_processess=["k_discorporation", "k_burial","k_sequestration_deep_soils"]
     elimination_rates = []
     for p in system_particle_object_list:
-        elimination_rates.append(p.RateConstants["k_discorporation"])
-        
+        elimination_rates.append(sum([p.RateConstants[e] for e in loss_processess if e in p.RateConstants]))
     #mass at Steady state
     m_ss=R["mass_g"]   
     

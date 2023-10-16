@@ -13,15 +13,15 @@ UTOPIA_water_compartments = [
     "Bulk_Freshwater",
 ]
 
-UTOPIA_soil_compartments = [
-    "Sediment",
-    "Urban_Soil_Surface",
+UTOPIA_deep_soil_compartments = [
     "Urban_Soil",
-    "Background_Soil_Surface",
     "Background_Soil",
-    "Agricultural_Soil_Surface",
     "Agricultural_Soil",
 ]
+
+UTOPIA_soil_surface_compartments=["Urban_Soil_Surface","Background_Soil_Surface","Agricultural_Soil_Surface"]
+
+UTOPIA_sediment_compartment=["Sediment"]
 
 UTOPIA_air_compartments = ["Air"]
 
@@ -134,7 +134,7 @@ class compartment_sediment(Compartment):
             "discorporation",
             "fragmentation",
             "sediment_resuspension",
-            "burial",
+            "burial"
         ]
 
 
@@ -156,12 +156,7 @@ class compartment_soil(Compartment):
         )
         self.processess = [
             "discorporation",
-            "fragmentation",
-            "percolation",
-            "tillage",
-            "sediment_resuspension",
-            "runoff_transport",
-            "soil_air_resuspension",
+            "fragmentation"
         ]
         self.infiltration_capacity = infiltration_capacity
         self.precipitation_rate = precipitation_rate
@@ -172,9 +167,9 @@ class compartment_soil_surface(compartment_soil):
     def __init__(
         self,
         Cname,
-        soilPore_waterVolume_m3,
-        earthworm_density_in_m3,  # migth be needed for bioturbation
-        Qrunoff_m3,  # migth be needed for runoff transport
+        #soilPore_waterVolume_m3,
+        #earthworm_density_in_m3,  # migth be needed for bioturbation
+        #Qrunoff_m3,  # migth be needed for runoff transport
         infiltration_capacity=0.25,
         precipitation_rate=2.22 * 1**-8,
         Cdepth_m=None,
@@ -184,7 +179,7 @@ class compartment_soil_surface(compartment_soil):
     ):
         super().__init__(
             Cname,
-            soilPore_waterVolume_m3,
+            #soilPore_waterVolume_m3,
             infiltration_capacity,
             precipitation_rate,
             Cdepth_m,
@@ -200,15 +195,15 @@ class compartment_soil_surface(compartment_soil):
             "percolation",
             "soil_air_resuspension",
         ]
-        self.earthworm_density_in_m3 = earthworm_density_in_m3
-        self.Qrunoff_m3 = Qrunoff_m3
+        #self.earthworm_density_in_m3 = earthworm_density_in_m3
+        #self.Qrunoff_m3 = Qrunoff_m3
 
 
 class compartment_deep_soil(compartment_soil):
     def __init__(
         self,
         Cname,
-        soilPore_waterVolume_m3,
+        #soilPore_waterVolume_m3,
         infiltration_capacity=0.25,
         precipitation_rate=2.22 * 1**-8,
         Cdepth_m=None,
@@ -218,7 +213,7 @@ class compartment_deep_soil(compartment_soil):
     ):
         super().__init__(
             Cname,
-            soilPore_waterVolume_m3,
+            #soilPore_waterVolume_m3,
             infiltration_capacity,
             precipitation_rate,
             Cdepth_m,
@@ -229,7 +224,6 @@ class compartment_deep_soil(compartment_soil):
         self.processess = [
             "discorporation",
             "fragmentation",
-            "retention_in_soil",
             "sequestration_deep_soils",
         ]
 
