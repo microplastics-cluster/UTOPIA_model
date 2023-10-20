@@ -114,19 +114,29 @@ def instantiate_compartments(inputs_path_file):
                 )
             )
         elif c["Cname"] in UTOPIA_sediment_compartment:
-            sedimentComp_objects.append(compartment_sediment(Cname=c.get("Cname"), Cdepth_m=c.get("Cdepth_m"),
-                    Cvolume_m3=c.get("Cvolume_m3")))
+            sedimentComp_objects.append(
+                compartment_sediment(
+                    Cname=c.get("Cname"),
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                )
+            )
             
         elif c["Cname"] in UTOPIA_deep_soil_compartments:
-            soilComp_objects.append(compartment_deep_soil(Cname=c.get("Cname"),Cdepth_m=c.get("Cdepth_m"),
-                    Cvolume_m3=c.get("Cvolume_m3")))
+            soilComp_objects.append(compartment_deep_soil(Cdepth_m=c.get("Cdepth_m"),Cvolume_m3=c.get('Cvolume_m3'),Cname=c.get("Cname"))
+            )
         
         elif c["Cname"] in UTOPIA_soil_surface_compartments:
-            soilComp_objects.append(compartment_soil_surface(Cname=c.get("Cname"),Cdepth_m=c.get("Cdepth_m"),
-                    Cvolume_m3=c.get("Cvolume_m3")))
+            soilComp_objects.append(
+                compartment_soil_surface(Cname=c.get("Cname"),Cdepth_m=c.get("Cdepth_m"),Cvolume_m3=c.get("Cvolume_m3"))
+            )
 
         elif c["Cname"] in UTOPIA_air_compartments:
-            airComp_objects.append(compartment_air(Cname=c.get("Cname"),Cvolume_m3=c.get("Cvolume_m3")))
+            airComp_objects.append(
+                compartment_air(
+                    Cname=c.get("Cname"),Cvolume_m3=c.get("Cvolume_m3")
+                )
+            )
         else:
             pass
 

@@ -453,26 +453,27 @@ def sediment_resuspension(particle):
     
     #When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
     
-    if particle.Pcompartment.Cdepth_m is None:
-        k_resusp = 4.52E-8
-    elif particle.Pcompartment.Cdepth_m == "nan":
-        k_resusp = 4.52E-8
-    else:
-        k_resusp = 4.52E-8#2.3 * 10**-7/ float(particle.Pcompartment.Cdepth_m)
-
+    if particle.Pcompartment.Cname == "Sediment_Freshwater":
+        k_resusp = 1E-9
+    elif particle.Pcompartment.Cname == "Sediment_Coast":
+        k_resusp = 1E-10
+    
+    elif particle.Pcompartment.Cname == "Sediment_Ocean":
+        k_resusp = 1E-11
+    
     return k_resusp
 
 
 def burial(particle):
     
     #When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
-    if particle.Pcompartment.Cdepth_m is None:
+    if particle.Pcompartment.Cname == "Sediment_Freshwater":
         k_burial = 2.7E-10
-    elif particle.Pcompartment.Cdepth_m == "nan":
-        k_burial = 2.7E-10
+    elif particle.Pcompartment.Cname == "Sediment_Coast":
+        k_burial = 2.7E-11
     
-    else:
-        k_burial = 5.6 * 10**-8 / float(particle.Pcompartment.Cdepth_m)
+    elif particle.Pcompartment.Cname == "Sediment_Ocean":
+        k_burial = 2.7E-12
 
     return k_burial
 
@@ -482,7 +483,8 @@ def soil_air_resuspension(particle):
     # To be formulated
     # default value talen from SimpleBox for Plastics as trasnfer rate soil-air in s-1
 
-    k_sa_reusp = 4.68E-24  
+    k_sa_reusp = 4.68E-24
+
 
     return k_sa_reusp
 

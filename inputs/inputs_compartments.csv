@@ -6,9 +6,11 @@ Coast_Surface_Water,7,6840000000,278,2.5,10,3.80E+15,10
 Coast_Column_Water,7,6840000000,278,2.5,1,1.00E+17,10
 Surface_Freshwater,30,10000,278,1.3,10,1.70E+13,10
 Bulk_Freshwater,30,10000,278,1.3,10,1.60E+14,30
-Sediment,nan,nan,nan,nan,nan,1.16E+12,0.03
-Urban_Soil_Surface,nan,nan,nan,nan,nan,19400000,0.05
-Urban_Soil,nan,nan,nan,nan,nan,19380600000,0.05
+Sediment_Freshwater,nan,nan,nan,nan,nan,1.16E+12,0.03
+Sediment_Ocean,nan,nan,nan,nan,nan,1.16E+12,0.03
+Sediment_Coast,nan,nan,nan,nan,nan,1.16E+12,0.03
+Urban_Soil_Surface,nan,nan,nan,nan,nan,1.94E+07,0.05
+Urban_Soil,nan,nan,nan,nan,nan,1.94E+10,0.05
 Background_Soil_Surface,nan,nan,nan,nan,nan,1191160000,0.05
 Background_Soil,nan,nan,nan,nan,nan,1.19E+12,0.05
 Agricultural_Soil_Surface,nan,nan,nan,nan,nan,729440000,0.2
