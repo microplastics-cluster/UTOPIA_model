@@ -92,15 +92,16 @@ class Compartment:
 
             else:
                 self.Cvolume_m3 = self.Cdepth_m * self.Clength_m * self.Cwidth_m
-                print(
-                    "Calculated "
-                    + self.Cname
-                    + " volume: "
-                    + str(self.Cvolume_m3)
-                    + " m3"
-                )
+                # print(
+                #     "Calculated "
+                #     + self.Cname
+                #     + " volume: "
+                #     + str(self.Cvolume_m3)
+                #     + " m3"
+                # )
         else:
-            print("Assigned " + self.Cname + " volume: " + str(self.Cvolume_m3) + " m3")
+            pass
+            # print("Assigned " + self.Cname + " volume: " + str(self.Cvolume_m3) + " m3")
 
     def calc_vol_fromBox(self):
         self.Cvolume_m3 = (

@@ -133,7 +133,7 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
 
     particles_df = pd.DataFrame(data=particles_properties)
     # print(particles_df)
-    particles_df.to_csv("Particles_properties_output.csv", index=False)
+    #particles_df.to_csv("Particles_properties_output.csv", index=False)
 
 
     # Assign compartmets to UTOPIA
@@ -185,4 +185,4 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
     
     model_lists=dict(zip(["compartmentNames_list","boxNames_list","dict_size_coding"],[compartmentNames_list,boxNames_list,dict_size_coding]))
     
-    return modelBoxes , system_particle_object_list, SpeciesList, process_inputs_df ,spm, dict_comp, model_lists
+    return modelBoxes , system_particle_object_list, SpeciesList, process_inputs_df ,spm, dict_comp, model_lists, particles_df,MPforms_list

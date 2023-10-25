@@ -1,10 +1,8 @@
 #function to organise results into a dictionary of compartments, each compartment containing a dictionary of aggregation states, of wich contain number of particles per size fraction
 
 
-def extract_by_comp(Results,compartmentNames_list):
-    particle_compartmentCoding = dict(
-    zip(compartmentNames_list, list(range(len(compartmentNames_list))))
-)
+def extract_by_comp(Results,particle_compartmentCoding):
+
     Results_comp_dict={}
     for comp in particle_compartmentCoding:
         key=comp
@@ -19,8 +17,7 @@ def extract_by_comp(Results,compartmentNames_list):
         
     return Results_comp_dict
 
-def extract_by_aggSt(Results_comp_dict,MPforms_list):
-    particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
+def extract_by_aggSt(Results_comp_dict,particle_forms_coding):
     Results_comp_organiced={}
     for comp in Results_comp_dict:
         Results_aggSt_dict={}
@@ -50,3 +47,24 @@ def extract_by_size(Results):
         Results_size_dict[key]= Results[Results["species"].isin(values)]
     print(Results_size_dict)
     return Results_size_dict
+
+def estimate_fractions(Results):
+    total_mass=sum(Results["mass_g"])
+    total_number=sum(Results["number_of_particles"])
+    Results_extended=Results.copy()
+    Results_extended.loc[:,"mass_fraction"]=[x/total_mass for x in Results["mass_g"]]
+    Results_extended.loc[:,"number_fraction"]=[x/total_number for x in Results["number_of_particles"]]
+    
+    mass_fraction_df=Results_extended.loc[:,["Compartment","MP_Form","Size_Fraction_um","mass_fraction"]]
+    
+    number_fraction_df=Results_extended.loc[:,["Compartment","MP_Form","Size_Fraction_um","number_fraction"]]
+    
+    #Short values (descending)
+    mf_shorted=mass_fraction_df.sort_values("mass_fraction", ascending=False)
+    
+    nf_shorted=number_fraction_df.sort_values("number_fraction", ascending=False)
+    
+    print(mf_shorted[:10])
+    print(nf_shorted[:10])
+    
+    return Results_extended
