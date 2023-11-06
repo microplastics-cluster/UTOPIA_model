@@ -40,7 +40,7 @@ Description of the workflow followed to develope UTOPIA
 
   -Model boxes (only one box for UTOPIA)
   
-  -Model compartments (15 compartments for UTOPIA)
+  -Model compartments (17 compartments for UTOPIA)
   
   -Particles (one object per MPform (e.g. freeMP, heteroaggregated, biofouled and heteroaggregted and biofouled) and per size fraction (defined 5 size fractions in the range of 0.5 um to 5mm separated by a factor of 10))
 
@@ -60,7 +60,7 @@ Description of the workflow followed to develope UTOPIA
 
 ### 6-Estimate processes rate constants (per particle in each compartment and model box)
 
-### 7-Generate system of differential equations (do we want to work with particle number or mass?):
+### 7-Generate system of differential equations:
 
 ![image](https://user-images.githubusercontent.com/58487662/186609599-c75bb341-45f4-4bf4-a055-fb332aff3756.png)
 
@@ -69,6 +69,10 @@ Description of the workflow followed to develope UTOPIA
 
 ### 8-Solve mass balance (in steady state for UTOPIA)
 
-### 9-Results presenation through interactive voila dashboards
+### 9-Results presentation through interactive voila dashboards?
+
+  -Mass and particle number concentrations
+  -Mass and numbers distribution as fraction of the total mass or total number
+  -Exposure metrics (Overall persistence, characteristic travel distance, transfer efficiency)
 
 (to be done)
