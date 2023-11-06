@@ -1,5 +1,9 @@
 # Extension of RS_generator module from the FUll Multi containing functions to calculate all rate constants
 
+
+
+###So far programmed so that if a parameter value for estimating a rate constant is missing (i.e. NOne or nan), the rate constant is equal to zero....this has to be fixed!! Example,when no depth ogf a compartment is given the rate constant of burial or resuspension is equal to 0
+
 import math
 import pandas as pd
 import os
@@ -84,7 +88,7 @@ def fragmentation(particle):
                 / 1000
             )
 
-    return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when needed (for Mass Balance?))
+    return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when/if needed (for Mass Balance?))
 
 
 
@@ -446,38 +450,41 @@ def defouling(particle):
 
 
 def sediment_resuspension(particle):
-    if particle.Pcompartment.Cdepth_m is None:
-        k_resusp = 0
-    else:
-        k_resusp = 2.3 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
-
+    
+    #When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
+    
+    if particle.Pcompartment.Cname == "Sediment_Freshwater":
+        k_resusp = 1E-9
+    elif particle.Pcompartment.Cname == "Sediment_Coast":
+        k_resusp = 1E-10
+    
+    elif particle.Pcompartment.Cname == "Sediment_Ocean":
+        k_resusp = 1E-11
+    
     return k_resusp
 
 
 def burial(particle):
-    if particle.Pcompartment.Cdepth_m is None:
-        k_burial = 0
-    else:
-        k_burial = 5.6 * 10**-7 / float(particle.Pcompartment.Cdepth_m)
+    
+    #When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
+    if particle.Pcompartment.Cname == "Sediment_Freshwater":
+        k_burial = 2.7E-10
+    elif particle.Pcompartment.Cname == "Sediment_Coast":
+        k_burial = 2.7E-11
+    
+    elif particle.Pcompartment.Cname == "Sediment_Ocean":
+        k_burial = 2.7E-12
 
     return k_burial
 
 
-def sediment_transport(particle):
-    m_sed_kg = (
-        (1 - sed_porosity)
-        * sed_density
-        * 10**3
-        * float(particle.Pcompartment.Cvolume_m3)
-    )
-    k_sed_trans = v_sed_trans / m_sed_kg
-
-    return k_sed_trans
-
 
 def soil_air_resuspension(particle):
+    # To be formulated
+    # default value talen from SimpleBox for Plastics as trasnfer rate soil-air in s-1
 
-    k_sa_reusp = 0  # To be formulated
+    k_sa_reusp = 4.68E-24
+
 
     return k_sa_reusp
 
@@ -503,12 +510,12 @@ def percolation(particle):
 def runoff_transport(particle):
     # transport from top soil layers to surface waters via runoff water
     # to be formulated
-    k_runoff = 0
+    k_runoff = 4.69E-9
     return k_runoff
 
 
 def wind_trasport(particle):
-    # diffusive transport of particles via wind speed
+    # diffusive transport of particles via wind speed (we should not need this process since ther is onlt one air compartment)
     # to be formulated as funcion of compartment property: wind_speed_m_s
     k_wind_transport = 0
     return k_wind_transport
@@ -517,28 +524,32 @@ def wind_trasport(particle):
 def dry_depossition(particle):
     # particles depossition from air to soil or water compartments
     # to be formulated
-    k_dry_depossition = 0
+    #Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1)Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+    k_dry_depossition = 7.91E-6
     return k_dry_depossition
 
 
 def wet_depossition(particle):
     # particles depossition from air to soil or water compartments via rainfall
     # to be formulated as function of rainfall intensity??
+    #Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+
     k_wet_depossition = 0
     return k_wet_depossition
 
 
 def sea_spray_aerosol(particle):
     # paticles resuspension from ocean and coastal surface waters to air
-
+    #Default value taken from SimpleBox for Plastics transfer rate water-air (s-1)
     # to be formulated
 
-    k_sea_spray_aerosol = 0
+    k_sea_spray_aerosol = 2.36E-25
     return k_sea_spray_aerosol
 
 
 def sequestration_deep_soils(particle):
     # to be formulated
-    k_sequestration_deep_soils = 0
+    # Default value taken from SimpleBox for Plastics Removal rate from soil in s-1
+    k_sequestration_deep_soils = 2.71E-9
 
     return k_sequestration_deep_soils

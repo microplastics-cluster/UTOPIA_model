@@ -5,7 +5,6 @@ def solve_ODES_SS(system_particle_object_list,q_mass_g_s,q_num_s,sp_imput,intera
     SpeciesList=[p.Pcode for p in system_particle_object_list]
     
     if q_mass_g_s !=0:
-        
         #set mass of particles for all particles in the system as zero
         m_t0=[]
         for p in system_particle_object_list:
@@ -82,14 +81,24 @@ def solve_ODES_SS(system_particle_object_list,q_mass_g_s,q_num_s,sp_imput,intera
         for p in system_particle_object_list:
             if "SPM" in p.Pname:
                 if "BF" in p.Pname:
-                    p.Pmass_SS_g=num_to_mass(number=p.Pnum_SS,volume_m3=p.parentMP.parentMP.Pvolume_m3,density_kg_m3=p.parentMP.parentMP.Pdensity_kg_m3)
+                    p.Pmass_g_SS=num_to_mass(number=p.Pnum_SS,volume_m3=p.parentMP.parentMP.Pvolume_m3,density_kg_m3=p.parentMP.parentMP.Pdensity_kg_m3)
                 else:
-                    p.Pmass_SS_g=num_to_mass(number=p.Pnum_SS,volume_m3=p.parentMP.Pvolume_m3,density_kg_m3=p.parentMP.Pdensity_kg_m3)  
+                    p.Pmass_g_SS=num_to_mass(number=p.Pnum_SS,volume_m3=p.parentMP.Pvolume_m3,density_kg_m3=p.parentMP.Pdensity_kg_m3)  
             else:
-                p.Pmass_SS_g=num_to_mass(number=p.Pnum_SS,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)  
+                p.Pmass_g_SS=num_to_mass(number=p.Pnum_SS,volume_m3=p.Pvolume_m3,density_kg_m3=p.Pdensity_kg_m3)  
         
         #Add to Results dataframe
         for p in system_particle_object_list:
-            R.loc[p.Pcode,"mass_g"]=p.Pmass_SS_g 
+            R.loc[p.Pcode,"mass_g"]=p.Pmass_g_SS 
     
-    return Results, R
+    
+    
+    ### Estimate SS concentration and add to particles
+    for p in system_particle_object_list:
+        p.C_g_m3_SS=p.Pmass_g_SS/float(p.Pcompartment.Cvolume_m3)
+        R.loc[p.Pcode,"concentration_g_m3"]=p.C_g_m3_SS 
+        p.C_num_m3_SS=p.Pnum_SS/float(p.Pcompartment.Cvolume_m3)
+        R.loc[p.Pcode,"concentration_num_m3"]=p.C_num_m3_SS
+        
+    
+    return R

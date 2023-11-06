@@ -24,12 +24,10 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
     # Compartmets
     """Call read imput file function for compartments"""
 
-    comp_impFile_name="\inputs_compartments.csv"
     compartments = instantiate_compartments(inputs_path + comp_impFile_name )
 
     # Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
-    comp_interactFile_name="\compartment_interactions.csv"
     set_interactions(compartments, connexions_path_file= inputs_path + comp_interactFile_name)
 
     # Assign modelling code to compartmanes
@@ -52,7 +50,6 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
 
     ##Free microplastics (freeMP)
 
-    mp_imputFile_name="\inputs_microplastics.csv"
     MP_freeParticles = instantiateParticles_from_csv(
         inputs_path + mp_imputFile_name
     )
@@ -136,7 +133,7 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
 
     particles_df = pd.DataFrame(data=particles_properties)
     # print(particles_df)
-    particles_df.to_csv("Particles_properties_output.csv", index=False)
+    #particles_df.to_csv("Particles_properties_output.csv", index=False)
 
 
     # Assign compartmets to UTOPIA
@@ -188,4 +185,4 @@ def generate_objects(inputs_path,boxName, comp_impFile_name, comp_interactFile_n
     
     model_lists=dict(zip(["compartmentNames_list","boxNames_list","dict_size_coding"],[compartmentNames_list,boxNames_list,dict_size_coding]))
     
-    return modelBoxes , system_particle_object_list, SpeciesList, process_inputs_df ,spm, dict_comp, model_lists
+    return modelBoxes , system_particle_object_list, SpeciesList, process_inputs_df ,spm, dict_comp, model_lists, particles_df,MPforms_list
