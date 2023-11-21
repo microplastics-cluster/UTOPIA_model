@@ -1,7 +1,6 @@
 # Extension of RS_generator module from the FUll Multi containing functions to calculate all rate constants
 
 
-
 ###So far programmed so that if a parameter value for estimating a rate constant is missing (i.e. NOne or nan), the rate constant is equal to zero....this has to be fixed!! Example,when no depth ogf a compartment is given the rate constant of burial or resuspension is equal to 0
 
 import math
@@ -69,7 +68,7 @@ def fragmentation(particle):
         fragments_formed = 0
     else:
         if (
-            particle.Pname[2:3] == "mp5"
+            particle.Pname[0:3] == "mp5"
         ):  # print("Smallest sizeBin mp5(0.05um), fragments formed will be considered losses")
             k_frag = k_frag = (
                 (1 / (float(t_frag_d) * 24 * 60 * 60))
@@ -89,7 +88,6 @@ def fragmentation(particle):
             )
 
     return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when/if needed (for Mass Balance?))
-
 
 
 def settling(particle):
@@ -182,9 +180,7 @@ def rising(particle):
 
 
 def heteroaggregation(particle, spm):
-
     if (particle.Pform == "freeMP") or (particle.Pform == "biofMP"):
-
         # heteroaggregation rate constants
         """heteroaggregation requires to particles to collide and interact
         favorably for the collision to result in attachment
@@ -267,7 +263,6 @@ def heteroaggregation(particle, spm):
 
 
 def heteroaggregate_breackup(particle, spm):
-
     if (particle.Pform == "heterMP") or (particle.Pform == "heterBiofMP"):
         # Kbreackup is calculated based on Kheter of the free and biofouled MPs
 
@@ -380,7 +375,7 @@ def advective_transport(particle):
 
 
 def mixing(particle, dict_comp):
-    # Taken from the Full Multi Model, should be adapted to UTOPIA 
+    # Taken from the Full Multi Model, should be adapted to UTOPIA
     # Mixing has not jet been included in UTOPIA
 
     if particle.Pcompartment.Cname == "Flowing_Water":
@@ -407,7 +402,6 @@ def mixing(particle, dict_comp):
 
 
 def biofouling(particle):
-
     cond_biof = (
         (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
         & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
@@ -450,41 +444,37 @@ def defouling(particle):
 
 
 def sediment_resuspension(particle):
-    
-    #When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
-    
+    # When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
+
     if particle.Pcompartment.Cname == "Sediment_Freshwater":
-        k_resusp = 1E-9
+        k_resusp = 1e-9
     elif particle.Pcompartment.Cname == "Sediment_Coast":
-        k_resusp = 1E-10
-    
+        k_resusp = 1e-10
+
     elif particle.Pcompartment.Cname == "Sediment_Ocean":
-        k_resusp = 1E-11
-    
+        k_resusp = 1e-11
+
     return k_resusp
 
 
 def burial(particle):
-    
-    #When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
+    # When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
     if particle.Pcompartment.Cname == "Sediment_Freshwater":
-        k_burial = 2.7E-10
+        k_burial = 2.7e-10
     elif particle.Pcompartment.Cname == "Sediment_Coast":
-        k_burial = 2.7E-11
-    
+        k_burial = 2.7e-11
+
     elif particle.Pcompartment.Cname == "Sediment_Ocean":
-        k_burial = 2.7E-12
+        k_burial = 2.7e-12
 
     return k_burial
-
 
 
 def soil_air_resuspension(particle):
     # To be formulated
     # default value talen from SimpleBox for Plastics as trasnfer rate soil-air in s-1
 
-    k_sa_reusp = 4.68E-24
-
+    k_sa_reusp = 4.68e-24
 
     return k_sa_reusp
 
@@ -510,7 +500,7 @@ def percolation(particle):
 def runoff_transport(particle):
     # transport from top soil layers to surface waters via runoff water
     # to be formulated
-    k_runoff = 4.69E-9
+    k_runoff = 4.69e-9
     return k_runoff
 
 
@@ -524,15 +514,15 @@ def wind_trasport(particle):
 def dry_depossition(particle):
     # particles depossition from air to soil or water compartments
     # to be formulated
-    #Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1)Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
-    k_dry_depossition = 7.91E-6
+    # Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1)Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+    k_dry_depossition = 7.91e-6
     return k_dry_depossition
 
 
 def wet_depossition(particle):
     # particles depossition from air to soil or water compartments via rainfall
     # to be formulated as function of rainfall intensity??
-    #Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+    # Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
 
     k_wet_depossition = 0
     return k_wet_depossition
@@ -540,16 +530,16 @@ def wet_depossition(particle):
 
 def sea_spray_aerosol(particle):
     # paticles resuspension from ocean and coastal surface waters to air
-    #Default value taken from SimpleBox for Plastics transfer rate water-air (s-1)
+    # Default value taken from SimpleBox for Plastics transfer rate water-air (s-1)
     # to be formulated
 
-    k_sea_spray_aerosol = 2.36E-25
+    k_sea_spray_aerosol = 2.36e-25
     return k_sea_spray_aerosol
 
 
 def sequestration_deep_soils(particle):
     # to be formulated
     # Default value taken from SimpleBox for Plastics Removal rate from soil in s-1
-    k_sequestration_deep_soils = 2.71E-9
+    k_sequestration_deep_soils = 2.71e-9
 
     return k_sequestration_deep_soils

@@ -1,5 +1,0 @@
-compType,depth_m,length_m,volume_m3,width_m,G,T_K,vFlow_m_s,SPM_mgL
-surface,0.1,50000,400000.0,80,10,287.15,1.3,30
-flowingWater,4.9,50000,19600000.000000004,80,10,287.15,1.3,30
-stagnantWater,0.4,50000,1600000.0,80,10,287.15,1.3,30
-sediment,0.02,50000,80000.0,80,10,287.15,1.3,30

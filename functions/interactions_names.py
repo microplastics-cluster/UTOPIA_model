@@ -1,4 +1,4 @@
-import numpy as np
+mport numpy as np
 import pandas as pd
 
 def extract_sinks(system_particle_object_list, SpeciesList):
