@@ -96,7 +96,7 @@ def instantiate_compartments(inputs_path_file):
         compartments = list(reader)
 
     waterComp_objects = []
-    sedimentComp_objects=[]
+    sedimentComp_objects = []
     soilComp_objects = []
     airComp_objects = []
     for c in compartments:
@@ -121,26 +121,35 @@ def instantiate_compartments(inputs_path_file):
                     Cvolume_m3=c.get("Cvolume_m3"),
                 )
             )
-            
+
         elif c["Cname"] in UTOPIA_deep_soil_compartments:
-            soilComp_objects.append(compartment_deep_soil(Cdepth_m=c.get("Cdepth_m"),Cvolume_m3=c.get('Cvolume_m3'),Cname=c.get("Cname"))
+            soilComp_objects.append(
+                compartment_deep_soil(
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                    Cname=c.get("Cname"),
+                )
             )
-        
+
         elif c["Cname"] in UTOPIA_soil_surface_compartments:
             soilComp_objects.append(
-                compartment_soil_surface(Cname=c.get("Cname"),Cdepth_m=c.get("Cdepth_m"),Cvolume_m3=c.get("Cvolume_m3"))
+                compartment_soil_surface(
+                    Cname=c.get("Cname"),
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                )
             )
 
         elif c["Cname"] in UTOPIA_air_compartments:
             airComp_objects.append(
-                compartment_air(
-                    Cname=c.get("Cname"),Cvolume_m3=c.get("Cvolume_m3")
-                )
+                compartment_air(Cname=c.get("Cname"), Cvolume_m3=c.get("Cvolume_m3"))
             )
         else:
             pass
 
-    Comp_objects = waterComp_objects + sedimentComp_objects + soilComp_objects + airComp_objects
+    Comp_objects = (
+        waterComp_objects + sedimentComp_objects + soilComp_objects + airComp_objects
+    )
 
     print(f"The compartments {[c.Cname for c in Comp_objects]} have been generated")
 
@@ -148,7 +157,6 @@ def instantiate_compartments(inputs_path_file):
 
 
 def instantiate_compartments_from_csv(inputs_path_file):
-
     # Read csv as dictionarys for each line
     compartments = {}
     with open(inputs_path_file, "r") as f:
@@ -176,7 +184,6 @@ class Struct:
 
 # Create connexions attributes as dictionaries for the different #compartments from the compartmentsInteractions file
 def set_interactions(compartments, connexions_path_file):
-
     with open(connexions_path_file, "r") as infile:
         reader = csv.reader(infile)
         array = []

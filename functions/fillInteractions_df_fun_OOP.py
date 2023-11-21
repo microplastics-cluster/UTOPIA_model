@@ -9,7 +9,6 @@ import pandas as pd
 
 
 def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
-
     # Asign loose rates
     elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
 
@@ -42,7 +41,6 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
     diag_list = []
 
     for sp in system_particle_object_list:
-
         dict_sp = sp.RateConstants
 
         # replace none values
@@ -74,14 +72,11 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
 
 
 def inboxProcess(sp1, sp2):
-
     # If same compartment (compartment processes)
     if sp1.Pcode[2:] == sp2.Pcode[2:]:
-
         # Only different size bins --> Fragmentation
 
         if sp1.Pcode[1:] == sp2.Pcode[1:] and sp1.Pcode[0] != sp2.Pcode[0]:
-
             # fragmentation only will occur from bigger to smaller and in consecutive sieBins Sizebin = sp[-3]
             if (
                 (sp2.Pcode[0] == "b" and sp1.Pcode[0] == "a")
@@ -89,7 +84,6 @@ def inboxProcess(sp1, sp2):
                 or (sp2.Pcode[0] == "d" and sp1.Pcode[0] == "c")
                 or (sp2.Pcode[0] == "e" and sp1.Pcode[0] == "d")
             ):
-
                 if type(sp2.RateConstants["k_fragmentation"]) is tuple:
                     frag = sp2.RateConstants["k_fragmentation"]
 
@@ -102,12 +96,11 @@ def inboxProcess(sp1, sp2):
         # Different aggergation states (same size)--> heteroagg, biofouling,defouling and agg-breackup
 
         elif sp1.Pcode[0] == sp2.Pcode[0] and sp1.Pcode[1] != sp2.Pcode[1]:
-
             # heteroaggregation from A-->B or from C-->D
             if (sp2.Pcode[1] == "A" and sp1.Pcode[1] == "B") or (
                 sp2.Pcode[1] == "C" and sp1.Pcode[1] == "D"
             ):
-                process ="heteroaggregation"
+                process = "heteroaggregation"
                 if process in sp2.Pcompartment.processess:
                     sol = sp2.RateConstants["k_" + process]
                 else:
@@ -155,7 +148,7 @@ def inboxProcess(sp1, sp2):
     # check if same agg form and size to select process of connexion for compartment and assign rate constant, else process has rate of 0
 
     elif sp1.Pcompartment.Cname in sp2.Pcompartment.connexions:
-        #transport between compartments only for same aggregation state and same particle size
+        # transport between compartments only for same aggregation state and same particle size
         if sp1.Pcode[:2] == sp2.Pcode[:2]:
             process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
             if type(process) == list:
@@ -166,7 +159,7 @@ def inboxProcess(sp1, sp2):
             else:
                 sol = sp2.RateConstants["k_" + process]
         else:
-            sol=0
+            sol = 0
     else:
         sol = 0
 
@@ -176,14 +169,12 @@ def inboxProcess(sp1, sp2):
 def interactionProcess(sp1, interactions_df, system_particle_object_list):
     sol = []
     for sp2 in system_particle_object_list:
-
         # Same particle in the same box and compartment (losses)
         if sp1.Pcode == sp2.Pcode:
             sol.append(interactions_df[sp2.Pcode][sp1.Pcode])
 
         # Different particle or different river section or compartment
         else:
-
             # Same box (i.e. river section RS)--> In box processes
 
             if sp1.Pcode.split("_")[1] == sp2.Pcode.split("_")[1]:

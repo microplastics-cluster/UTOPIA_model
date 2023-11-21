@@ -64,11 +64,13 @@ def plot_rate_constants(RC_df):
         fontsize=12,
         stacked=True,
     )
+    plt.savefig("rateConstants.png")
+
+    plt.show()
 
 
 import numpy as np
 import pandas as pd
-
 
 
 def timeLimit_particles_RC(system_particle_object_list, lim):
@@ -84,22 +86,23 @@ def timeLimit_particles_RC(system_particle_object_list, lim):
     return system_particle_object_list
 
 
-def change_RC_value(system_particle_object_list,rc_name,rc_val):
+def change_RC_value(system_particle_object_list, rc_name, rc_val):
     for p in system_particle_object_list:
         for k in p.RateConstants:
-            if k== rc_name:
-                p.RateConstants[k]=rc_val
+            if k == rc_name:
+                p.RateConstants[k] = rc_val
             else:
                 pass
     return system_particle_object_list
 
-#function to convert mass to number
+
+# function to convert mass to number
 def mass_to_num(mass_g, volume_m3, density_kg_m3):
-    number = mass_g/1000/density_kg_m3/volume_m3
+    number = mass_g / 1000 / density_kg_m3 / volume_m3
     return number
 
 
-#function to convert number to mass
+# function to convert number to mass
 def num_to_mass(number, volume_m3, density_kg_m3):
-    mass_g = number*volume_m3*density_kg_m3*1000
+    mass_g = number * volume_m3 * density_kg_m3 * 1000
     return mass_g

@@ -19,9 +19,17 @@ UTOPIA_deep_soil_compartments = [
     "Agricultural_Soil",
 ]
 
-UTOPIA_soil_surface_compartments=["Urban_Soil_Surface","Background_Soil_Surface","Agricultural_Soil_Surface"]
+UTOPIA_soil_surface_compartments = [
+    "Urban_Soil_Surface",
+    "Background_Soil_Surface",
+    "Agricultural_Soil_Surface",
+]
 
-UTOPIA_sediment_compartment=["Sediment_Freshwater","Sediment_Ocean","Sediment_Coast"]
+UTOPIA_sediment_compartment = [
+    "Sediment_Freshwater",
+    "Sediment_Ocean",
+    "Sediment_Coast",
+]
 
 UTOPIA_air_compartments = ["Air"]
 
@@ -49,7 +57,6 @@ class compartment_water(Compartment):
         CsurfaceArea_m2=None,
         flowVelocity_m_s=None,
     ):
-
         super().__init__(
             Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
         )
@@ -134,7 +141,7 @@ class compartment_sediment(Compartment):
             "discorporation",
             "fragmentation",
             "sediment_resuspension",
-            "burial"
+            "burial",
         ]
 
 
@@ -176,7 +183,7 @@ class compartment_soil_surface(Compartment):
         super().__init__(
             Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
         )
-    
+
         self.processess = [
             "discorporation",
             "fragmentation",
@@ -185,8 +192,8 @@ class compartment_soil_surface(Compartment):
             "percolation",
             "soil_air_resuspension",
         ]
-        #self.earthworm_density_in_m3 = earthworm_density_in_m3
-        #self.Qrunoff_m3 = Qrunoff_m3
+        # self.earthworm_density_in_m3 = earthworm_density_in_m3
+        # self.Qrunoff_m3 = Qrunoff_m3
 
 
 class compartment_deep_soil(Compartment):
