@@ -134,7 +134,7 @@ q_mass_g_s = 1
 
 # particle imput
 size_bin = "e"
-comp = "Air"
+comp = "Surface_Freshwater"
 MP_form = "freeMP"
 
 sp_imput = (

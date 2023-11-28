@@ -7,12 +7,31 @@ import numpy as np
 
 def massBalance(R, system_particle_object_list, q_mass_g_s):
     # Estimate looses: loss processess=[discorporation, burial]
+    # Lossess also from fragmentation of the smallest size bin
     loss_processess = ["k_discorporation", "k_burial", "k_sequestration_deep_soils"]
     elimination_rates = []
     for p in system_particle_object_list:
-        elimination_rates.append(
-            sum([p.RateConstants[e] for e in loss_processess if e in p.RateConstants])
-        )
+        if p.Pcode[0] == "a":
+            elimination_rates.append(
+                sum(
+                    [
+                        p.RateConstants[e]
+                        for e in loss_processess
+                        if e in p.RateConstants
+                    ]
+                )
+                + p.RateConstants["k_fragmentation"]
+            )
+        else:
+            elimination_rates.append(
+                sum(
+                    [
+                        p.RateConstants[e]
+                        for e in loss_processess
+                        if e in p.RateConstants
+                    ]
+                )
+            )
     # mass at Steady state
     m_ss = R["mass_g"]
 
@@ -68,19 +87,6 @@ def compartment_massBalance(
                 emiss_flow_g_s = -sum(s)
             else:
                 emiss_flow_g_s = 0
-    # # imputFlows from transport from other compartments
-    # comp_input_flows = []
-    # for e_comp in dict_comp:
-    #     if comp in dict_comp[e_comp].connexions:
-    #         r = tables_outputFlows[e_comp]
-    #         proc = dict_comp[e_comp].connexions[comp]
-    #         if type(proc) == list:
-    #             comp_input_flows.append(
-    #                 sum(r.loc[:, ["k_" + ele for ele in proc]].sum())
-    #             )
-    #         else:
-    #             comp_input_flows.append(sum(r.loc[:, "k_" + proc]))
-    # transport_input_flow = sum(comp_input_flows)
 
     transport_input_flow = sum(tables_inputFlows[comp].sum())
 
@@ -91,3 +97,29 @@ def compartment_massBalance(
         + " is = "
         + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s)
     )
+
+
+def global_massBalance(q_mass_g_s, tables_outputFlows):
+    # Estimate looses: loss processess=[discorporation, burial]
+    # Lossess also from fragmentation of the smallest size bin
+    loss_processess = ["k_discorporation", "k_burial", "k_sequestration_deep_soils"]
+    output_flows = []
+    for comp in tables_outputFlows:
+        frag_flows = []
+        for i in tables_outputFlows[comp].index:
+            if i[0] == "a":
+                frag_flows.append(tables_outputFlows[comp].loc[i, "k_fragmentation"])
+            else:
+                pass
+        output_flows.append(
+            sum(
+                [
+                    tables_outputFlows[comp][e]
+                    for e in loss_processess
+                    if e in tables_outputFlows[comp].columns
+                ]
+            ).sum()
+            + sum(frag_flows)
+        )
+
+    print("Difference inflow-outflow = " + str(q_mass_g_s - sum(output_flows)))
