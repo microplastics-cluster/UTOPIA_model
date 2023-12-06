@@ -25,6 +25,17 @@ outputs_path = os.path.join(os.path.dirname(__file__), "Results")
 current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 current_date = datetime.now().strftime("%Y-%m-%d")
 
+# Create directory with current date where to save results
+directory = current_date
+path = os.path.join(outputs_path, directory)
+
+# check whether directory already exists
+if not os.path.exists(path):
+    os.mkdir(path)
+    print("Folder %s created!" % path)
+else:
+    print("Folder %s already exists" % path)
+
 
 """Generate objects"""
 
@@ -38,6 +49,21 @@ boxName = "Utopia"
 
 runName = "LowDensityMP"
 
+# Create directory with model run name under the current date directory where to save results
+
+subDirectory = current_date + "_" + runName
+
+path_run = os.path.join(path, subDirectory)
+
+# check whether directory already exists
+if not os.path.exists(path_run):
+    os.mkdir(path_run)
+    print("Folder %s created!" % path_run)
+else:
+    print("Folder %s already exists" % path_run)
+
+
+# Generate objects
 (
     modelBoxes,
     system_particle_object_list,
@@ -71,6 +97,26 @@ df4 = RC_df.fillna(0)
 # Plot rate constants
 plot_rate_constants(df4)
 
+# # Plot heatmaps of rate constants per compartment
+
+# Create rate constants folder:
+path_RC = os.path.join(path_run, "RateConstants")
+
+# check whether directory already exists
+if not os.path.exists(path_RC):
+    os.mkdir(path_RC)
+    print("Folder %s created!" % path_RC)
+else:
+    print("Folder %s already exists" % path_RC)
+
+# Save rate constants dataframe
+
+t_filename = os.path.join(path_RC, "RateConstants_table.csv")
+df4.to_csv(t_filename, index=False)
+
+# Plot and save RC heatmaps per compartment
+for comp in dict_comp.keys():
+    plot_heatmap_RC(comp, df4, path_RC)
 
 """Build Matrix of interactions"""
 
@@ -134,7 +180,7 @@ q_mass_g_s = 1
 
 # particle imput
 size_bin = "e"
-comp = "Surface_Freshwater"
+comp = "Ocean_Surface_Water"
 MP_form = "freeMP"
 
 sp_imput = (
@@ -207,32 +253,67 @@ Results_comp_organiced = extract_by_aggSt(Results_comp_dict, particle_forms_codi
 
 # Plot results in Total number of particles and Total mass
 
-total_number_figures = {}
-total_mass_figues = {}
-mass_conc_figures = {}
+# Create Steady State results folders:
+path_SteadyState_mass = os.path.join(path_run, "SteadyState_mass_distribution")
+path_SteadyState_number = os.path.join(path_run, "SteadyState_number_distribution")
+
+
+# check whether directory already exists
+if not os.path.exists(path_SteadyState_mass):
+    os.mkdir(path_SteadyState_mass)
+    print("Folder %s created!" % path_SteadyState_mass)
+else:
+    print("Folder %s already exists" % path_SteadyState_mass)
+
+if not os.path.exists(path_SteadyState_number):
+    os.mkdir(path_SteadyState_number)
+    print("Folder %s created!" % path_SteadyState_number)
+else:
+    print("Folder %s already exists" % path_SteadyState_number)
+
 
 for comp in Results_comp_organiced:
-    total_number_figures[comp] = plot_bySize_total_number_particles(
-        Results_comp_organiced, comp, model_lists["dict_size_coding"]
+    plot_bySize_total_number_particles(
+        Results_comp_organiced,
+        comp,
+        model_lists["dict_size_coding"],
+        path=path_SteadyState_number,
     )
-    total_mass_figues[comp] = plot_bySize_total_mass(
+    plot_bySize_total_mass(
         results_dict=Results_comp_organiced,
         comp_name=comp,
         dict_size_coding=model_lists["dict_size_coding"],
+        path=path_SteadyState_mass,
     )
-    mass_conc_figures[comp] = plot_by(
-        results_dict=Results_comp_organiced,
-        comp_name=comp,
-        dict_size_coding=model_lists["dict_size_coding"],
-        plot_by="concentration_g_m3",
-    )
+    # plot_by(
+    #     results_dict=Results_comp_organiced,
+    #     comp_name=comp,
+    #     dict_size_coding=model_lists["dict_size_coding"],
+    #     plot_by="concentration_g_m3",
+    # )
 
 
 print("Distribution of mass in the system")
 print(mf_shorted[:10])
+df_massDistribution = mf_shorted[:10]
+
+# Save the table of mass distribution
+massDitribution_filename = os.path.join(
+    path_SteadyState_mass, "SS_mass_distribution.csv"
+)
+df_massDistribution.to_csv(massDitribution_filename)
+
 
 print("distribution of particle number in the system")
 print(nf_shorted[:10])
+df_numberDistribution = nf_shorted[:10]
+
+# Save the table of number distribution
+numberDitribution_filename = os.path.join(
+    path_SteadyState_number, "SS_number_distribution.csv"
+)
+df_numberDistribution.to_csv(numberDitribution_filename)
+
 
 # Mass distribution by compartment
 mass_frac_100 = []
@@ -264,6 +345,11 @@ plt.ylabel("% of total mass")
 plt.yscale("log")
 plt.ylim(0.01, 100)
 plt.xticks(rotation=90)
+# Save the plot
+massDistribPlot_filename = os.path.join(
+    path_SteadyState_mass, "mass_by_compartment.png"
+)
+plt.savefig(massDistribPlot_filename, bbox_inches="tight")
 plt.show()
 plt.close()
 
@@ -275,6 +361,11 @@ plt.ylabel("% of total number")
 plt.yscale("log")
 plt.ylim(0.01, 100)
 plt.xticks(rotation=90)
+# Save the plot
+numberDistribPlot_filename = os.path.join(
+    path_SteadyState_number, "number_by_compartment.png"
+)
+plt.savefig(numberDistribPlot_filename, bbox_inches="tight")
 plt.show()
 plt.close()
 
@@ -289,7 +380,7 @@ for p in system_particle_object_list:
     for c in p.RateConstants:
         p.outFlow_mass_g_s[c] = p.RateConstants[c] * p.Pmass_g_SS
 
-# Print tables of output flows per compartmet
+# Tables of output flows per compartmet
 tables_outputFlows = {}
 for c in list(dict_comp.keys()):
     part_dic = {}
@@ -303,16 +394,6 @@ for k in tables_outputFlows:
     tables_outputFlows[k] = (
         tables_outputFlows[k].reset_index(level=1).drop("level_1", axis=1)
     )
-
-# # Plot tables and heatmaps of outputflows per compartment
-# for comp in tables_outputFlows:
-#     print(comp)
-#     extract_output_table(
-#         comp=comp,
-#         tables_outputFlows=tables_outputFlows,
-#         MP_form_dict_reverse=MP_form_dict_reverse,
-#         size_dict=size_dict,
-#     )
 
 # Estimate imput flows from transport from other compartments
 
@@ -336,6 +417,28 @@ for comp in list(dict_comp.keys()):
 
     tables_inputFlows[comp] = pd.concat(comp_input_flows).fillna(0)
 
+
+# Create folder for saving ouput and input mass flows
+path_mass_flows = os.path.join(path_run, "Compartment_mass_flows")
+
+# check whether directory already exists
+if not os.path.exists(path_mass_flows):
+    os.mkdir(path_mass_flows)
+    print("Folder %s created!" % path_mass_flows)
+else:
+    print("Folder %s already exists" % path_mass_flows)
+
+for comp in tables_outputFlows:
+    flows_tables_to_csv(
+        comp,
+        tables_outputFlows,
+        tables_inputFlows,
+        MP_form_dict_reverse,
+        size_dict,
+        path=path_mass_flows,
+    )
+
+
 ## Compartment mass balance --> Check mass balance function (when done manually it works.... adding inputs from table of inputs + emissions - outflows (selecting the rigth processess))
 
 
@@ -348,6 +451,20 @@ for comp in list(dict_comp.keys()):
         dict_comp=dict_comp,
         tables_inputFlows=tables_inputFlows,
     )
+
+
+""" Generate PDF report """
+
+filename = runName + "_" + current_date
+text_elements = {
+    "plastic_density_kg_m3": system_particle_object_list[0].Pdensity_kg_m3,
+    "imput_flow_g_s": q_mass_g_s,
+    "particle_emissions_form": MP_form,
+    "particle_emissions_size_nm": size_dict[size_bin],
+    "recieving_compartment": comp,
+}
+df_list = [df_massDistribution, df_numberDistribution, df4]
+figs = ["rateConstants.png", "massDistribution.png", "numberDistribution.png"]
 
 
 """ Save results """
