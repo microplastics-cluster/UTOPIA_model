@@ -207,11 +207,23 @@ def flows_tables_to_csv(
     df2.insert(1, "MP_form", MP_form)
 
     # Create a Pandas Excel writer using the file name and desired engine
-    writer = pd.ExcelWriter(comp + "_mass_flows.xlsx", engine="xlsxwriter")
+    writer = pd.ExcelWriter(path + "/" + comp + "_mass_flows.xlsx", engine="xlsxwriter")
 
     # Write each dataframe to a different worksheet
     df1.to_excel(writer, sheet_name="Output_flows", index=False)
     df2.to_excel(writer, sheet_name="Input_flows", index=False)
 
+    # Save the file
+    writer.save()
+
+
+def results_extended_by_compartment_to_csv(path, results_dict):
+    # Create a Pandas Excel writer using the file name and desired engine
+    writer = pd.ExcelWriter(path + "/" + "Results_SS.xlsx", engine="xlsxwriter")
+
+    # Write each dataframe to a different worksheet (for each compartment)
+    for comp in results_dict:
+        df_results = results_dict[comp]
+        df_results.to_excel(writer, sheet_name=comp, index=False)
     # Save the file
     writer.save()

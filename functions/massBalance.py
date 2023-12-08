@@ -51,6 +51,8 @@ def compartment_massBalance(
 ):
     loss_processess = ["k_discorporation", "k_burial", "k_sequestration_deep_soils"]
 
+    # fragmentation is a loss process only for the smallest size bin (a=0.5nm)
+
     transfer_processes = [
         "k_advective_transport",
         "k_rising",
@@ -68,7 +70,18 @@ def compartment_massBalance(
     ]
     comp_loss_processess = loss_processess + transfer_processes
 
-    output_flows = tables_outputFlows[comp]
+    outputs_frag = sum(
+        [
+            val
+            for i, val in zip(
+                tables_outputFlows[comp]["MP_size"],
+                tables_outputFlows[comp]["k_fragmentation"],
+            )
+            if i == 0.5
+        ]
+    )
+
+    output_flows = tables_outputFlows[comp].drop(["MP_size", "MP_form"], axis=1)
     output_flows_sum = output_flows.sum()
 
     out_flow_comp_g_s = sum(
@@ -88,15 +101,18 @@ def compartment_massBalance(
             else:
                 emiss_flow_g_s = 0
 
-    transport_input_flow = sum(tables_inputFlows[comp].sum())
+    transport_input_flow = sum(
+        tables_inputFlows[comp].drop(["MP_size", "MP_form"], axis=1).sum()
+    )
 
     # Mass balance per compartment
     print(
         "Difference inflow-outflow in "
         + comp
         + " is = "
-        + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s)
+        + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag)
     )
+    return emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag
 
 
 def global_massBalance(q_mass_g_s, tables_outputFlows):

@@ -22,7 +22,6 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 outputs_path = os.path.join(os.path.dirname(__file__), "Results")
 
 # get current date and time to store results
-current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 current_date = datetime.now().strftime("%Y-%m-%d")
 
 # Create directory with current date where to save results
@@ -37,7 +36,7 @@ else:
     print("Folder %s already exists" % path)
 
 
-"""Generate objects"""
+"""Define run parameters"""
 
 ## choose input files to load
 
@@ -47,7 +46,65 @@ mp_imputFile_name = "\inputs_microplastics.csv"
 
 boxName = "Utopia"
 
-runName = "LowDensityMP"
+# Choose input flow (in g per second)
+# Define particle imput (sp_imput):
+
+# Size fraction:
+# a= 0.5 um
+# b= 5 um
+# c= 50 um
+# d= 500 um
+# e= 5000 um
+size_dict = dict(zip(["a", "b", "c", "d", "e"], [0.5, 5, 50, 500, 5000]))
+
+# Aggregation state:
+# A= Free MP
+# B= heteroaggregatedMP
+# C= biofouled MP
+# D= biofouled and heteroaggregated MP
+particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
+
+MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
+
+## Compartments:
+# 0= 'Ocean_Surface_Water'
+# 1= 'Ocean_Mixed_Water'
+# 2= 'Ocean_Column_Water'
+# 3= 'Coast_Surface_Water'
+# 4= 'Coast_Column_Water'
+# 5= 'Surface_Freshwater'
+# 6= 'Bulk_Freshwater'
+# 7= 'Sediment_Freshwater'
+# 8= 'Sediment_Ocean'
+# 9= 'Sediment_Coast'
+# 10= 'Urban_Soil_Surface'
+# 11= 'Urban_Soil'
+# 12= 'Background_Soil_Surface'
+# 13= 'Background_Soil'
+# 14= 'Agricultural_Soil_Surface'
+# 15= 'Agricultural_Soil'
+# 16= 'Air'
+
+# input flow (in g per second)
+q_mass_g_s = 1
+
+# particle imput
+size_bin = "e"
+compartment = "Ocean_Surface_Water"
+MP_form = "freeMP"
+MP_density = "LowDensity"  # To be changed based on the MP imputs file
+
+runName = (
+    MP_density
+    + "MP_Emissions_"
+    + str(q_mass_g_s)
+    + "g_s_"
+    + MP_form
+    + "_"
+    + str(size_dict[size_bin])
+    + "_nm_"
+    + compartment
+)
 
 # Create directory with model run name under the current date directory where to save results
 
@@ -62,6 +119,8 @@ if not os.path.exists(path_run):
 else:
     print("Folder %s already exists" % path_run)
 
+
+"""Generate objects"""
 
 # Generate objects
 (
@@ -130,43 +189,6 @@ interactions_df_Knames = fillInteractions_Knames(
 
 """SOLVE SYSTEM OF ODES"""
 
-# Choose input flow (in g per second)
-# Define particle imput (sp_imput):
-
-# Size fraction:
-# a= 0.5 um
-# b= 5 um
-# c= 50 um
-# d= 500 um
-# e= 5000 um
-size_dict = dict(zip(["a", "b", "c", "d", "e"], [0.5, 5, 50, 500, 5000]))
-# Aggregation state:
-# A= Free MP
-# B= heteroaggregatedMP
-# C= biofouled MP
-# D= biofouled and heteroaggregated MP
-particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
-
-MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
-
-# Compartment:
-# 0= 'Ocean_Surface_Water'
-# 1= 'Ocean_Mixed_Water'
-# 2= 'Ocean_Column_Water'
-# 3= 'Coast_Surface_Water'
-# 4= 'Coast_Column_Water'
-# 5= 'Surface_Freshwater'
-# 6= 'Bulk_Freshwater'
-# 7= 'Sediment_Freshwater'
-# 8= 'Sediment_Ocean'
-# 9= 'Sediment_Coast'
-# 10= 'Urban_Soil_Surface'
-# 11= 'Urban_Soil'
-# 12= 'Background_Soil_Surface'
-# 13= 'Background_Soil'
-# 14= 'Agricultural_Soil_Surface'
-# 15= 'Agricultural_Soil'
-# 16= 'Air'
 particle_compartmentCoding = dict(
     zip(
         model_lists["compartmentNames_list"],
@@ -175,18 +197,10 @@ particle_compartmentCoding = dict(
 )
 comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
 
-# input flow (in g per second)
-q_mass_g_s = 1
-
-# particle imput
-size_bin = "e"
-comp = "Ocean_Surface_Water"
-MP_form = "freeMP"
-
 sp_imput = (
     size_bin
     + particle_forms_coding[MP_form]
-    + str(particle_compartmentCoding[comp])
+    + str(particle_compartmentCoding[compartment])
     + "_"
     + boxName
 )
@@ -199,7 +213,7 @@ print(
     + " of size "
     + str(size_dict[size_bin])
     + " into the "
-    + comp
+    + compartment
     + " compartment"
 )
 
@@ -250,6 +264,10 @@ Results_comp_dict = extract_by_comp(
     Results_extended.reset_index(), particle_compartmentCoding
 )
 Results_comp_organiced = extract_by_aggSt(Results_comp_dict, particle_forms_coding)
+
+# Save results extended organised in excel sheets per compartment
+
+results_extended_by_compartment_to_csv(path=path_run, results_dict=Results_comp_dict)
 
 # Plot results in Total number of particles and Total mass
 
@@ -441,9 +459,9 @@ for comp in tables_outputFlows:
 
 ## Compartment mass balance --> Check mass balance function (when done manually it works.... adding inputs from table of inputs + emissions - outflows (selecting the rigth processess))
 
-
+comp_mass_balance = {}
 for comp in list(dict_comp.keys()):
-    compartment_massBalance(
+    comp_mass_balance[comp] = compartment_massBalance(
         comp=comp,
         tables_outputFlows=tables_outputFlows,
         PartMass_t0=PartMass_t0,
@@ -453,7 +471,8 @@ for comp in list(dict_comp.keys()):
     )
 
 
-""" Generate PDF report """
+""" Generate PDF report """  ## WORK IN PROGRESS
+from functions.generate_pfd_report import *
 
 filename = runName + "_" + current_date
 text_elements = {
@@ -466,143 +485,4 @@ text_elements = {
 df_list = [df_massDistribution, df_numberDistribution, df4]
 figs = ["rateConstants.png", "massDistribution.png", "numberDistribution.png"]
 
-
-""" Save results """
-
-# Create directory with current date
-directory = current_date
-
-path = os.path.join(outputs_path, directory)
-
-# check whether directory already exists
-if not os.path.exists(path):
-    os.mkdir(path)
-    print("Folder %s created!" % path)
-else:
-    print("Folder %s already exists" % path)
-
-# Save results in directory
-
-## Particle properties
-particles_df.to_csv(
-    os.path.join(path, "particle_properties_" + runName + "_" + current_date + ".csv")
-)
-
-## Process inputs
-process_inputs_df.to_csv(
-    os.path.join(path, "process_inputs_" + runName + "_" + current_date + ".csv")
-)
-
-## Rate constants
-df4.to_csv(
-    os.path.join(path, "rate_constants_" + runName + "_" + current_date + ".csv")
-)
-
-## Interactions matrix
-# interactions_df.to_csv(
-#     os.path.join(path, "interactions_matrix_" + runName + "_" + current_date + ".csv")
-# )
-# interactions_df_Knames.to_csv(
-#     os.path.join(
-#         path, "interactions_matrix_Knames_" + runName + "_" + current_date + ".csv"
-#     )
-# )
-
-## Results at steady state
-
-Results_extended.to_csv(
-    os.path.join(path, "Results_SS_" + runName + "_" + current_date + ".csv")
-)
-
-# Save figures?
-
-# for comp in mass_conc_figures.keys():
-#     mass_conc_figures[comp].saveFigure()
-
-
-###Modify rate constants by stablishing a time limit or chaging specific rate constant values using the change_RC_value function
-# "Timelimit" mode sets up a time limit of 30min on the processes that exceeds that speed (k > 0.000556), while "raw" mode leaves the rate constant as calcualted. The raw version can straing the solver due to time.
-
-# particles_updated= change_RC_value(system_particle_object_list,#rc_name="k_sediment_resuspension",rc_val=1E-7)
-
-# particles_updated = timeLimit_particles_RC(system_particle_object_list,0.000556)
-
-
-# RC_df_timeLim = create_rateConstants_table(particles_updated)
-
-# #Plot rate constants
-# plot_rate_constants(RC_df_timeLim)
-
-# # create rate constants table:
-
-# fileName = "rateConstantsUTOPIA_Test.csv"
-
-# # Save rate contants dataframe as csv file
-
-# df4 = RC_df_timeLim.fillna(0)
-# #df4.to_csv(fileName, index=False)
-
-
-# # Generate system of differentia equations (1-Matrix of interactions, 2-System of differential equations)
-
-# # Build Matrix of interactions
-
-# interactions_df = fillInteractions_fun_OOP(particles_updated, SpeciesList)
-
-
-# #Optional Check interactions dataframe by process:
-
-# from functions.fill_interactions_Knames import*
-
-
-# #interactions_df_Knames=fillInteractions_Knames(
-# #system_particle_object_list,SpeciesList
-# #)
-
-
-# # """SOLVE SYSTEM OF ODES"""
-
-# #Choose input flow (in g per second)
-# q_mass_g_s=1
-# sp_imput="eA0_Utopia"
-
-# R = solve_ODES_SS(system_particle_object_list=particles_updated,q_mass_g_s=q_mass_g_s,q_num_s=0,sp_imput=sp_imput,interactions_df=interactions_df)
-
-# from functions.massBalance import*
-# massBalance(R,system_particle_object_list, q_mass_g_s)
-
-# Results_comp_dict=extract_by_comp(R.reset_index(),model_lists["compartmentNames_list"])
-# Results_comp_organiced=extract_by_aggSt(Results_comp_dict,MPforms_list)
-
-# #Plot results
-# particle_sizes_coding = {"mp5": "a", "mp4": "b", "mp3": "c", "mp2": "d", "mp1": "e"}
-
-
-# for comp in Results_comp_organiced:
-#     plot_bySize_total_number_particles(Results_comp_organiced,comp,model_lists["dict_size_coding"])
-
-### Code to check
-
-# Estimate mass flows of particles out of a compartment due to transfer to other compartments (rate constants of transfer * C at steady steat)
-for p in system_particle_object_list:
-    p.outFlow_mass_g_s = {}
-    for c in p.Pcompartment.connexions.values():
-        if type(c) != list:
-            p.outFlow_mass_g_s[c] = p.RateConstants["k_" + c] * p.Pmass_g_SS
-        else:
-            for e in c:
-                p.outFlow_mass_g_s[e] = p.RateConstants["k_" + e] * p.Pmass_g_SS
-
-# Print tables of output flows per compartmet
-tables_outputFlows = {}
-for c in list(dict_comp.keys()):
-    comp_out_flow_table = pd.DataFrame(
-        columns=["MP_form", "MP_size"] + list(dict_comp[c].connexions.values())
-    )
-    for p in system_particle_object_list:
-        if p.Pcompartment.Cname == c:
-            comp_out_flow_table.loc[len(comp_out_flow_table)] = [
-                p.Pform,
-                p.Pcode[0],
-            ] + [p.outFlow_mass_g_s[z] for z in list(dict_comp[c].connexions.values())]
-    tables_outputFlows[c] = comp_out_flow_table
+create_pdf_report(df_list, figs, filename, text_elements)
