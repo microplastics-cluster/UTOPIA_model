@@ -111,6 +111,7 @@ def instantiate_compartments(inputs_path_file):
                     G=c.get("G"),
                     Cdepth_m=c.get("Cdepth_m"),
                     Cvolume_m3=c.get("Cvolume_m3"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                 )
             )
         elif c["Cname"] in UTOPIA_sediment_compartment:
@@ -119,6 +120,7 @@ def instantiate_compartments(inputs_path_file):
                     Cname=c.get("Cname"),
                     Cdepth_m=c.get("Cdepth_m"),
                     Cvolume_m3=c.get("Cvolume_m3"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                 )
             )
 
@@ -128,6 +130,7 @@ def instantiate_compartments(inputs_path_file):
                     Cdepth_m=c.get("Cdepth_m"),
                     Cvolume_m3=c.get("Cvolume_m3"),
                     Cname=c.get("Cname"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                 )
             )
 
@@ -137,12 +140,17 @@ def instantiate_compartments(inputs_path_file):
                     Cname=c.get("Cname"),
                     Cdepth_m=c.get("Cdepth_m"),
                     Cvolume_m3=c.get("Cvolume_m3"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                 )
             )
 
         elif c["Cname"] in UTOPIA_air_compartments:
             airComp_objects.append(
-                compartment_air(Cname=c.get("Cname"), Cvolume_m3=c.get("Cvolume_m3"))
+                compartment_air(
+                    Cname=c.get("Cname"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
+                )
             )
         else:
             pass

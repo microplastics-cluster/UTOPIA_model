@@ -2,7 +2,6 @@ from functions import RC_generator
 
 
 def generate_rateConstants(particle, spm, dict_comp):
-
     particle.RateConstants = dict.fromkeys(
         ["k_" + p for p in particle.Pcompartment.processess]
     )
@@ -16,6 +15,11 @@ def generate_rateConstants(particle, spm, dict_comp):
             )
 
         elif process[2:] == "mixing":
+            particle.RateConstants[process] = getattr(RC_generator, process[2:])(
+                particle, dict_comp
+            )
+
+        elif process[2:] == "dry_depossition" or process[2:] == "wet_depossition":
             particle.RateConstants[process] = getattr(RC_generator, process[2:])(
                 particle, dict_comp
             )

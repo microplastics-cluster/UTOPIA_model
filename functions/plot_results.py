@@ -9,6 +9,14 @@ import pandas as pd
 particle_sizes_coding = {"mp5": "a", "mp4": "b", "mp3": "c", "mp2": "d", "mp1": "e"}
 
 
+# Define a function to check if a value is a list and calculate the sum if it is
+def sum_if_list(value):
+    if isinstance(value, list):
+        return sum(value)
+    else:
+        return value
+
+
 def plot_bySize_total_number_particles(results_dict, comp_name, dict_size_coding, path):
     new_size_dict = dict(
         zip(
@@ -150,6 +158,13 @@ def extract_output_table(
     return T
 
 
+def sum_if_list(value):
+    if isinstance(value, list):
+        return sum(value)
+    else:
+        return value
+
+
 def plot_heatmap_RC(comp, rateConstants_df, path_RC):
     T = rateConstants_df[rateConstants_df["Compartment"] == comp]
 
@@ -159,6 +174,7 @@ def plot_heatmap_RC(comp, rateConstants_df, path_RC):
 
     # Select the desired columns
     df_selected = T[selected_columns]
+    df_selected = df_selected.applymap(sum_if_list)
 
     # Generate the heatmap with combined labels
     fig, ax = plt.subplots(

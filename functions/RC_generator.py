@@ -511,18 +511,30 @@ def wind_trasport(particle):
     return k_wind_transport
 
 
-def dry_depossition(particle):
+def dry_depossition(particle, dict_comp):
     # particles depossition from air to soil or water compartments
     # to be formulated
     # Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1)Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
-    k_dry_depossition = 7.91e-6
+
+    dd_rate = 7.91e-6
+    k_dry_depossition = [
+        dd_rate
+        * (
+            float(dict_comp[c].CsurfaceArea_m2)
+            / float(dict_comp["Air"].CsurfaceArea_m2)
+        )
+        for c in list(dict_comp.keys())
+        if "Surface" in c
+    ]
     return k_dry_depossition
 
 
-def wet_depossition(particle):
+def wet_depossition(particle, dict_comp):
     # particles depossition from air to soil or water compartments via rainfall
     # to be formulated as function of rainfall intensity??
     # Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+    # wd_rate=?
+    # k_dry_depossition = wd_rate*float(particle.Pcompartment.CsurfaceArea_m2)/float(dict_comp["Air"].CsurfaceArea_m2)
 
     k_wet_depossition = 0
     return k_wet_depossition

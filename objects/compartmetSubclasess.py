@@ -97,6 +97,7 @@ class compartment_oceanWater(compartment_water):
         Clength_m=None,
         Cwidth_m=None,
         Cvolume_m3=None,
+        CsurfaceArea_m2=None,
     ):
         super().__init__(
             Cname,
@@ -108,6 +109,7 @@ class compartment_oceanWater(compartment_water):
             Clength_m,
             Cwidth_m,
             Cvolume_m3,
+            CsurfaceArea_m2,
         )
         self.processess = [
             "discorporation",

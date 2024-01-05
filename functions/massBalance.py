@@ -82,6 +82,14 @@ def compartment_massBalance(
     )
 
     output_flows = tables_outputFlows[comp].drop(["MP_size", "MP_form"], axis=1)
+
+    ##Take into account for dry depossition and wet depossition the sum of all output flows
+
+    for proc in output_flows:
+        output_flows[proc] = output_flows[proc].apply(
+            lambda x: sum(x) if isinstance(x, list) else x
+        )
+
     output_flows_sum = output_flows.sum()
 
     out_flow_comp_g_s = sum(

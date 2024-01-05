@@ -90,7 +90,7 @@ q_mass_g_s = 1
 
 # particle imput
 size_bin = "e"
-compartment = "Ocean_Surface_Water"
+compartment = "Air"
 MP_form = "freeMP"
 MP_density = "LowDensity"  # To be changed based on the MP imputs file
 
@@ -141,6 +141,7 @@ else:
     mp_imputFile_name=mp_imputFile_name,
 )
 
+surfComp_list = [c for c in dict_comp if "Surface" in c]
 
 """Estimate rate constants per particle"""
 
@@ -154,7 +155,12 @@ RC_df = create_rateConstants_table(system_particle_object_list)
 df4 = RC_df.fillna(0)
 
 # Plot rate constants
-plot_rate_constants(df4)
+
+
+"""(FIX RC for wet deposition, now its given as a list of rate constants per surface compartment only for dry deposition)This needs to be fixed also for the matrix of interactions and estimation of flows"""
+
+
+# plot_rate_constants(df4)
 
 # # Plot heatmaps of rate constants per compartment
 
@@ -173,13 +179,15 @@ else:
 t_filename = os.path.join(path_RC, "RateConstants_table.csv")
 df4.to_csv(t_filename, index=False)
 
-# Plot and save RC heatmaps per compartment
+# Plot and save RC heatmaps per compartment (Has to be fixed for the procesess wherer there are multiple values of rate constants)
 for comp in dict_comp.keys():
     plot_heatmap_RC(comp, df4, path_RC)
 
 """Build Matrix of interactions"""
 
-interactions_df = fillInteractions_fun_OOP(system_particle_object_list, SpeciesList)
+interactions_df = fillInteractions_fun_OOP(
+    system_particle_object_list, SpeciesList, surfComp_list
+)
 
 from functions.fill_interactions_Knames import *
 
@@ -396,7 +404,10 @@ plt.close()
 for p in system_particle_object_list:
     p.outFlow_mass_g_s = {}
     for c in p.RateConstants:
-        p.outFlow_mass_g_s[c] = p.RateConstants[c] * p.Pmass_g_SS
+        if type(p.RateConstants[c]) == list:
+            p.outFlow_mass_g_s[c] = [R * p.Pmass_g_SS for R in p.RateConstants[c]]
+        else:
+            p.outFlow_mass_g_s[c] = p.RateConstants[c] * p.Pmass_g_SS
 
 # Tables of output flows per compartmet
 tables_outputFlows = {}
@@ -423,9 +434,16 @@ for comp in list(dict_comp.keys()):
         if comp in dict_comp[e_comp].connexions:
             inpProc = dict_comp[e_comp].connexions[comp]
             if type(inpProc) == list:
-                comp_input_flows.append(
-                    tables_outputFlows[e_comp].loc[:, ["k_" + ele for ele in inpProc]]
-                )
+                for index, value in enumerate(surfComp_list):
+                    if value == comp:
+                        position = index
+                df = tables_outputFlows[e_comp].loc[:, ["k_" + ele for ele in inpProc]]
+                for proc in inpProc:
+                    df["k_" + proc] = df["k_" + proc].apply(
+                        lambda x: x[position] if isinstance(x, list) else x
+                    )
+
+                comp_input_flows.append(df)
             else:
                 comp_input_flows.append(
                     tables_outputFlows[e_comp].loc[:, "k_" + inpProc].to_frame()

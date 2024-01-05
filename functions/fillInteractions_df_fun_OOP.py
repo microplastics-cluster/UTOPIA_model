@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
+def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList, surfComp_list):
     # Asign loose rates
     elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
 
@@ -21,7 +21,9 @@ def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList):
 
     for sp1 in system_particle_object_list:
         interactions_df_rows.append(
-            interactionProcess(sp1, interactions_df, system_particle_object_list)
+            interactionProcess(
+                sp1, interactions_df, system_particle_object_list, surfComp_list
+            )
         )
 
     # interact3(sp1) for sp1 in interactions_df.index.to_list()]
@@ -57,21 +59,18 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
                     losses.append(dict_sp[i][0])
                 else:
                     losses.append(dict_sp[i])
-            elif i == "k_advective_transport" or i == "k_mixing":
-                if type(dict_sp[i]) == tuple:
-                    losses.append(sum(dict_sp[i]))
-                else:
-                    losses.append(dict_sp[i])
+
+            elif type(dict_sp[i]) == tuple or type(dict_sp[i]) == list:
+                losses.append(sum(dict_sp[i]))
             else:
                 losses.append(dict_sp[i])
 
         diag_list.append(-(sum(losses)))
 
-    """Revisit losses!!"""
     return diag_list
 
 
-def inboxProcess(sp1, sp2):
+def inboxProcess(sp1, sp2, surfComp_list):
     # If same compartment (compartment processes)
     if sp1.Pcode[2:] == sp2.Pcode[2:]:
         # Only different size bins --> Fragmentation
@@ -154,7 +153,16 @@ def inboxProcess(sp1, sp2):
             if type(process) == list:
                 sol2 = []
                 for p in process:
-                    sol2.append(sp2.RateConstants["k_" + p])
+                    if p == "dry_depossition":
+                        element = sp1.Pcompartment.Cname
+                        # Iterate over the list using enumerate()
+                        for index, value in enumerate(surfComp_list):
+                            if value == element:
+                                position = index
+                        sol2.append(sp2.RateConstants["k_" + p][position])
+
+                    else:
+                        sol2.append(sp2.RateConstants["k_" + p])
                 sol = sum(sol2)
             else:
                 sol = sp2.RateConstants["k_" + process]
@@ -166,7 +174,9 @@ def inboxProcess(sp1, sp2):
     return sol
 
 
-def interactionProcess(sp1, interactions_df, system_particle_object_list):
+def interactionProcess(
+    sp1, interactions_df, system_particle_object_list, surfComp_list
+):
     sol = []
     for sp2 in system_particle_object_list:
         # Same particle in the same box and compartment (losses)
@@ -178,7 +188,7 @@ def interactionProcess(sp1, interactions_df, system_particle_object_list):
             # Same box (i.e. river section RS)--> In box processes
 
             if sp1.Pcode.split("_")[1] == sp2.Pcode.split("_")[1]:
-                sol.append(inboxProcess(sp1, sp2))
+                sol.append(inboxProcess(sp1, sp2, surfComp_list))
 
             # Different Box but same particle in same compartment (Full Multi version where more than 1 box (i.e. river sections)) -->Transport (advection or sediment transport determined by flow_connectivity file)
 

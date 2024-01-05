@@ -27,10 +27,10 @@ def create_pdf_report(df_list, figs, filename, text_elements):
 
     # Add a title to the document
     title_style = getSampleStyleSheet()["Title"]
-    flowables.append(Paragraph("PDF Report " + filename+".pdf", title_style))
+    flowables.append(Paragraph("PDF Report " + filename + ".pdf", title_style))
 
     # Add an empty paragraph to the flowables list
-    flowables.append(Paragraph('', text_style))
+    flowables.append(Paragraph("", text_style))
 
     # Add a paragraph of text to the document
     text_style = getSampleStyleSheet()["Normal"]
@@ -41,8 +41,8 @@ def create_pdf_report(df_list, figs, filename, text_elements):
         )
     )
     # Add an empty paragraph to the flowables list
-    flowables.append(Paragraph('', text_style))
-    
+    flowables.append(Paragraph("", text_style))
+
     # Add a new paragraph of text to the document
     new_text = (
         "Emission of plastic particles of "
@@ -72,16 +72,15 @@ def create_pdf_report(df_list, figs, filename, text_elements):
             text_style,
         )
     )
-    
+
     # Add an empty paragraph to the flowables list
-    flowables.append(Paragraph('', text_style))
-    
+    flowables.append(Paragraph("", text_style))
+
     # Define a style for the subsection title
     subsection_style = getSampleStyleSheet()["Heading2"]
 
     # Add the subsection title to the document
     flowables.append(Paragraph("Results by compartment", subsection_style))
-    
 
     # Add content for the subsection
 
@@ -98,7 +97,13 @@ def create_pdf_report(df_list, figs, filename, text_elements):
                 [
                     ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
                     ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-                    ("LINEBELOW", (0, 0), (-1, 0), 1, colors.black),  # Add a line below the header row
+                    (
+                        "LINEBELOW",
+                        (0, 0),
+                        (-1, 0),
+                        1,
+                        colors.black,
+                    ),  # Add a line below the header row
                     ("ALIGN", (0, 0), (-1, 0), "CENTER"),
                     ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                     ("FONTSIZE", (0, 0), (-1, 0), 14),
@@ -140,4 +145,4 @@ def create_pdf_report(df_list, figs, filename, text_elements):
 create_pdf_report(df_list, figs, filename, text_elements)
 
 
-def create_pdf_compartments_subsections(comp,
+# def create_pdf_compartments_subsections(comp,
