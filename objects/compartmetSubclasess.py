@@ -2,12 +2,11 @@ from objects.compartment import *
 
 # Subclasses (inheritances) of the class compartment add extra attributes to the compatment that define the type of compartment
 
+UTOPIA_surfaceSea_water_compartments = ["Ocean_Surface_Water", "Coast_Surface_Water"]
 
 UTOPIA_water_compartments = [
-    "Ocean_Surface_Water",
     "Ocean_Mixed_Water",
     "Ocean_Column_Water",
-    "Coast_Surface_Water",
     "Coast_Column_Water",
     "Surface_Freshwater",
     "Bulk_Freshwater",
@@ -76,7 +75,6 @@ class compartment_water(Compartment):
             "settling",
             "rising",
             "mixing",
-            "sea_spray_aerosol",
         ]
         # if waterFlow_m3_s == "nan":
         #     waterFlow_m3_s = self.flowVelocity_m * self.Cdepth_m * self.Cwidth_m
@@ -84,7 +82,7 @@ class compartment_water(Compartment):
         #     pass
 
 
-class compartment_oceanWater(compartment_water):
+class compartment_surfaceSea_water(Compartment):
     # added new processess to the list of processess. new attributes that migth be needed to this processess should be added here
     def __init__(
         self,
@@ -98,19 +96,16 @@ class compartment_oceanWater(compartment_water):
         Cwidth_m=None,
         Cvolume_m3=None,
         CsurfaceArea_m2=None,
+        flowVelocity_m_s=None,
     ):
         super().__init__(
-            Cname,
-            SPM_mgL,
-            waterFlow_m3_s,
-            T_K,
-            G,
-            Cdepth_m,
-            Clength_m,
-            Cwidth_m,
-            Cvolume_m3,
-            CsurfaceArea_m2,
+            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
         )
+        self.SPM_mgL = SPM_mgL
+        self.flowVelocity_m_s = flowVelocity_m_s
+        self.waterFlow_m3_s = waterFlow_m3_s
+        self.T_K = T_K
+        self.G = G  # Shear rate (G, in s−1)
         self.processess = [
             "discorporation",
             "fragmentation",

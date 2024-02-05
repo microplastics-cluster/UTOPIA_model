@@ -120,7 +120,10 @@ def compartment_massBalance(
         + " is = "
         + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag)
     )
-    return emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag
+    return {
+        "Inflow": emiss_flow_g_s + transport_input_flow,
+        "Outflow": out_flow_comp_g_s + outputs_frag,
+    }
 
 
 def global_massBalance(q_mass_g_s, tables_outputFlows):

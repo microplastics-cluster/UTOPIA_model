@@ -114,6 +114,21 @@ def instantiate_compartments(inputs_path_file):
                     CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                 )
             )
+
+        elif c["Cname"] in UTOPIA_surfaceSea_water_compartments:
+            waterComp_objects.append(
+                compartment_surfaceSea_water(
+                    Cname=c.get("Cname"),
+                    SPM_mgL=c.get("SPM_mgL"),
+                    flowVelocity_m_s=c.get("flowVelocity_m_s"),
+                    waterFlow_m3_s=c.get("waterFlow_m3_s"),
+                    T_K=c.get("T_K"),
+                    G=c.get("G"),
+                    Cdepth_m=c.get("Cdepth_m"),
+                    Cvolume_m3=c.get("Cvolume_m3"),
+                    CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
+                )
+            )
         elif c["Cname"] in UTOPIA_sediment_compartment:
             sedimentComp_objects.append(
                 compartment_sediment(

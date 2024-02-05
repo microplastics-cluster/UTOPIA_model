@@ -90,7 +90,7 @@ q_mass_g_s = 1
 
 # particle imput
 size_bin = "e"
-compartment = "Air"
+compartment = "Surface_Freshwater"
 MP_form = "freeMP"
 MP_density = "LowDensity"  # To be changed based on the MP imputs file
 
@@ -475,7 +475,7 @@ for comp in tables_outputFlows:
     )
 
 
-## Compartment mass balance --> Check mass balance function (when done manually it works.... adding inputs from table of inputs + emissions - outflows (selecting the rigth processess))
+## Compartment mass balance
 
 comp_mass_balance = {}
 for comp in list(dict_comp.keys()):
@@ -487,6 +487,29 @@ for comp in list(dict_comp.keys()):
         dict_comp=dict_comp,
         tables_inputFlows=tables_inputFlows,
     )
+
+# Print compartment mass balance table
+comp_mass_balance_df = pd.DataFrame.from_dict(comp_mass_balance, orient="index")
+print(comp_mass_balance_df)
+
+comp_mass_balance_df["Mass balance"] = [
+    comp_mass_balance_df["Inflow"][c] - comp_mass_balance_df["Outflow"][c]
+    for c in comp_mass_balance_df.index
+]
+
+# Add total steady state mass and number of particles concentrations to dataframe
+
+# comp_mass_balance_df["Total Mass (g)"] = [sum(Results_comp_dict[c].mass_g) for c in comp_mass_balance_df.index]
+# comp_mass_balance_df["Total Number of Particles"] = [sum(Results_comp_dict[c].number_of_particles) for c in comp_mass_balance_df.index]
+comp_mass_balance_df["Concentration (g/m3)"] = [
+    sum(Results_comp_dict[c].concentration_g_m3) for c in comp_mass_balance_df.index
+]
+comp_mass_balance_df["Concentration (N/m3)"] = [
+    sum(Results_comp_dict[c].concentration_num_m3) for c in comp_mass_balance_df.index
+]
+
+# Save compartment mass balance table
+comp_mass_balance_df.to_csv(os.path.join(path_run, "compartment_mass_balance.csv"))
 
 
 """ Generate PDF report """  ## WORK IN PROGRESS
