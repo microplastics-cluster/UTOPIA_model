@@ -48,9 +48,11 @@ def discorporation(particle):
 
 
 def fragmentation(particle):
-    # estimate fragmentation relation between size bins (all except smallest size bin)
+
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
-    # for fragmentation of pristine particles in the largest (x=500μm => mp1 => e) size class.
+    # for fragmentation of pristine particles in the largest (x=5000μm => mp1 => e) size class.
+
+    # estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
 
     # Fragmentation of heteroaggregated particles is assumed negligible in the default model formulation
 
@@ -516,6 +518,8 @@ def dry_depossition(particle, dict_comp):
     # to be formulated
     # Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1).
     # Will be reformulated to be made size class and recieving compartment dependent
+
+    # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
     dd_rate = 7.91e-6
     k_dry_depossition = [

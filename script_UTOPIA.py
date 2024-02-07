@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from functions import create_inputsTable_UTOPIA
 from functions.create_rateConstants_tabel import *
-from functions.fillInteractions_df_fun_OOP import *
+from functions.fillInteractions_df_fun import *
 from functions.generate_modelObjects import *
 from functions.generateRateConstants_particles import *
 from functions.solver_SteadyState import *
