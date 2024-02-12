@@ -99,6 +99,13 @@ def settling(particle):
     !! currently only classical Stokes is implemented (which is probably not
     very realistic and will be updated soon !!"""
 
+    # Depending on the compartment we should use a specific water density
+
+    if "Freshwater" in particle.Pcompartment.Cname:
+        w_den_kg_m3 = density_w_21C_kg_m3
+    else:
+        w_den_kg_m3 = density_seaWater_kg_m3
+
     settlingMethod = "Stokes"
 
     # Settling occurs in all aquatic compartments which should be specified in the comprtment class
@@ -109,7 +116,7 @@ def settling(particle):
         vSet_m_s = (
             2
             / 9
-            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - w_den_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
             * (float(particle.radius_m)) ** 2
@@ -152,11 +159,17 @@ def rising(particle):
         "Coast_Column_Water",
         "Bulk_Freshwater",
     ]:
+
+        if "Freshwater" in particle.Pcompartment.Cname:
+            w_den_kg_m3 = density_w_21C_kg_m3
+        else:
+            w_den_kg_m3 = density_seaWater_kg_m3
+
         if settlingMethod == "Stokes":
             vSet_m_s = (
                 2
                 / 9
-                * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
+                * (float(particle.Pdensity_kg_m3) - w_den_kg_m3)
                 / mu_w_21C_kg_ms
                 * g_m_s2
                 * (float(particle.radius_m)) ** 2
@@ -212,10 +225,15 @@ def heteroaggregation(particle, spm):
         )
         # orthokinetic contributions to collision rate constant (caused by fluid motion)
 
+        if "Freshwater" in particle.Pcompartment.Cname:
+            w_den_kg_m3 = density_w_21C_kg_m3
+        else:
+            w_den_kg_m3 = density_seaWater_kg_m3
+
         MP_vSet_m_s = (
             2
             / 9
-            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - w_den_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
             * (float(particle.radius_m)) ** 2
@@ -224,7 +242,7 @@ def heteroaggregation(particle, spm):
         SPM_vSet_m_s = (
             2
             / 9
-            * (spm.Pdensity_kg_m3 - density_w_21C_kg_m3)
+            * (spm.Pdensity_kg_m3 - w_den_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
             * (spm.radius_m) ** 2
@@ -290,11 +308,15 @@ def heteroaggregate_breackup(particle, spm):
             * (float(particle.radius_m) + spm.radius_m) ** 3
         )
         # orthokinetic contributions to collision rate constant (caused by fluid motion)
+        if "Freshwater" in particle.Pcompartment.Cname:
+            w_den_kg_m3 = density_w_21C_kg_m3
+        else:
+            w_den_kg_m3 = density_seaWater_kg_m3
 
         MP_vSet_m_s = (
             2
             / 9
-            * (float(particle.Pdensity_kg_m3) - density_w_21C_kg_m3)
+            * (float(particle.Pdensity_kg_m3) - w_den_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
             * (float(particle.radius_m)) ** 2
@@ -302,7 +324,7 @@ def heteroaggregate_breackup(particle, spm):
         SPM_vSet_m_s = (
             2
             / 9
-            * (spm.Pdensity_kg_m3 - density_w_21C_kg_m3)
+            * (spm.Pdensity_kg_m3 - w_den_kg_m3)
             / mu_w_21C_kg_ms
             * g_m_s2
             * (spm.radius_m) ** 2
