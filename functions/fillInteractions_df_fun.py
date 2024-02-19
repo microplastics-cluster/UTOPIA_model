@@ -51,7 +51,7 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
             i
         ) in (
             dict_sp.keys()
-        ):  # Do we need to remove fragemtation of smallest size bin and only take into consideration desintegration??
+        ):  # Do we need to remove fragmentation of smallest size bin and only take into consideration desintegration?? # It should be anyways = to zero
             if i == "k_fragmentation":
                 if type(dict_sp[i]) == tuple:
                     losses.append(dict_sp[i][0])
@@ -60,10 +60,14 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
 
             elif type(dict_sp[i]) == tuple or type(dict_sp[i]) == list:
                 losses.append(sum(dict_sp[i]))
+            elif type(dict_sp[i]) == dict:
+                losses.append(sum(dict_sp[i].values()))
             else:
                 losses.append(dict_sp[i])
 
-        diag_list.append(-(sum(losses)))
+        losses_all = [sum(e) if isinstance(e, list) else e for e in losses]
+
+        diag_list.append(-(sum(losses_all)))
 
     return diag_list
 
@@ -76,31 +80,20 @@ def inboxProcess(sp1, sp2, surfComp_list):
         if sp1.Pcode[1:] == sp2.Pcode[1:] and sp1.Pcode[0] != sp2.Pcode[0]:
 
             # We reformulate fractionation as it is not a happening only for consecutive size Bins(bigger to next smaller) but using the fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
-            #  fsd = is a 2D matrix, but as fragmentation only happens from larger to smaller size classes, the matrix is zero everywhere except its lower left triangle.
+            # We have to select the fragmentation rate corresponding to the recieving size bin from the size_dict
 
-            # Set fsd. This is an example of distribution but can be changed and also subject to beta factor as described in the link avobe. To be discussed
-            fsd = np.array(
-                [
-                    [0, 0, 0, 0, 0],
-                    [1, 0, 0, 0, 0],
-                    [0.5, 0.5, 0, 0, 0],
-                    [0.6, 0.2, 0.2, 0, 0],
-                    [0.7, 0.15, 0.1, 0.05, 0],
-                ]
-            )
             # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
 
             size_dict = {chr(i): i - ord("a") for i in range(ord("a"), ord("e") + 1)}
 
-            fsd_index_i = size_dict[sp2.Pcode[0]]
-            fsd_index_j = size_dict[sp1.Pcode[0]]
-            frag_factor = fsd[fsd_index_i, fsd_index_j]
+            fsd_index = size_dict[sp1.Pcode[0]]
+
             if type(sp2.RateConstants["k_fragmentation"]) is tuple:
                 frag = sp2.RateConstants["k_fragmentation"]
 
-                sol = frag[0] * frag_factor
+                sol = frag[0][fsd_index]
             else:
-                sol = sp2.RateConstants["k_fragmentation"] * frag_factor
+                sol = sp2.RateConstants["k_fragmentation"][fsd_index]
 
         # Different aggergation states (same size)--> heteroagg, biofouling,defouling and agg-breackup
 
@@ -158,42 +151,51 @@ def inboxProcess(sp1, sp2, surfComp_list):
 
     elif sp1.Pcompartment.Cname in sp2.Pcompartment.connexions:
         # transport between compartments only for same aggregation state and same particle size
+
+        surfComp_dict = {key: index for index, key in enumerate(surfComp_list)}
+
         if sp1.Pcode[:2] == sp2.Pcode[:2]:
             process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
             if type(process) == list:
                 sol2 = []
                 for p in process:
-                    if p == "dry_depossition":
-                        element = sp1.Pcompartment.Cname
-                        # Iterate over the list using enumerate()
-                        for index, value in enumerate(surfComp_list):
-                            if value == element:
-                                position = index
-                        sol2.append(sp2.RateConstants["k_" + p][position])
+                    if (
+                        p == "dry_depossition"
+                    ):  # Select the rate corresponding to the recieving compartment dictated by surfComp_dict
+                        sol2.append(
+                            sp2.RateConstants["k_" + p][
+                                surfComp_dict[sp1.Pcompartment.Cname]
+                            ]
+                        )
+
+                    elif p == "mixing":
+                        if type(sp2.RateConstants["k_" + p]) == list:
+                            if sp1.Pcompartment.Cname == "Ocean_Surface_Water":
+                                sol2.append(sp2.RateConstants["k_" + p][0])
+
+                            elif sp1.Pcompartment.Cname == "Ocean_Column_Water":
+                                sol2.append(sp2.RateConstants["k_" + p][1])
+                        else:
+                            sol2.append(sp2.RateConstants["k_" + p])
 
                     else:
                         sol2.append(sp2.RateConstants["k_" + p])
                 sol = sum(sol2)
             else:
                 if process == "runoff_transport":
+
                     # Runoff can happen from soil surface to freshwater surface and to coast surface water and it will happen in different proportions. we stablish the fraction that goes into each water body through fdd : the matrix containing the fractions of the runoff of each surface soil type that goes into each surface water body (only coast and freshwater)
-                    ro_comp = {
-                        "Urban_Soil_Surface": 0,
-                        "Background_Soil_Surface": 1,
-                        "Agricultural_Soil_Surface": 2,
-                    }
-                    recieving_comp = {"Coast_Surface_Water": 0, "Surface_Freshwater": 1}
+                    if type(sp2.RateConstants["k_" + process]) != int:
+                        recieving_comp = {
+                            "Coast_Surface_Water": 0,
+                            "Surface_Freshwater": 1,
+                        }
 
-                    # In this example of fdd all runoff goes to surface freshwater. To be discussed later
-                    fro = np.array([[0, 1], [0, 1], [0, 1]])
-
-                    sol = (
-                        sp2.RateConstants["k_" + process]
-                        * fro[
-                            ro_comp[sp2.Pcompartment.Cname],
-                            recieving_comp[sp1.Pcompartment.Cname],
+                        sol = sp2.RateConstants["k_" + process][
+                            recieving_comp[sp1.Pcompartment.Cname]
                         ]
-                    )
+                    else:
+                        sol = sp2.RateConstants["k_" + process]
                 else:
                     sol = sp2.RateConstants["k_" + process]
         else:

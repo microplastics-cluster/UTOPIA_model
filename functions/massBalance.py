@@ -1,4 +1,4 @@
-from functions.fillInteractions_df_fun_OOP import eliminationProcesses
+from functions.fillInteractions_df_fun import eliminationProcesses
 from helpers.helpers import num_to_mass
 
 import pandas as pd
@@ -10,7 +10,11 @@ def massBalance(R, system_particle_object_list, q_mass_g_s):
     # Lossess also from fragmentation of the smallest size bin
     loss_processess = ["k_discorporation", "k_burial", "k_sequestration_deep_soils"]
     elimination_rates = []
+
+    # Estimate outflows
+
     for p in system_particle_object_list:
+
         if p.Pcode[0] == "a":
             elimination_rates.append(
                 sum(
@@ -20,7 +24,7 @@ def massBalance(R, system_particle_object_list, q_mass_g_s):
                         if e in p.RateConstants
                     ]
                 )
-                + p.RateConstants["k_fragmentation"]
+                + sum(p.RateConstants["k_fragmentation"])
             )
         else:
             elimination_rates.append(
@@ -72,7 +76,7 @@ def compartment_massBalance(
 
     outputs_frag = sum(
         [
-            val
+            sum(val)
             for i, val in zip(
                 tables_outputFlows[comp]["MP_size"],
                 tables_outputFlows[comp]["k_fragmentation"],
@@ -80,6 +84,9 @@ def compartment_massBalance(
             if i == 0.5
         ]
     )
+    # output flow from fragmentation should be == 0 as we account fragemntation of the smallest size fraction as dissintegration
+    if outputs_frag != 0:
+        print("Error: fragmentation of smallest size bin not zero")
 
     output_flows = tables_outputFlows[comp].drop(["MP_size", "MP_form"], axis=1)
 

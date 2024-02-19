@@ -44,9 +44,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         dataFrame_inputs[i] = "NAN"
 
     # Stablish input parameter values
-    "Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
 
     ## Degradation half time: thalf_deg_d
+    "Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
 
     thalf_deg_d_dict = {
         "freeMP": 5000,
@@ -60,7 +60,9 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         dataFrame_inputs.loc[cond, "thalf_deg_d"] = thalf_deg_d_dict[key]
 
     # Timescale for fragmentation of the 1000um size fraction (mp1): tfrag_gen_d
-    "fragmentation only occurs for free and biofouled MPs and the timescale depends on the compartment and aggregation state"
+
+    "Old Assumption (Full Multi): fragmentation only occurs for free and biofouled MPs and the timescale depends on the compartment and aggregation state"
+    "In UTOPIA we include fragmentation of the heteroaggregated MPs as being 100 slower than fragmentation of the Free MPs and breackup of biofouled and heteroaggregated will be two times slowed of tose only heteroaggregated, following the same assumption as for free and biofouled. These values are used in the Domercq et al. 2021 paper and they are asumptions made from lack of current knowlegde"  #!Values to be revisited
 
     # Assumptions: fractionation does not take place in the Air compartment. -->To be revisited!!
 
@@ -90,6 +92,34 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         & (dataFrame_inputs["sizeBin"] == "mp1")
     )
     dataFrame_inputs.loc[cond_frag1, "tfrag_gen_d"] = 73
+
+    cond_frag_new = (
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Surface_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+
+    dataFrame_inputs.loc[cond_frag_new, "tfrag_gen_d"] = 36.5 * 100
+
+    cond_frag_new1 = (
+        (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Coast_Surface_Water")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Surface_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+
+    dataFrame_inputs.loc[cond_frag_new1, "tfrag_gen_d"] = 36.5 * 100 * 2
 
     cond_frag2 = (
         (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
@@ -142,6 +172,56 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     )
     dataFrame_inputs.loc[cond_frag3, "tfrag_gen_d"] = 730
 
+    cond_frag_new2 = (
+        (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+    dataFrame_inputs.loc[cond_frag_new2, "tfrag_gen_d"] = 365 * 100
+
+    cond_frag_new3 = (
+        (dataFrame_inputs["Compartment"] == "Ocean_Mixed_Water")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Ocean_Column_Water")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Coast_Column_Water")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+    dataFrame_inputs.loc[cond_frag_new3, "tfrag_gen_d"] = 365 * 100 * 2
+
     cond_frag4 = (
         (dataFrame_inputs["Compartment"] == "Sediment_Freshwater")
         & (dataFrame_inputs["MPform"] == "freeMP")
@@ -185,6 +265,50 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
         & (dataFrame_inputs["sizeBin"] == "mp1")
     )
     dataFrame_inputs.loc[cond_frag5, "tfrag_gen_d"] = 7300
+
+    cond_frag_new4 = (
+        (dataFrame_inputs["Compartment"] == "Sediment_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Sediment_Ocean")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Background_Soil")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        & (dataFrame_inputs["MPform"] == "heterMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+    dataFrame_inputs.loc[cond_frag_new4, "tfrag_gen_d"] = 3650 * 100
+
+    cond_frag_new5 = (
+        (dataFrame_inputs["Compartment"] == "Sediment_Freshwater")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Sediment_Ocean")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Background_Soil")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        & (dataFrame_inputs["MPform"] == "heterBiofMP")
+        & (dataFrame_inputs["sizeBin"] == "mp1")
+    )
+    dataFrame_inputs.loc[cond_frag_new5, "tfrag_gen_d"] = 3650 * 100 * 2
 
     # Time for the biofilm coverage to grow: tbiof_growth_d
 

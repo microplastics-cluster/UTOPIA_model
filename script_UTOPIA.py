@@ -15,6 +15,7 @@ from functions.extract_results import *
 from functions.plot_results import *
 from functions.massBalance import *
 from functions.fill_interactions_Knames import *
+from functions.exposure_indicators_calculation import *
 
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
@@ -90,9 +91,9 @@ q_mass_g_s = 1
 
 # particle imput
 size_bin = "e"
-compartment = "Surface_Freshwater"
+compartment = "Ocean_Surface_Water"
 MP_form = "freeMP"
-MP_density = "LowDensity"  # To be changed based on the MP imputs file
+MP_density = "lowDensity"  # To be changed based on the MP imputs file
 
 runName = (
     MP_density
@@ -150,6 +151,7 @@ for particle in system_particle_object_list:
 
 #### Original results with no time limit
 
+
 ## create rate constants table:
 RC_df = create_rateConstants_table(system_particle_object_list)
 df4 = RC_df.fillna(0)
@@ -180,8 +182,8 @@ t_filename = os.path.join(path_RC, "RateConstants_table.csv")
 df4.to_csv(t_filename, index=False)
 
 # Plot and save RC heatmaps per compartment (Has to be fixed for the procesess wherer there are multiple values of rate constants)
-for comp in dict_comp.keys():
-    plot_heatmap_RC(comp, df4, path_RC)
+# for comp in dict_comp.keys():
+#     plot_heatmap_RC(comp, df4, path_RC)
 
 """Build Matrix of interactions"""
 
@@ -369,7 +371,7 @@ sns.barplot(data=mass_dist_comp, x="Compartments", y="%_mass").set(
 )
 plt.ylabel("% of total mass")
 plt.yscale("log")
-plt.ylim(0.01, 100)
+# plt.ylim(0.01, 100)
 plt.xticks(rotation=90)
 # Save the plot
 massDistribPlot_filename = os.path.join(
@@ -385,7 +387,7 @@ sns.barplot(data=mass_dist_comp, x="Compartments", y="%_number").set(
 )
 plt.ylabel("% of total number")
 plt.yscale("log")
-plt.ylim(0.01, 100)
+# plt.ylim(0.01, 100)
 plt.xticks(rotation=90)
 # Save the plot
 numberDistribPlot_filename = os.path.join(
@@ -433,21 +435,64 @@ for comp in list(dict_comp.keys()):
     for e_comp in dict_comp:
         if comp in dict_comp[e_comp].connexions:
             inpProc = dict_comp[e_comp].connexions[comp]
-            if type(inpProc) == list:
-                for index, value in enumerate(surfComp_list):
-                    if value == comp:
-                        position = index
-                df = tables_outputFlows[e_comp].loc[:, ["k_" + ele for ele in inpProc]]
-                for proc in inpProc:
-                    df["k_" + proc] = df["k_" + proc].apply(
-                        lambda x: x[position] if isinstance(x, list) else x
-                    )
+            if (
+                type(inpProc) == list
+            ):  # When there is more than one process of inflow into the compartment
+                df_inflows = tables_outputFlows[e_comp].loc[
+                    :, ["k_" + ele for ele in inpProc]
+                ]
 
-                comp_input_flows.append(df)
+                for proc in inpProc:
+                    if proc == "dry_depossition":
+                        position = surfComp_list.index(comp)
+                        df_inflows["k_" + proc] = df_inflows["k_" + proc].apply(
+                            lambda x: x[position] if isinstance(x, list) else x
+                        )
+                    elif proc == "mixing":
+
+                        if (
+                            e_comp == "Ocean_Mixed_Water"
+                            and comp == "Ocean_Surface_Water"
+                        ):
+                            df_inflows["k_" + proc] = df_inflows["k_" + proc].apply(
+                                lambda x: x[0] if isinstance(x, list) else x
+                            )
+                        elif (
+                            e_comp == "Ocean_Mixed_Water"
+                            and comp == "Ocean_Column_Water"
+                        ):
+                            df_inflows["k_" + proc] = df_inflows["k_" + proc].apply(
+                                lambda x: x[1] if isinstance(x, list) else x
+                            )
+                        else:
+                            pass
+                        # Revisit for percollation and tillage
+                    else:
+                        pass
+                comp_input_flows.append(df_inflows)
             else:
-                comp_input_flows.append(
+                df_inflows = (
                     tables_outputFlows[e_comp].loc[:, "k_" + inpProc].to_frame()
                 )
+                for ele in df_inflows["k_" + inpProc]:
+                    if type(ele) == list:
+                        connecting_comp = {
+                            key: value
+                            for key, value in dict_comp[e_comp].connexions.items()
+                            if value == inpProc
+                        }
+                        poss_dict = {
+                            key: index
+                            for index, key in enumerate(connecting_comp.keys())
+                        }
+                        possition = poss_dict[comp]
+                        df_inflows["k_" + inpProc] = df_inflows["k_" + inpProc].apply(
+                            lambda x: x[possition] if isinstance(x, list) else x
+                        )
+
+                    else:
+                        pass
+                comp_input_flows.append(df_inflows)
         else:
             pass
 
@@ -511,6 +556,10 @@ comp_mass_balance_df["Concentration (N/m3)"] = [
 # Save compartment mass balance table
 comp_mass_balance_df.to_csv(os.path.join(path_run, "compartment_mass_balance.csv"))
 
+""" Estimate exposure indicators """
+
+# Overall residence time
+overall_residence_time_calculation(tables_outputFlows, Results_extended)
 
 """ Generate PDF report """  ## WORK IN PROGRESS
 from functions.generate_pfd_report import *

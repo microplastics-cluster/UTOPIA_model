@@ -6,6 +6,7 @@
 import math
 import pandas as pd
 import os
+import numpy as np
 
 
 # import file storing required constants
@@ -66,30 +67,50 @@ def fragmentation(particle):
 
     if t_frag_d == "NAN":
         # It is assumed that fragmentation doesnt occur in heteroaggregated particles (heterMP or heterBiofMP)
-        k_frag = 0
+        frag_rate = 0
         fragments_formed = 0
     else:
         if (
             particle.Pname[0:3] == "mp5"
         ):  # print("Smallest sizeBin mp5(0.05um), fragments formed will be considered losses")
-            k_frag = k_frag = (
-                (1 / (float(t_frag_d) * 24 * 60 * 60))
-                * float(particle.diameter_um)
-                / 1000
-            )
+            frag_rate = 0  # We consider only discorporation for mp5(0.05um)
             fragments_formed = 0
         else:
             volume_fragment = (
                 4 / 3 * math.pi * (float(particle.radius_m) / 10) ** 3
             )  #!!!only works for bins 10 times smaller!!!
             fragments_formed = float(particle.Pvolume_m3) / volume_fragment
-            k_frag = (
+            frag_rate = (
                 (1 / (float(t_frag_d) * 24 * 60 * 60))
                 * float(particle.diameter_um)
                 / 1000
             )
+    # each article fractions into fragments of samller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
+    size_dict = {chr(i): i - ord("a") for i in range(ord("a"), ord("e") + 1)}
+    # fsd = np.array(
+    #     [
+    #         [0, 0, 0, 0, 0],
+    #         [0, 0, 0, 0, 0],
+    #         [0, 0, 0, 0, 0],
+    #         [0, 0, 0, 0, 0],
+    #         [0, 0, 0, 0, 0],
+    #     ]
+    # )
 
-    return k_frag  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when/if needed (for Mass Balance?))
+    fsd = np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0.5, 0.5, 0, 0, 0],
+            [0.6, 0.2, 0.2, 0, 0],
+            [0.7, 0.15, 0.1, 0.05, 0],
+        ]
+    )
+    k_frag = frag_rate * fsd[size_dict[particle.Pcode[0]]]
+
+    return (
+        k_frag.tolist()
+    )  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when/if needed (for Mass Balance?))
 
 
 def settling(particle):
@@ -282,7 +303,12 @@ def heteroaggregation(particle, spm):
     return k_hetAgg
 
 
+# k_hetAgg
+
+
 def heteroaggregate_breackup(particle, spm):
+    """Assumption: the breack-up of heteroaggregates is 10E8 times slower than the formation of heteroaggregates"""
+
     if (particle.Pform == "heterMP") or (particle.Pform == "heterBiofMP"):
         # Kbreackup is calculated based on Kheter of the free and biofouled MPs
 
@@ -367,11 +393,14 @@ def heteroaggregate_breackup(particle, spm):
             k_hetAgg = float(alpha) * k_coll * SPM_concNum_part_m3
             # the pseudo first-order heteroaggregation rate constant
 
-            k_aggBreakup = 1 / 10 * k_hetAgg
+            k_aggBreakup = (1 / 1000000000) * k_hetAgg
     else:
         k_aggBreakup = 0
 
     return k_aggBreakup
+
+
+# k_aggBreakup
 
 
 def advective_transport(particle):
@@ -399,21 +428,57 @@ def advective_transport(particle):
 
 
 def mixing(particle, dict_comp):
-    # Taken from the Full Multi Model, should be adapted to UTOPIA
-    # Mixing has not jet been included in UTOPIA
+    # Now adapted to UTOPIA's compartments and changed rates-- In progress--
+    # k_mix has to be multiplied by the compartment volume ratio calculated with the interacting compartment volume
 
-    if particle.Pcompartment.Cname == "Flowing_Water":
-        k_mix_up = 10**-10
-        k_mix_down = 10**-13
-        k_mix = (k_mix_up, k_mix_down)
-    elif particle.Pcompartment.Cname == "Surface_Water":
-        k_mix = (10**-10) * (
-            dict_comp["Flowing Water"].Cvolume_m3
+    k_mix_up = (
+        10**-2
+    )  # (1): <Handbook of Chemical Mass Transport in the Environment> Edited by Louis J. Thibodeaux, Donald Mackay (DOI: 10.1201/b10262)
+
+    k_mix_down = (
+        10**-3
+    )  # (2): <Handbook on Mixing in Rivers> Edited by J.C. Rutherford (Water and Soil Miscellaneous Publication No. 26. 1981. 60pp.ISSN 0110-4705)
+
+    if particle.Pcompartment.Cname == "Ocean_Mixed_Water":
+        k_mix = [
+            k_mix_up
+            * float(dict_comp["Ocean_Surface_Water"].Cvolume_m3)
+            / float(particle.Pcompartment.Cvolume_m3),
+            k_mix_down
+            * float(dict_comp["Ocean_Column_Water"].Cvolume_m3)
+            / float(particle.Pcompartment.Cvolume_m3),
+        ]
+        # {"mix_up": k_mix_up, "mix_down": k_mix_down}
+
+    elif particle.Pcompartment.Cname in [
+        "Ocean_Column_Water",
+        "Coast_Column_Water",
+        "Bulk_Freshwater",
+    ]:
+        connecting_comp = [
+            key
+            for key, value in particle.Pcompartment.connexions.items()
+            if (isinstance(value, list) and "mixing" in value)
+        ][0]
+
+        k_mix = (
+            k_mix_up
+            * float(dict_comp[connecting_comp].Cvolume_m3)
             / float(particle.Pcompartment.Cvolume_m3)
         )
-    elif particle.Pcompartment.Cname == "Stagnant_Water":
-        k_mix = (10**-13) * (
-            dict_comp["Flowing Water"].Cvolume_m3
+    elif particle.Pcompartment.Cname in [
+        "Ocean_Surface_Water",
+        "Coast_Surface_Water",
+        "Surface_Freshwater",
+    ]:
+        connecting_comp = [
+            key
+            for key, value in particle.Pcompartment.connexions.items()
+            if (isinstance(value, list) and "mixing" in value)
+        ][0]
+        k_mix = (
+            k_mix_down
+            * float(dict_comp[connecting_comp].Cvolume_m3)
             / float(particle.Pcompartment.Cvolume_m3)
         )
     else:
@@ -444,6 +509,9 @@ def biofouling(particle):
     return k_biof
 
 
+# k_biof
+
+
 def defouling(particle):
     # Defouling = degradation of Biofilm.
 
@@ -469,27 +537,26 @@ def defouling(particle):
 
 def sediment_resuspension(particle):
     # When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
+    resusp_dict = {
+        "Sediment_Freshwater": 1e-9,
+        "Sediment_Coast": 1e-10,
+        "Sediment_Ocean": 1e-11,
+    }
 
-    if particle.Pcompartment.Cname == "Sediment_Freshwater":
-        k_resusp = 1e-9
-    elif particle.Pcompartment.Cname == "Sediment_Coast":
-        k_resusp = 1e-10
-
-    elif particle.Pcompartment.Cname == "Sediment_Ocean":
-        k_resusp = 1e-11
+    k_resusp = resusp_dict[particle.Pcompartment.Cname]
 
     return k_resusp
 
 
 def burial(particle):
     # When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
-    if particle.Pcompartment.Cname == "Sediment_Freshwater":
-        k_burial = 2.7e-10
-    elif particle.Pcompartment.Cname == "Sediment_Coast":
-        k_burial = 2.7e-11
+    burial_dict = {
+        "Sediment_Freshwater": 2.7e-10,
+        "Sediment_Coast": 2.7e-11,
+        "Sediment_Ocean": 2.7e-12,
+    }
 
-    elif particle.Pcompartment.Cname == "Sediment_Ocean":
-        k_burial = 2.7e-12
+    k_burial = burial_dict[particle.Pcompartment.Cname]
 
     return k_burial
 
@@ -497,8 +564,14 @@ def burial(particle):
 def soil_air_resuspension(particle):
     # To be formulated
     # default value talen from SimpleBox for Plastics as trasnfer rate soil-air in s-1
+    # If it would be compartment dependent we can sue a dictionary with values: now we use the same values for all soil surface compartments
+    sa_resusp_dic = {
+        "Urban_Soil_Surface": 4.68e-24,
+        "Background_Soil_Surface": 4.68e-24,
+        "Agricultural_Soil_Surface": 4.68e-24,
+    }
 
-    k_sa_reusp = 4.68e-24
+    k_sa_reusp = sa_resusp_dic[particle.Pcompartment.Cname]
 
     return k_sa_reusp
 
@@ -522,9 +595,30 @@ def percolation(particle):
 
 
 def runoff_transport(particle):
-    # transport from top soil layers to surface waters via runoff water
+    # transport from top soil layers to surface waters ["Coast_Surface_Water","Surface_Freshwater"] via runoff water
     # to be formulated
-    k_runoff = 4.69e-9
+    runooff_dict = {
+        "Urban_Soil_Surface": 4.69e-9,
+        "Background_Soil_Surface": 4.69e-9,
+        "Agricultural_Soil_Surface": 4.69e-9,
+    }
+    runoff_rate = runooff_dict[particle.Pcompartment.Cname]
+
+    # The total amount of runoff will be distributed into the recieving compartments according to the following matrix
+    fro = np.array([[0, 1], [0, 1], [0, 1]])
+    # number row corresponds to the soil emiting compartment
+    soilSurf_dic = {
+        "Urban_Soil_Surface": 0,
+        "Background_Soil_Surface": 1,
+        "Agricultural_Soil_Surface": 2,
+    }
+    # column number corresponds to the recieving compartment
+
+    # In this example of fdd all runoff goes to surface freshwater. To be discussed later
+
+    k_runoff = runoff_rate * fro[soilSurf_dic[particle.Pcompartment.Cname]]
+    k_runoff = k_runoff.tolist()
+
     return k_runoff
 
 
