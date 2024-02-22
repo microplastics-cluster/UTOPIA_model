@@ -27,8 +27,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 ## Define microplastics physical properties # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 980
-MP_composition = "PE"
+MPdensity_kg_m3 = 1580
+MP_composition = "PVC"
 shape = "sphere"
 N_sizeBins = 5  # Fixed for now
 big_bin_diameter_um = 5000
@@ -105,9 +105,9 @@ q_mass_g_s = 1
 size_bin = "e"
 compartment = "Air"
 MP_form = "freeMP"
-MP_density = "lowDensity"  # To be changed based on the MP imputs file
+MP_density = "highDensity"  # To be changed based on the MP imputs file
 
-runName = (
+saveName = (
     MP_density
     + "MP_Emissions_"
     + str(q_mass_g_s)
@@ -350,14 +350,14 @@ path = os.path.join(outputs_path, directory)
 
 # Create directory with model run name under the current date directory where to save results
 
-subDirectory = current_date + "_" + runName
+subDirectory = current_date + "_" + saveName
 
 path_run = os.path.join(path, subDirectory)
 
 store_results(
     path,
     outputs_path,
-    runName,
+    saveName,
     path_run,
     df4,
     Results_comp_dict,
@@ -376,7 +376,7 @@ store_results(
 """ Generate PDF report """  ## WORK IN PROGRESS
 # from functions.generate_pfd_report import *
 
-# filename = runName + "_" + current_date
+# filename = saveName + "_" + current_date
 # text_elements = {
 #     "plastic_density_kg_m3": system_particle_object_list[0].Pdensity_kg_m3,
 #     "imput_flow_g_s": q_mass_g_s,

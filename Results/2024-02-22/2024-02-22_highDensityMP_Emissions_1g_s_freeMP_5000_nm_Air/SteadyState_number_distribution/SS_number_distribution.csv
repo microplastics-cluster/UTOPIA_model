@@ -1,0 +1,11 @@
+species,Compartment,MP_Form,Size_Fraction_um,number_fraction
+aB8_Utopia,Sediment_Ocean,heterMP,0.5,0.6629112797200878
+aD7_Utopia,Sediment_Freshwater,heterBiofMP,0.5,0.21930834742198244
+aD8_Utopia,Sediment_Ocean,heterBiofMP,0.5,0.08396473107763394
+aA12_Utopia,Background_Soil_Surface,freeMP,0.5,0.009618350589548455
+aB9_Utopia,Sediment_Coast,heterMP,0.5,0.009610427541410541
+aA10_Utopia,Urban_Soil_Surface,freeMP,0.5,0.0060872894496917015
+aD9_Utopia,Sediment_Coast,heterBiofMP,0.5,0.0045193996915555085
+aB7_Utopia,Sediment_Freshwater,heterMP,0.5,0.0017465434682789331
+aD2_Utopia,Ocean_Column_Water,heterBiofMP,0.5,0.0010500254263297482
+aD6_Utopia,Bulk_Freshwater,heterBiofMP,0.5,0.00037002069342661635

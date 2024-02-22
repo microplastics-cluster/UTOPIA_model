@@ -428,7 +428,7 @@ def advective_transport(particle):
 
 
 def mixing(particle, dict_comp):
-    # Currently turned off
+    # Currently turned off while developing the rigth process description
 
     # Now adapted to UTOPIA's compartments and changed rates-- In progress--
     # k_mix has to be multiplied by the compartment volume ratio calculated with the interacting compartment volume
@@ -539,6 +539,7 @@ def defouling(particle):
 
 def sediment_resuspension(particle):
     # When no depth parameter available assign transfer sediment to water rate taken from SimpleBox for Plastics model
+    # Currently placeholder values. To be revisited
     resusp_dict = {
         "Sediment_Freshwater": 1e-9,
         "Sediment_Coast": 1e-10,
@@ -551,6 +552,7 @@ def sediment_resuspension(particle):
 
 
 def burial(particle):
+    # Currenlty place holder values. To be revisited
     # When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
     burial_dict = {
         "Sediment_Freshwater": 2.7e-10,
@@ -587,7 +589,7 @@ def tillage(particle):
 
 def percolation(particle):
     # downwards movement of particles in soil via infiltrated water
-    # to be formulated
+    # # to be defined/formulated
 
     # k_percol = particle.Pcompartment.infiltration_capacity*particle.Pcompartment.precipitation_rate*(float(particle.Pcompartment.Cvolume_m3)/float(particle.Pcompartment.Cdepth_m))/float(particle.Pcompartment.soilPore_waterVolume_m3)
 
@@ -653,6 +655,7 @@ def dry_depossition(particle, dict_comp):
 
 
 def wet_depossition(particle, dict_comp):
+    # Currently turned off
     # particles depossition from air to soil or water compartments via rainfall
     # wont be formulated as function of rainfall intensity but dependent on the average rain events per year. we asume that any rain event will trigger the depossition of the particles regardless of rainfall intensity
     # Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
