@@ -25,19 +25,16 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 """Define run parameters"""
 
-## Define microplastics physical properties # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
+## Define microplastics physical properties
+
+# The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
 MPdensity_kg_m3 = 1580
 MP_composition = "PVC"
-shape = "sphere"
+shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed for now
 big_bin_diameter_um = 5000
 runName = MP_composition
-
-## Suspended particulates properties
-
-spm_diameter_um = 0.5
-spm_density_kg_m3 = 2000
 
 # write microplastics inputs file
 mp_imputFile_name = write_MPinputs_table(
@@ -50,10 +47,67 @@ mp_imputFile_name = write_MPinputs_table(
     inputs_path,
 )
 
+## Suspended particulates properties
+
+spm_diameter_um = 0.5
+spm_density_kg_m3 = 2000
+
+## Select fragmentation type
+
+frag_styles_dict = {
+    "sequential_fragmentation": np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0.1, 0.9, 0, 0, 0],
+            [0.01, 0.09, 0.9, 0, 0],
+            [0.001, 0.009, 0.09, 0.9, 0],
+        ]
+    ),
+    "erosive_fragmentation": np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0.9, 0.1, 0, 0, 0],
+            [0.99, 0.009, 0.001, 0, 0],
+            [0.99, 0.009, 0.0009, 0.0001, 0],
+        ]
+    ),
+    "mixed_fragmentation": np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [0.5, 0.5, 0, 0, 0],
+            [0.6, 0.2, 0.2, 0, 0],
+            [0.7, 0.15, 0.1, 0.05, 0],
+        ]
+    ),
+    "no_fragmentation": np.array(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    ),
+}
+
+frag_style = "erosive_fragmentation"
+
+fsd = frag_styles_dict[frag_style]
+
+# optionally the user can type its own fsd matrix following the desciption below:
+
+# estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
+# each article fractions into fragments of samller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
+
 ## choose input files to load
 
 comp_impFile_name = "\inputs_compartments.csv"
-comp_interactFile_name = "\compartment_interactions.csv"
+comp_interactFile_name = (
+    "\compartment_interactions.csv"  # Fixed, should not be modified
+)
 # mp_imputFile_name = os.path.join(
 #         inputs_path, "\inputs_microplastics.csv") #Choose one existing input file to load
 
@@ -75,6 +129,7 @@ size_dict = dict(zip(["a", "b", "c", "d", "e"], [0.5, 5, 50, 500, 5000]))
 # B= heteroaggregatedMP
 # C= biofouled MP
 # D= biofouled and heteroaggregated MP
+MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 
 MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
@@ -132,10 +187,10 @@ saveName = (
     dict_comp,
     model_lists,
     particles_df,
-    MPforms_list,
 ) = generate_objects(
     inputs_path,
     boxName=boxName,
+    MPforms_list=MPforms_list,
     comp_impFile_name=comp_impFile_name,
     comp_interactFile_name=comp_interactFile_name,
     mp_imputFile_name=mp_imputFile_name,
@@ -148,7 +203,7 @@ surfComp_list = [c for c in dict_comp if "Surface" in c]
 """Estimate rate constants per particle"""
 
 for particle in system_particle_object_list:
-    generate_rateConstants(particle, spm, dict_comp)
+    generate_rateConstants(particle, spm, dict_comp, fsd)
 
 #### Original results with no time limit
 

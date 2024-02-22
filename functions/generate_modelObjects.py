@@ -14,6 +14,7 @@ import os
 def generate_objects(
     inputs_path,
     boxName,
+    MPforms_list,
     comp_impFile_name,
     comp_interactFile_name,
     mp_imputFile_name,
@@ -55,7 +56,6 @@ def generate_objects(
     compartmentNames_list = [item.Cname for item in compartments]
 
     # PARTICLES
-    MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 
     ##Free microplastics (freeMP)
 
@@ -211,5 +211,4 @@ def generate_objects(
         dict_comp,
         model_lists,
         particles_df,
-        MPforms_list,
     )

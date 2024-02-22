@@ -48,7 +48,7 @@ def discorporation(particle):
     return k_deg
 
 
-def fragmentation(particle):
+def fragmentation(particle, fsd):
 
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
     # for fragmentation of pristine particles in the largest (x=5000μm => mp1 => e) size class.
@@ -87,25 +87,7 @@ def fragmentation(particle):
             )
     # each article fractions into fragments of samller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
     size_dict = {chr(i): i - ord("a") for i in range(ord("a"), ord("e") + 1)}
-    # fsd = np.array(
-    #     [
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #         [0, 0, 0, 0, 0],
-    #     ]
-    # )
 
-    fsd = np.array(
-        [
-            [0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0.5, 0.5, 0, 0, 0],
-            [0.6, 0.2, 0.2, 0, 0],
-            [0.7, 0.15, 0.1, 0.05, 0],
-        ]
-    )
     k_frag = frag_rate * fsd[size_dict[particle.Pcode[0]]]
 
     return (

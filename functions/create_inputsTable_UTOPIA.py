@@ -12,7 +12,7 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     boxNames = [b.Bname for b in modelBoxes]
     compNames = [c.Cname for c in compartments]
     mpFormsLabels = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
-    sizeBins = ["x01um", "um", "x10um", "x100um", "mm"]
+    # sizeBins = ["x01um", "um", "x10um", "x100um", "mm"]
     sizeBinsLables = ["mp5", "mp4", "mp3", "mp2", "mp1"]
 
     # system_dict = {
