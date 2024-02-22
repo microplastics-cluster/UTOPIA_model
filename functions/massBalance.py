@@ -78,7 +78,7 @@ def compartment_massBalance(
         [
             sum(val)
             for i, val in zip(
-                tables_outputFlows[comp]["MP_size"],
+                tables_outputFlows[comp].index[0],
                 tables_outputFlows[comp]["k_fragmentation"],
             )
             if i == 0.5
@@ -88,7 +88,8 @@ def compartment_massBalance(
     if outputs_frag != 0:
         print("Error: fragmentation of smallest size bin not zero")
 
-    output_flows = tables_outputFlows[comp].drop(["MP_size", "MP_form"], axis=1)
+    output_flows = tables_outputFlows[comp]
+    # output_flows = output_flows.drop(["MP_size", "MP_form"], axis=1)
 
     ##Take into account for dry depossition and wet depossition the sum of all output flows
 
@@ -116,9 +117,10 @@ def compartment_massBalance(
             else:
                 emiss_flow_g_s = 0
 
-    transport_input_flow = sum(
-        tables_inputFlows[comp].drop(["MP_size", "MP_form"], axis=1).sum()
-    )
+    transport_input_flow = sum(tables_inputFlows[comp].sum())
+    # transport_input_flow = sum(
+    #     tables_inputFlows[comp].drop(["MP_size", "MP_form"], axis=1).sum()
+    # )
 
     # Mass balance per compartment
     print(

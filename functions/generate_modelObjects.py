@@ -12,7 +12,13 @@ import os
 
 
 def generate_objects(
-    inputs_path, boxName, comp_impFile_name, comp_interactFile_name, mp_imputFile_name
+    inputs_path,
+    boxName,
+    comp_impFile_name,
+    comp_interactFile_name,
+    mp_imputFile_name,
+    spm_density_kg_m3,
+    spm_diameter_um,
 ):
     # Boxes
     UTOPIA = Box(boxName)
@@ -53,7 +59,9 @@ def generate_objects(
 
     ##Free microplastics (freeMP)
 
-    MP_freeParticles = instantiateParticles_from_csv(inputs_path + mp_imputFile_name)
+    # MP_freeParticles = instantiateParticles_from_csv(inputs_path + mp_imputFile_name)
+
+    MP_freeParticles = instantiateParticles_from_csv(mp_imputFile_name)
 
     dict_size_coding = dict(
         zip(
@@ -85,9 +93,9 @@ def generate_objects(
         Pname="spm1",
         Pform="suspendedParticulates",
         Pcomposition="Mixed",
-        Pdensity_kg_m3=2000,
+        Pdensity_kg_m3=spm_density_kg_m3,
         Pshape="sphere",
-        PdimensionX_um=0.5 / 2,
+        PdimensionX_um=spm_diameter_um / 2,
         PdimensionY_um=0,
         PdimensionZ_um=0,
     )

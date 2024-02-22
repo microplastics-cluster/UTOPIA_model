@@ -428,61 +428,63 @@ def advective_transport(particle):
 
 
 def mixing(particle, dict_comp):
+    # Currently turned off
+
     # Now adapted to UTOPIA's compartments and changed rates-- In progress--
     # k_mix has to be multiplied by the compartment volume ratio calculated with the interacting compartment volume
 
-    k_mix_up = (
-        10**-2
-    )  # (1): <Handbook of Chemical Mass Transport in the Environment> Edited by Louis J. Thibodeaux, Donald Mackay (DOI: 10.1201/b10262)
+    # k_mix_up = (
+    #     10**-2
+    # )  # (1): <Handbook of Chemical Mass Transport in the Environment> Edited by Louis J. Thibodeaux, Donald Mackay (DOI: 10.1201/b10262)
 
-    k_mix_down = (
-        10**-3
-    )  # (2): <Handbook on Mixing in Rivers> Edited by J.C. Rutherford (Water and Soil Miscellaneous Publication No. 26. 1981. 60pp.ISSN 0110-4705)
+    # k_mix_down = (
+    #     10**-3
+    # )  # (2): <Handbook on Mixing in Rivers> Edited by J.C. Rutherford (Water and Soil Miscellaneous Publication No. 26. 1981. 60pp.ISSN 0110-4705)
 
-    if particle.Pcompartment.Cname == "Ocean_Mixed_Water":
-        k_mix = [
-            k_mix_up
-            * float(dict_comp["Ocean_Surface_Water"].Cvolume_m3)
-            / float(particle.Pcompartment.Cvolume_m3),
-            k_mix_down
-            * float(dict_comp["Ocean_Column_Water"].Cvolume_m3)
-            / float(particle.Pcompartment.Cvolume_m3),
-        ]
-        # {"mix_up": k_mix_up, "mix_down": k_mix_down}
+    # if particle.Pcompartment.Cname == "Ocean_Mixed_Water":
+    #     k_mix = [
+    #         k_mix_up
+    #         * float(dict_comp["Ocean_Surface_Water"].Cvolume_m3)
+    #         / float(particle.Pcompartment.Cvolume_m3),
+    #         k_mix_down
+    #     ]
+    #     # {"mix_up": k_mix_up, "mix_down": k_mix_down}
 
-    elif particle.Pcompartment.Cname in [
-        "Ocean_Column_Water",
-        "Coast_Column_Water",
-        "Bulk_Freshwater",
-    ]:
-        connecting_comp = [
-            key
-            for key, value in particle.Pcompartment.connexions.items()
-            if (isinstance(value, list) and "mixing" in value)
-        ][0]
+    # elif particle.Pcompartment.Cname in [
+    #     "Ocean_Column_Water",
+    #     "Coast_Column_Water",
+    #     "Bulk_Freshwater",
+    # ]:
+    #     connecting_comp = [
+    #         key
+    #         for key, value in particle.Pcompartment.connexions.items()
+    #         if (isinstance(value, list) and "mixing" in value)
+    #     ][0]
 
-        k_mix = (
-            k_mix_up
-            * float(dict_comp[connecting_comp].Cvolume_m3)
-            / float(particle.Pcompartment.Cvolume_m3)
-        )
-    elif particle.Pcompartment.Cname in [
-        "Ocean_Surface_Water",
-        "Coast_Surface_Water",
-        "Surface_Freshwater",
-    ]:
-        connecting_comp = [
-            key
-            for key, value in particle.Pcompartment.connexions.items()
-            if (isinstance(value, list) and "mixing" in value)
-        ][0]
-        k_mix = (
-            k_mix_down
-            * float(dict_comp[connecting_comp].Cvolume_m3)
-            / float(particle.Pcompartment.Cvolume_m3)
-        )
-    else:
-        k_mix = 0
+    #     k_mix = (
+    #         k_mix_up
+    #         * float(dict_comp[connecting_comp].Cvolume_m3)
+    #         / float(particle.Pcompartment.Cvolume_m3)
+    #     )
+    # elif particle.Pcompartment.Cname in [
+    #     "Ocean_Surface_Water",
+    #     "Coast_Surface_Water",
+    #     "Surface_Freshwater",
+    # ]:
+    #     connecting_comp = [
+    #         key
+    #         for key, value in particle.Pcompartment.connexions.items()
+    #         if (isinstance(value, list) and "mixing" in value)
+    #     ][0]
+    #     k_mix = (
+    #         k_mix_down
+    #         * float(dict_comp[connecting_comp].Cvolume_m3)
+    #         / float(particle.Pcompartment.Cvolume_m3)
+    #     )
+    # else:
+    #     k_mix = 0
+
+    k_mix = 0
 
     return k_mix
 
