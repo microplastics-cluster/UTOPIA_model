@@ -3,7 +3,7 @@ Ocean_Surface_Water,,"rising,mixing",,advective_transport,,,,,,,,,,,,,"dry_depos
 Ocean_Mixed_Water,"settling,mixing",,"rising,mixing",,advective_transport,,,,,,,,,,,,
 Ocean_Column_Water,,"settling,mixing",,,,,,,,sediment_resuspension,,,,,,,
 Coast_Surface_Water,advective_transport,,,,"rising,mixing",advective_transport,,,,,runoff_transport,,runoff_transport,,runoff_transport,,"dry_depossition,wet_depossition"
-Coast_Column_Water,,,,"settling,mixing",,,advective_transport,,sediment_resuspension,,,,,,,,
+Coast_Column_Water,,advective_transport,,"settling,mixing",,,advective_transport,,sediment_resuspension,,,,,,,,
 Surface_Freshwater,,,,,,,"rising,mixing",,,,runoff_transport,,runoff_transport,,runoff_transport,,"dry_depossition,wet_depossition"
 Bulk_Freshwater,,,,,,"settling,mixing",,sediment_resuspension,,,,,,,,,
 Sediment_Freshwater,,,,,,,settling,,,,,,,,,,

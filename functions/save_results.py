@@ -118,7 +118,7 @@ def store_results(
     )
     df_numberDistribution.to_csv(numberDitribution_filename)
 
-    # Plot Mass distribution by compartment
+    # Plot Mass distribution by compartment and save compartment mass distribution table
 
     sns.barplot(data=mass_dist_comp, x="Compartments", y="%_mass").set(
         title="Mass distribution"
@@ -150,6 +150,11 @@ def store_results(
     plt.savefig(numberDistribPlot_filename, bbox_inches="tight")
     plt.show()
     plt.close()
+
+    table_total_mass_number_distribution = os.path.join(
+        path_run, "total_distribution_byCompartment.csv"
+    )
+    mass_dist_comp.to_csv(table_total_mass_number_distribution)
 
     # Create folder for saving ouput and input mass flows
     path_mass_flows = os.path.join(path_run, "Compartment_mass_flows")

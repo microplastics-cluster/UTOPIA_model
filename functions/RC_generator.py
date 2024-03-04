@@ -85,7 +85,7 @@ def fragmentation(particle, fsd):
                 * float(particle.diameter_um)
                 / 1000
             )
-    # each article fractions into fragments of samller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
+    # each particle fractions into fragments of smaller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
     size_dict = {chr(i): i - ord("a") for i in range(ord("a"), ord("e") + 1)}
 
     k_frag = frag_rate * fsd[size_dict[particle.Pcode[0]]]
@@ -403,8 +403,6 @@ def advective_transport(particle):
     # Based on Praetorius et al. 2012: Kflow = v_riv_flow*(Aw1/Vw1)
     # Being v_riv_flow the river flow velocity in ms-1, Aw1 is the crossectional
     # area of the flowing water and Vw1 the volume of the box of moving water.
-
-    """So far advection was described for a river with changing discharges, TO BE ADAPTED FOR THE UTOPIA"""
 
     return k_adv
 

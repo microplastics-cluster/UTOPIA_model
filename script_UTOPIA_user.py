@@ -29,10 +29,10 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 1580
-MP_composition = "PVC"
+MPdensity_kg_m3 = 980
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
-N_sizeBins = 5  # Fixed for now
+N_sizeBins = 5  # Fixed for now. The 5 size bins are generated as being one order of magnitude appart (i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000
 runName = MP_composition
 
@@ -53,6 +53,8 @@ spm_diameter_um = 0.5
 spm_density_kg_m3 = 2000
 
 ## Select fragmentation type
+"""estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html). Each particle fractions into fragments of smaller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class """
+
 
 frag_styles_dict = {
     "sequential_fragmentation": np.array(
@@ -93,14 +95,12 @@ frag_styles_dict = {
     ),
 }
 
-frag_style = "erosive_fragmentation"
+frag_style = "mixed_fragmentation"
 
 fsd = frag_styles_dict[frag_style]
 
-# optionally the user can type its own fsd matrix following the desciption below:
+# optionally the user can type its own fsd matrix following the desciption above
 
-# estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
-# each article fractions into fragments of samller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class
 
 ## choose input files to load
 
@@ -108,10 +108,9 @@ comp_impFile_name = "\inputs_compartments.csv"
 comp_interactFile_name = (
     "\compartment_interactions.csv"  # Fixed, should not be modified
 )
-# mp_imputFile_name = os.path.join(
-#         inputs_path, "\inputs_microplastics.csv") #Choose one existing input file to load
+# mp_imputFile_name = os.path.join(inputs_path, "inputs_microplastics.csv") #Choose one existing input file to load
 
-boxName = "Utopia"
+boxName = "Utopia"  # fixed, do not modify
 
 # Choose input flow (in g per second)
 # Define particle imput (sp_imput):
@@ -157,10 +156,12 @@ MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 q_mass_g_s = 1
 
 # particle imput
-size_bin = "e"
-compartment = "Air"
-MP_form = "freeMP"
-MP_density = "highDensity"  # To be changed based on the MP imputs file
+size_bin = (
+    "e"  # Chosse from size_dict = {"a": 0.5, "b": 5, "c": 50, "d": 500, "e": 5000}
+)
+compartment = "Air"  # Choose from list of compartments above
+MP_form = "freeMP"  # Choose from MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
+MP_density = "lowDensity"  # To be changed based on the MP imputs file
 
 saveName = (
     MP_density
@@ -204,8 +205,6 @@ surfComp_list = [c for c in dict_comp if "Surface" in c]
 
 for particle in system_particle_object_list:
     generate_rateConstants(particle, spm, dict_comp, fsd)
-
-#### Original results with no time limit
 
 
 ## create rate constants table:
@@ -320,6 +319,8 @@ df_numberDistribution = nf_shorted[:10]
 # Mass distribution by compartment
 mass_frac_100 = []
 num_frac_100 = []
+mass_conc_g_m3 = []
+num_conc = []
 for comp in list(dict_comp.keys()):
     mass_frac_100.append(
         sum(Results_extended[Results_extended["Compartment"] == comp]["mass_fraction"])
@@ -331,11 +332,27 @@ for comp in list(dict_comp.keys()):
         )
         * 100
     )
+    mass_conc_g_m3.append(
+        sum(
+            Results_extended[Results_extended["Compartment"] == comp][
+                "concentration_g_m3"
+            ]
+        )
+    )
+    num_conc.append(
+        sum(
+            Results_extended[Results_extended["Compartment"] == comp][
+                "concentration_num_m3"
+            ]
+        )
+    )
 
 mass_dist_comp = pd.DataFrame(columns=["Compartments"])
 mass_dist_comp["Compartments"] = list(dict_comp.keys())
 mass_dist_comp["%_mass"] = mass_frac_100
 mass_dist_comp["%_number"] = num_frac_100
+mass_dist_comp["Concentration_g_m3"] = mass_conc_g_m3
+mass_dist_comp["Concentration_num_m3"] = num_conc
 
 
 ### MASS BALANCE PER COMPARTMENT###

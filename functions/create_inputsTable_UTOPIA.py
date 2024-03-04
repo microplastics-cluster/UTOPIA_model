@@ -1,4 +1,4 @@
-# creates a pandas dataframe of inputs for all the particles in the system
+# creates a pandas dataframe of process parameters inputs for all the particles in the system
 # (regarding combination of sizes, MPforms and compartments)
 
 # If the systems consist on several model boxes a further
@@ -409,3 +409,43 @@ def create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path):
     dataFrame_inputs.to_csv(inputs_path + "\processInputs_table.csv", index=False)
 
     return dataFrame_inputs
+
+
+def create_compartment_inputsTable():
+
+    compList = [
+        "Ocean_Surface_Water",
+        "Ocean_Mixed_Water",
+        "Ocean_Column_Water",
+        "Coast_Surface_Water",
+        "Coast_Column_Water",
+        "Surface_Freshwater",
+        "Bulk_Freshwater",
+        "Sediment_Freshwater",
+        "Sediment_Ocean",
+        "Sediment_Coast",
+        "Urban_Soil_Surface",
+        "Urban_Soil",
+        "Background_Soil_Surface",
+        "Background_Soil",
+        "Agricultural_Soil_Surface",
+        "Agricultural_Soil",
+        "Air",
+    ]
+
+
+earth_SA_m2 = 5.10e14
+land_SA_m2 = earth_SA_m2 * 0.29
+water_SA_m2 = earth_SA_m2 * 0.71
+"""Total Surface Area of the earth and water and land percentages taken form OECD tool"""
+
+freshWater_SA_m2 = water_SA_m2 * 0.025
+oceanSeaWater_SA_m2 = water_SA_m2 * 0.975
+""""""
+
+coastWater_SA_m2 = oceanSeaWater_SA_m2 * 0.025
+oceanWater_SA_m2 = oceanSeaWater_SA_m2 * 0.975
+
+agri_land_SA_m2 = land_SA_m2 * 0.02
+urban_land_SA_m2 = land_SA_m2 * 0.38
+background_land_SA_m2 = land_SA_m2 * 0.60
