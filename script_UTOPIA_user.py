@@ -55,49 +55,54 @@ spm_density_kg_m3 = 2000
 ## Select fragmentation type
 """estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html). Each particle fractions into fragments of smaller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class """
 
+if N_sizeBins == 5:
+    frag_styles_dict = {
+        "sequential_fragmentation": np.array(
+            [
+                [0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0],
+                [0.1, 0.9, 0, 0, 0],
+                [0.01, 0.09, 0.9, 0, 0],
+                [0.001, 0.009, 0.09, 0.9, 0],
+            ]
+        ),
+        "erosive_fragmentation": np.array(
+            [
+                [0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0],
+                [0.9, 0.1, 0, 0, 0],
+                [0.99, 0.009, 0.001, 0, 0],
+                [0.99, 0.009, 0.0009, 0.0001, 0],
+            ]
+        ),
+        "mixed_fragmentation": np.array(
+            [
+                [0, 0, 0, 0, 0],
+                [1, 0, 0, 0, 0],
+                [0.5, 0.5, 0, 0, 0],
+                [0.6, 0.2, 0.2, 0, 0],
+                [0.7, 0.15, 0.1, 0.05, 0],
+            ]
+        ),
+        "no_fragmentation": np.array(
+            [
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0],
+            ]
+        ),
+    }
 
-frag_styles_dict = {
-    "sequential_fragmentation": np.array(
-        [
-            [0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0.1, 0.9, 0, 0, 0],
-            [0.01, 0.09, 0.9, 0, 0],
-            [0.001, 0.009, 0.09, 0.9, 0],
-        ]
-    ),
-    "erosive_fragmentation": np.array(
-        [
-            [0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0.9, 0.1, 0, 0, 0],
-            [0.99, 0.009, 0.001, 0, 0],
-            [0.99, 0.009, 0.0009, 0.0001, 0],
-        ]
-    ),
-    "mixed_fragmentation": np.array(
-        [
-            [0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0],
-            [0.5, 0.5, 0, 0, 0],
-            [0.6, 0.2, 0.2, 0, 0],
-            [0.7, 0.15, 0.1, 0.05, 0],
-        ]
-    ),
-    "no_fragmentation": np.array(
-        [
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-        ]
-    ),
-}
+    frag_style = "mixed_fragmentation"
 
-frag_style = "mixed_fragmentation"
+    fsd = frag_styles_dict[frag_style]
 
-fsd = frag_styles_dict[frag_style]
+else:
+    print(
+        "Fragmetation size distribution not defined for this number of size fractions, please define manually the fsd matrix"
+    )
 
 # optionally the user can type its own fsd matrix following the desciption above
 
@@ -112,75 +117,10 @@ comp_interactFile_name = (
 
 boxName = "Utopia"  # fixed, do not modify
 
-# Choose input flow (in g per second)
-# Define particle imput (sp_imput):
-
-# Size fraction:
-# a= 0.5 um
-# b= 5 um
-# c= 50 um
-# d= 500 um
-# e= 5000 um
-size_dict = dict(zip(["a", "b", "c", "d", "e"], [0.5, 5, 50, 500, 5000]))
-
-# Aggregation state:
-# A= Free MP
-# B= heteroaggregatedMP
-# C= biofouled MP
-# D= biofouled and heteroaggregated MP
-MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
-particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
-
-MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
-
-## Compartments:
-# 0= 'Ocean_Surface_Water'
-# 1= 'Ocean_Mixed_Water'
-# 2= 'Ocean_Column_Water'
-# 3= 'Coast_Surface_Water'
-# 4= 'Coast_Column_Water'
-# 5= 'Surface_Freshwater'
-# 6= 'Bulk_Freshwater'
-# 7= 'Sediment_Freshwater'
-# 8= 'Sediment_Ocean'
-# 9= 'Sediment_Coast'
-# 10= 'Urban_Soil_Surface'
-# 11= 'Urban_Soil'
-# 12= 'Background_Soil_Surface'
-# 13= 'Background_Soil'
-# 14= 'Agricultural_Soil_Surface'
-# 15= 'Agricultural_Soil'
-# 16= 'Air'
-
-# input flow (in g per second)
-q_mass_g_s = 1
-
-# particle imput
-size_bin = (
-    "e"  # Chosse from size_dict = {"a": 0.5, "b": 5, "c": 50, "d": 500, "e": 5000}
-)
-compartment = "Air"  # Choose from list of compartments above
-MP_form = "freeMP"  # Choose from MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
-MP_density = "lowDensity"  # To be changed based on the MP imputs file
-
-saveName = (
-    MP_density
-    + "MP_Emissions_"
-    + str(q_mass_g_s)
-    + "g_s_"
-    + MP_form
-    + "_"
-    + str(size_dict[size_bin])
-    + "_nm_"
-    + compartment
-)
-
-
 """Generate objects"""
 
 # Generate objects
 (
-    modelBoxes,
     system_particle_object_list,
     SpeciesList,
     process_inputs_df,
@@ -222,11 +162,67 @@ interactions_df = fillInteractions_fun_OOP(
     system_particle_object_list, SpeciesList, surfComp_list
 )
 
-from functions.fill_interactions_Knames import *
 
-interactions_df_Knames = fillInteractions_Knames(
-    system_particle_object_list, SpeciesList
+# Choose input flow (in g per second)
+# Define particle imput (sp_imput): the user has to define in wich form and size the particles are released into the environment and specify the input flow for each compartment
+
+# Size fraction:
+# for the preloaded scenario:
+# a= 0.5 um
+# b= 5 um
+# c= 50 um
+# d= 500 um
+# e= 5000 um
+import string
+
+size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
+size_codes.reverse()
+size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
+
+size_bin = "e"  # Chosse from size_dict
+
+
+# Aggregation state (MP form):
+# A= Free MP
+# B= heteroaggregatedMP
+# C= biofouled MP
+# D= biofouled and heteroaggregated MP
+MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
+particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
+MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
+
+MP_form = "freeMP"  # Choose from MPforms_list above
+
+# input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+q_mass_g_s_dict = {
+    "Ocean_Surface_Water": 1,
+    "Ocean_Mixed_Water": 0,
+    "Ocean_Column_Water": 0,
+    "Coast_Surface_Water": 0,
+    "Coast_Column_Water": 0,
+    "Surface_Freshwater": 0,
+    "Bulk_Freshwater": 0,
+    "Sediment_Freshwater": 0,
+    "Sediment_Ocean": 0,
+    "Sediment_Coast": 0,
+    "Urban_Soil_Surface": 0,
+    "Urban_Soil": 0,
+    "Background_Soil_Surface": 0,
+    "Background_Soil": 0,
+    "Agricultural_Soil_Surface": 0,
+    "Agricultural_Soil": 0,
+    "Air": 0,
+}
+
+saveName = (
+    MP_composition
+    + "_MP_Emissions_"
+    + MP_form
+    + "_"
+    + str(size_dict[size_bin])
+    + "_nm_"
 )
+
 
 """SOLVE SYSTEM OF ODES"""
 
@@ -238,31 +234,26 @@ particle_compartmentCoding = dict(
 )
 comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
 
-sp_imput = (
-    size_bin
-    + particle_forms_coding[MP_form]
-    + str(particle_compartmentCoding[compartment])
-    + "_"
-    + boxName
-)
+sp_imputs = []
+q_mass_g_s = []
+for compartment in q_mass_g_s_dict.keys():
 
-print(
-    "Imput flow = "
-    + str(q_mass_g_s)
-    + " g/s of "
-    + MP_form
-    + " of size "
-    + str(size_dict[size_bin])
-    + " into the "
-    + compartment
-    + " compartment"
-)
+    sp_imputs.append(
+        size_bin
+        + particle_forms_coding[MP_form]
+        + str(particle_compartmentCoding[compartment])
+        + "_"
+        + boxName
+    )
+    q_mass_g_s.append(q_mass_g_s_dict[compartment])
+
+imput_flows_g_s = dict(zip(sp_imputs, q_mass_g_s))
+
 
 R, PartMass_t0 = solve_ODES_SS(
     system_particle_object_list=system_particle_object_list,
-    q_mass_g_s=q_mass_g_s,
     q_num_s=0,
-    sp_imput=sp_imput,
+    imput_flows_g_s=imput_flows_g_s,
     interactions_df=interactions_df,
 )
 
