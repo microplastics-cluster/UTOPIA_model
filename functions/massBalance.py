@@ -42,7 +42,7 @@ def massBalance(R, system_particle_object_list, q_mass_g_s):
     # output flow
     out_flow_g_s = sum(elimination_rates * m_ss)
 
-    print("Difference inflow-outflow = " + str(q_mass_g_s - out_flow_g_s))
+    print("Difference inflow-outflow = " + str(sum(q_mass_g_s) - out_flow_g_s))
 
 
 def compartment_massBalance(
@@ -158,4 +158,4 @@ def global_massBalance(q_mass_g_s, tables_outputFlows):
             + sum(frag_flows)
         )
 
-    print("Difference inflow-outflow = " + str(q_mass_g_s - sum(output_flows)))
+    print("Difference inflow-outflow = " + str(sum(q_mass_g_s) - sum(output_flows)))

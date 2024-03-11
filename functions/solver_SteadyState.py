@@ -3,11 +3,11 @@ from helpers.helpers import *
 
 
 def solve_ODES_SS(
-    system_particle_object_list, q_mass_g_s, q_num_s, sp_imput, interactions_df
+    system_particle_object_list, q_num_s, imput_flows_g_s, interactions_df
 ):
     SpeciesList = [p.Pcode for p in system_particle_object_list]
 
-    if q_mass_g_s != 0:
+    if sum(imput_flows_g_s.values()) != 0:
         # set mass of particles for all particles in the system as zero
         m_t0 = []
         for p in system_particle_object_list:
@@ -19,7 +19,8 @@ def solve_ODES_SS(
         PartMass_t0 = PartMass_t0.set_index("species")
 
         # Set emissions
-        PartMass_t0.at[sp_imput, "mass_g"] = -q_mass_g_s
+        for sp_imput in imput_flows_g_s.keys():
+            PartMass_t0.at[sp_imput, "mass_g"] = -imput_flows_g_s[sp_imput]
 
         # Input vector
         inputVector = PartMass_t0["mass_g"].to_list()
@@ -59,8 +60,16 @@ def solve_ODES_SS(
         # Add to Results dataframe
         for p in system_particle_object_list:
             R.loc[p.Pcode, "number_of_particles"] = p.Pnum_SS
+        ### Estimate SS concentration and add to particles
+        for p in system_particle_object_list:
+            p.C_g_m3_SS = p.Pmass_g_SS / float(p.Pcompartment.Cvolume_m3)
+            R.loc[p.Pcode, "concentration_g_m3"] = p.C_g_m3_SS
+            p.C_num_m3_SS = p.Pnum_SS / float(p.Pcompartment.Cvolume_m3)
+            R.loc[p.Pcode, "concentration_num_m3"] = p.C_num_m3_SS
 
-    elif q_num_s != 0:
+    elif (
+        q_num_s != 0
+    ):  # By default the inputs are always given in mass this piece of code only needed if inputs given in particle numbers but this is has to be included in the imputs sections and updated to reflect the same structure as the mass inputs (list of inputs and not a single value)
         # Set number of particles for all particles in the system as zero
         N_t0 = []
         for p in system_particle_object_list:
@@ -116,11 +125,14 @@ def solve_ODES_SS(
         for p in system_particle_object_list:
             R.loc[p.Pcode, "mass_g"] = p.Pmass_g_SS
 
-    ### Estimate SS concentration and add to particles
-    for p in system_particle_object_list:
-        p.C_g_m3_SS = p.Pmass_g_SS / float(p.Pcompartment.Cvolume_m3)
-        R.loc[p.Pcode, "concentration_g_m3"] = p.C_g_m3_SS
-        p.C_num_m3_SS = p.Pnum_SS / float(p.Pcompartment.Cvolume_m3)
-        R.loc[p.Pcode, "concentration_num_m3"] = p.C_num_m3_SS
+        ### Estimate SS concentration and add to particles
+        for p in system_particle_object_list:
+            p.C_g_m3_SS = p.Pmass_g_SS / float(p.Pcompartment.Cvolume_m3)
+            R.loc[p.Pcode, "concentration_g_m3"] = p.C_g_m3_SS
+            p.C_num_m3_SS = p.Pnum_SS / float(p.Pcompartment.Cvolume_m3)
+            R.loc[p.Pcode, "concentration_num_m3"] = p.C_num_m3_SS
+
+    else:
+        print("ERROR: No particles have been input to the system")
 
     return R, PartMass_t0

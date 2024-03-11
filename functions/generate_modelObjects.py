@@ -203,7 +203,6 @@ def generate_objects(
     )
 
     return (
-        modelBoxes,
         system_particle_object_list,
         SpeciesList,
         process_inputs_df,
