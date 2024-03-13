@@ -29,8 +29,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 1580
-MP_composition = "PVC"
+MPdensity_kg_m3 = 980
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -47,12 +47,50 @@ mp_imputFile_name = write_MPinputs_table(
     inputs_path,
 )
 
+## Environmental Characteristics
+
 ## Suspended particulates properties
 
 spm_diameter_um = 0.5
 spm_density_kg_m3 = 2000
 
-## Select fragmentation type
+
+## choose input files to load
+
+comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
+comp_interactFile_name = (
+    "\compartment_interactions.csv"  # Fixed, should not be modified
+)
+# mp_imputFile_name = os.path.join(inputs_path, "inputs_microplastics.csv") #Choose one existing input file to load
+
+boxName = "Utopia"  # fixed, do not modify
+
+"""Generate objects"""
+
+# Generate objects
+(
+    system_particle_object_list,
+    SpeciesList,
+    spm,
+    dict_comp,
+    model_lists,
+    particles_df,
+) = generate_objects(
+    inputs_path,
+    boxName=boxName,
+    MPforms_list=MPforms_list,
+    comp_impFile_name=comp_impFile_name,
+    comp_interactFile_name=comp_interactFile_name,
+    mp_imputFile_name=mp_imputFile_name,
+    spm_diameter_um=spm_diameter_um,
+    spm_density_kg_m3=spm_density_kg_m3,
+)
+
+surfComp_list = [c for c in dict_comp if "Surface" in c]
+
+## Microplastics weathering properties
+
+## Select fragmentation style
 """estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html). Each particle fractions into fragments of smaller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class """
 
 if N_sizeBins == 5:
@@ -98,56 +136,92 @@ if N_sizeBins == 5:
     frag_style = "mixed_fragmentation"
 
     fsd = frag_styles_dict[frag_style]
+    sizes = [list(model_lists["dict_size_coding"].keys())]
+    fsd_df = pd.DataFrame(fsd, index=sizes, columns=sizes)
+
+    # Save the fsd matrix
+    fsd_filename = os.path.join(inputs_path, "fsd.csv")
+    fsd_df.to_csv(fsd_filename)
+
 
 else:
     print(
-        "Fragmetation size distribution not defined for this number of size fractions, please define manually the fsd matrix"
+        "Fragmetation size distribution not defined for this number of size fractions, please define manually the fsd matrix via the fsd.csv file"
     )
+    fsd_df = pd.read_csv(os.path.join(inputs_path, "fsd.csv"), index_col=0)
+    fsd = fsd_df.to_numpy()
 
 # optionally the user can type its own fsd matrix following the desciption above
 
 
-## choose input files to load
-
-comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
-comp_interactFile_name = (
-    "\compartment_interactions.csv"  # Fixed, should not be modified
-)
-# mp_imputFile_name = os.path.join(inputs_path, "inputs_microplastics.csv") #Choose one existing input file to load
-
-boxName = "Utopia"  # fixed, do not modify
-
-"""Generate objects"""
-
-# Generate objects
-(
-    system_particle_object_list,
-    SpeciesList,
-    spm,
-    dict_comp,
-    model_lists,
-    particles_df,
-) = generate_objects(
-    inputs_path,
-    boxName=boxName,
-    MPforms_list=MPforms_list,
-    comp_impFile_name=comp_impFile_name,
-    comp_interactFile_name=comp_interactFile_name,
-    mp_imputFile_name=mp_imputFile_name,
-    spm_diameter_um=spm_diameter_um,
-    spm_density_kg_m3=spm_density_kg_m3,
-)
-
-surfComp_list = [c for c in dict_comp if "Surface" in c]
-
-
+## Weahering processes input parameters
 # Generate the process inputs table based on the given model structure (created model boxes, compartments and particles)
 
-compartments_list = model_lists["compartmentNames_list"]
 
-process_inputs_df = create_inputsTable_UTOPIA(compartments_list, inputs_path)
+process_inputs_df = create_inputsTable_UTOPIA(inputs_path, model_lists)
 
 """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
+
+## Emission Scenario
+
+# Choose input flow (in g per second)
+# Define particle imput (sp_imput): the user has to define in wich form and size the particles are released into the environment and specify the input flow for each compartment
+
+# Size fraction:
+# for the preloaded scenario:
+# a= 0.5 um
+# b= 5 um
+# c= 50 um
+# d= 500 um
+# e= 5000 um
+import string
+
+size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
+size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
+
+size_bin = "e"  # Chosse from size_dict
+
+
+# Aggregation state (MP form):
+# A= Free MP
+# B= heteroaggregatedMP
+# C= biofouled MP
+# D= biofouled and heteroaggregated MP
+MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
+particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
+MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
+
+MP_form = "freeMP"  # Choose from MPforms_list above
+
+# input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+q_mass_g_s_dict = {
+    "Ocean_Surface_Water": 0,
+    "Ocean_Mixed_Water": 0,
+    "Ocean_Column_Water": 0,
+    "Coast_Surface_Water": 0,
+    "Coast_Column_Water": 0,
+    "Surface_Freshwater": 0,
+    "Bulk_Freshwater": 0,
+    "Sediment_Freshwater": 0,
+    "Sediment_Ocean": 0,
+    "Sediment_Coast": 0,
+    "Urban_Soil_Surface": 0,
+    "Urban_Soil": 0,
+    "Background_Soil_Surface": 0,
+    "Background_Soil": 0,
+    "Agricultural_Soil_Surface": 0,
+    "Agricultural_Soil": 0,
+    "Air": 1,
+}
+
+saveName = (
+    MP_composition
+    + "_MP_Emissions_"
+    + MP_form
+    + "_"
+    + str(size_dict[size_bin])
+    + "_nm_"
+)
 
 """Estimate rate constants per particle"""
 
@@ -171,73 +245,12 @@ interactions_df = fillInteractions_fun_OOP(
 )
 
 
-# Choose input flow (in g per second)
-# Define particle imput (sp_imput): the user has to define in wich form and size the particles are released into the environment and specify the input flow for each compartment
-
-# Size fraction:
-# for the preloaded scenario:
-# a= 0.5 um
-# b= 5 um
-# c= 50 um
-# d= 500 um
-# e= 5000 um
-import string
-
-size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
-size_codes.reverse()
-size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
-
-size_bin = "e"  # Chosse from size_dict
-
-
-# Aggregation state (MP form):
-# A= Free MP
-# B= heteroaggregatedMP
-# C= biofouled MP
-# D= biofouled and heteroaggregated MP
-MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
-particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
-MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
-
-MP_form = "freeMP"  # Choose from MPforms_list above
-
-# input flow (in g per second) for each compartment the User should specify here the input flows per compartment
-q_mass_g_s_dict = {
-    "Ocean_Surface_Water": 1,
-    "Ocean_Mixed_Water": 0,
-    "Ocean_Column_Water": 0,
-    "Coast_Surface_Water": 0,
-    "Coast_Column_Water": 0,
-    "Surface_Freshwater": 0,
-    "Bulk_Freshwater": 0,
-    "Sediment_Freshwater": 0,
-    "Sediment_Ocean": 0,
-    "Sediment_Coast": 0,
-    "Urban_Soil_Surface": 0,
-    "Urban_Soil": 0,
-    "Background_Soil_Surface": 0,
-    "Background_Soil": 0,
-    "Agricultural_Soil_Surface": 0,
-    "Agricultural_Soil": 0,
-    "Air": 0,
-}
-
-saveName = (
-    MP_composition
-    + "_MP_Emissions_"
-    + MP_form
-    + "_"
-    + str(size_dict[size_bin])
-    + "_nm_"
-)
-
-
 """SOLVE SYSTEM OF ODES"""
 
 particle_compartmentCoding = dict(
     zip(
-        compartments_list,
-        list(range(len(compartments_list))),
+        model_lists["compartmentNames_list"],
+        list(range(len(model_lists["compartmentNames_list"]))),
     )
 )
 comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}

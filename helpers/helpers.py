@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def generate_system_species_list(
     system_particle_object_list, MPforms_list, compartmentNames_list, boxNames_list
 ):
-    particle_sizes_coding = {"mp5": "a", "mp4": "b", "mp3": "c", "mp2": "d", "mp1": "e"}
+    particle_sizes_coding = {"mp1": "a", "mp2": "b", "mp3": "c", "mp4": "d", "mp5": "e"}
 
     particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 

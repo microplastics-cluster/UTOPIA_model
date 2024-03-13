@@ -50,7 +50,7 @@ def discorporation(particle):
 def fragmentation(particle, fsd):
 
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
-    # for fragmentation of pristine particles in the largest (x=5000μm => mp1 => e) size class.
+    # for fragmentation of pristine particles in the largest (x=5000μm => mp5 => e) size class.
 
     # estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
 
@@ -59,7 +59,7 @@ def fragmentation(particle, fsd):
     cond = (
         (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
-        & (process_inputs_df["sizeBin"] == "mp1")
+        & (process_inputs_df["sizeBin"] == "mp5")
     )
     t_frag_d = process_inputs_df.loc[cond, "tfrag_gen_d"].item()
 
@@ -69,7 +69,7 @@ def fragmentation(particle, fsd):
         fragments_formed = 0
     else:
         if (
-            particle.Pname[0:3] == "mp5"
+            particle.Pname[0:3] == "mp1"
         ):  # print("Smallest sizeBin mp5(0.05um), fragments formed will be considered losses")
             frag_rate = 0  # We consider only discorporation for mp5(0.05um)
             fragments_formed = 0

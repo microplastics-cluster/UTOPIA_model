@@ -17,7 +17,7 @@ def write_MPinputs_table(
         Bsize = size_distribution[-1]
         newSize = Bsize / 10
         size_distribution.append(newSize)
-
+    size_distribution.reverse()
     if shape == "sphere":
         data = {
             "Name": ["mp" + str(i + 1) for i in range(N_sizeBins)],
