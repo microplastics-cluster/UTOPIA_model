@@ -6,7 +6,6 @@ from objects.compartment import Compartment
 
 def create_rateConstants_table(system_particle_object_list):
     df_dict = {
-        "Model_box": [],
         "Compartment": [],
         "MP_form": [],
         "Size_Bin": [],
@@ -14,7 +13,6 @@ def create_rateConstants_table(system_particle_object_list):
     }
 
     for p in system_particle_object_list:
-        df_dict["Model_box"].append(p.Pcompartment.CBox.Bname)
         df_dict["Compartment"].append(p.Pcompartment.Cname)
         df_dict["MP_form"].append(p.Pform)
         df_dict["Size_Bin"].append(p.Pname[:3])

@@ -31,6 +31,7 @@ def model_run(
     spm_density_kg_m3,
     fsd,
     q_mass_g_s,
+    imput_flows_g_s,
     particle_forms_coding,
     size_dict,
     MP_form_dict_reverse,
@@ -38,11 +39,11 @@ def model_run(
     compartment,
     MP_form,
     saveName,
+    saveOpt,
 ):
 
     # Generate objects
     (
-        modelBoxes,
         system_particle_object_list,
         SpeciesList,
         process_inputs_df,
@@ -94,31 +95,10 @@ def model_run(
     )
     comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
 
-    sp_imput = (
-        size_bin
-        + particle_forms_coding[MP_form]
-        + str(particle_compartmentCoding[compartment])
-        + "_"
-        + boxName
-    )
-
-    print(
-        "Imput flow = "
-        + str(q_mass_g_s)
-        + " g/s of "
-        + MP_form
-        + " of size "
-        + str(size_dict[size_bin])
-        + " into the "
-        + compartment
-        + " compartment"
-    )
-
     R, PartMass_t0 = solve_ODES_SS(
         system_particle_object_list=system_particle_object_list,
-        q_mass_g_s=q_mass_g_s,
         q_num_s=0,
-        sp_imput=sp_imput,
+        imput_flows_g_s=imput_flows_g_s,
         interactions_df=interactions_df,
     )
 
@@ -265,36 +245,40 @@ def model_run(
 
     # Save results
 
-    outputs_path = os.path.join(os.path.dirname(__file__), "Results")
+    if saveOpt == "save":
 
-    # Create directory with current date where to save results
+        outputs_path = os.path.join(os.path.dirname(__file__), "Results")
 
-    # get current date and time to store results
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    directory = current_date
-    path = os.path.join(outputs_path, directory)
+        # Create directory with current date where to save results
 
-    # Create directory with model run name under the current date directory where to save results
+        # get current date and time to store results
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        directory = current_date
+        path = os.path.join(outputs_path, directory)
 
-    subDirectory = current_date + "_" + saveName
+        # Create directory with model run name under the current date directory where to save results
 
-    path_run = os.path.join(path, subDirectory)
+        subDirectory = current_date + "_" + saveName
 
-    store_results(
-        path,
-        outputs_path,
-        saveName,
-        path_run,
-        df4,
-        Results_comp_dict,
-        Results_comp_organiced,
-        model_lists,
-        df_massDistribution,
-        df_numberDistribution,
-        mass_dist_comp,
-        tables_outputFlows,
-        tables_inputFlows,
-        MP_form_dict_reverse,
-        size_dict,
-        comp_mass_balance_df,
-    )
+        path_run = os.path.join(path, subDirectory)
+
+        store_results(
+            path,
+            outputs_path,
+            saveName,
+            path_run,
+            df4,
+            Results_comp_dict,
+            Results_comp_organiced,
+            model_lists,
+            df_massDistribution,
+            df_numberDistribution,
+            mass_dist_comp,
+            tables_outputFlows,
+            tables_inputFlows,
+            MP_form_dict_reverse,
+            size_dict,
+            comp_mass_balance_df,
+        )
+    else:
+        pass

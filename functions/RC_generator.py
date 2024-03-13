@@ -35,8 +35,7 @@ def discorporation(particle):
     ! Add a size relation?!"""
     # degradation half-life of MPs used as input is in days
     cond = (
-        (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-        & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+        (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
         & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
     )
@@ -58,8 +57,7 @@ def fragmentation(particle, fsd):
     # Fragmentation of heteroaggregated particles is assumed negligible in the default model formulation
 
     cond = (
-        (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-        & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+        (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
         & (process_inputs_df["sizeBin"] == "mp1")
     )
@@ -264,8 +262,7 @@ def heteroaggregation(particle, spm):
         # the collision rate constant
 
         cond_alpha = (
-            (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-            & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+            (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
             & (process_inputs_df["MPform"] == particle.Pform)
             & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
         )
@@ -350,15 +347,13 @@ def heteroaggregate_breackup(particle, spm):
         # the collision rate constant
         if particle.Pform == "heterMP":
             cond_alpha = (
-                (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-                & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+                (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
                 & (process_inputs_df["MPform"] == "freeMP")
                 & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
             )
         elif particle.Pform == "heterBiofMP":
             cond_alpha = (
-                (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-                & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+                (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
                 & (process_inputs_df["MPform"] == "biofMP")
                 & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
             )
@@ -474,8 +469,7 @@ def mixing(particle, dict_comp):
 
 def biofouling(particle):
     cond_biof = (
-        (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-        & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+        (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
         & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
     )
@@ -498,8 +492,7 @@ def defouling(particle):
     # Defouling = degradation of Biofilm.
 
     cond_defoul = (
-        (process_inputs_df["modelBox"] == particle.Pcompartment.CBox.Bname)
-        & (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
+        (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
         & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
     )

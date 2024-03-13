@@ -126,12 +126,16 @@ compList = [
 ]
 
 # input flow (in g per second)
-q_mass_g_s = 1
+
 
 # particle imput
 size_bin = "e"
 MP_form = "freeMP"
 MP_density = "lowDensity"  # To be changed based on the MP imputs file
+
+
+# save results option
+saveOpt = "Notsave"  # "save" or "Notsave"
 
 for comp in compList:
     compartment = comp
@@ -139,14 +143,54 @@ for comp in compList:
     saveName = (
         MP_density
         + "MP_Emissions_"
-        + str(q_mass_g_s)
-        + "g_s_"
         + MP_form
         + "_"
         + str(size_dict[size_bin])
         + "_nm_"
         + compartment
     )
+    # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+    q_mass_g_s_dict = {
+        "Ocean_Surface_Water": 0,
+        "Ocean_Mixed_Water": 0,
+        "Ocean_Column_Water": 0,
+        "Coast_Surface_Water": 0,
+        "Coast_Column_Water": 0,
+        "Surface_Freshwater": 0,
+        "Bulk_Freshwater": 0,
+        "Sediment_Freshwater": 0,
+        "Sediment_Ocean": 0,
+        "Sediment_Coast": 0,
+        "Urban_Soil_Surface": 0,
+        "Urban_Soil": 0,
+        "Background_Soil_Surface": 0,
+        "Background_Soil": 0,
+        "Agricultural_Soil_Surface": 0,
+        "Agricultural_Soil": 0,
+        "Air": 0,
+    }
+
+    particle_compartmentCoding = dict(
+        zip(
+            compList,
+            list(range(len(compList))),
+        )
+    )
+    comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
+    sp_imputs = []
+    q_mass_g_s = []
+    for compartment in q_mass_g_s_dict.keys():
+
+        sp_imputs.append(
+            size_bin
+            + particle_forms_coding[MP_form]
+            + str(particle_compartmentCoding[compartment])
+            + "_"
+            + boxName
+        )
+        q_mass_g_s.append(q_mass_g_s_dict[compartment])
+
+    imput_flows_g_s = dict(zip(sp_imputs, q_mass_g_s))
 
     model_run(
         inputs_path,
@@ -159,6 +203,7 @@ for comp in compList:
         spm_density_kg_m3,
         fsd,
         q_mass_g_s,
+        imput_flows_g_s,
         particle_forms_coding,
         size_dict,
         MP_form_dict_reverse,
@@ -166,4 +211,5 @@ for comp in compList:
         compartment,
         MP_form,
         saveName,
+        saveOpt,
     )

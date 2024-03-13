@@ -29,11 +29,11 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 980
-MP_composition = "PE"
+MPdensity_kg_m3 = 1580
+MP_composition = "PVC"
 shape = "sphere"  # Fixed for now
-N_sizeBins = 5  # Fixed for now. The 5 size bins are generated as being one order of magnitude appart (i.e. 5000um, 500um, 50um, 5um, 0.5um)
-big_bin_diameter_um = 5000
+N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
+big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
 runName = MP_composition
 
 # write microplastics inputs file
@@ -109,7 +109,7 @@ else:
 
 ## choose input files to load
 
-comp_impFile_name = "\inputs_compartments.csv"
+comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
 comp_interactFile_name = (
     "\compartment_interactions.csv"  # Fixed, should not be modified
 )
@@ -123,7 +123,6 @@ boxName = "Utopia"  # fixed, do not modify
 (
     system_particle_object_list,
     SpeciesList,
-    process_inputs_df,
     spm,
     dict_comp,
     model_lists,
@@ -140,6 +139,15 @@ boxName = "Utopia"  # fixed, do not modify
 )
 
 surfComp_list = [c for c in dict_comp if "Surface" in c]
+
+
+# Generate the process inputs table based on the given model structure (created model boxes, compartments and particles)
+
+compartments_list = model_lists["compartmentNames_list"]
+
+process_inputs_df = create_inputsTable_UTOPIA(compartments_list, inputs_path)
+
+"""Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
 
 """Estimate rate constants per particle"""
 
@@ -228,8 +236,8 @@ saveName = (
 
 particle_compartmentCoding = dict(
     zip(
-        model_lists["compartmentNames_list"],
-        list(range(len(model_lists["compartmentNames_list"]))),
+        compartments_list,
+        list(range(len(compartments_list))),
     )
 )
 comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}

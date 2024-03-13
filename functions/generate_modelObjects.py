@@ -169,13 +169,6 @@ def generate_objects(
                 c.add_particles(copy.deepcopy(p))
         print(f"The particles have been added to the compartments of {b.Bname}")
 
-    # Based on the given model structure (created model boxes, compartments and particles)
-    # generate the process inputs table
-
-    process_inputs_df = create_inputsTable_UTOPIA(compartments, modelBoxes, inputs_path)
-
-    """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
-
     # List of particle objects in the system:
     system_particle_object_list = []
 
@@ -205,7 +198,6 @@ def generate_objects(
     return (
         system_particle_object_list,
         SpeciesList,
-        process_inputs_df,
         spm,
         dict_comp,
         model_lists,
