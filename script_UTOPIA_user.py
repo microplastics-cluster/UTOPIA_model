@@ -155,10 +155,49 @@ else:
 
 
 ## Weahering processes input parameters
+
 # Generate the process inputs table based on the given model structure (created model boxes, compartments and particles)
 
+## Degradation half time: thalf_deg_d
+"Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
+# Assumptions:
+# Heteroaggregated particles degrade 10 times slower than the free MPs
+# Biofouled particles degrade 5 times slower than the free MPs
 
-process_inputs_df = create_inputsTable_UTOPIA(inputs_path, model_lists)
+# thalf_deg_d_dict = {
+#     "freeMP": 5000,
+#     "heterMP": 50000,
+#     "biofMP": 25000,
+#     "heterBiofMP": 100000,
+# } #default values
+
+# # Save the fsd matrix
+# t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
+# t_half_deg_df = pd.DataFrame(list(thalf_deg_d_dict.items()), columns=['MP_form', 'thalf_deg_d'])
+# t_half_deg_df.to_csv(t_half_deg_filename,index=False)
+
+
+# If user wants to modify the default thalf_deg_d_dict, they can do so here or through the csv file and upload it
+
+# Read the CSV file into a DataFrame
+t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
+t_half_deg_df = pd.read_csv(t_half_deg_filename)
+
+# Convert the DataFrame to a dictionary
+thalf_deg_d_dict = t_half_deg_df.set_index("MP_form")["thalf_deg_d"].to_dict()
+
+# Heteroaggregation attachment efficiency: alpha_heter.
+alpha_heter_filename = os.path.join(inputs_path, "alpha_heter.csv")
+alpha_heter_df = pd.read_csv(alpha_heter_filename)
+alpha_hetr_dict = alpha_heter_df.set_index("MP_form")["alpha_heter"].to_dict()
+
+# Timescale for fragmentation of the biggest size fraction (mp5): tfrag_gen_d
+
+# t_frag_gen_df=
+
+process_inputs_df = create_inputsTable_UTOPIA(
+    inputs_path, model_lists, thalf_deg_d_dict, alpha_hetr_dict
+)
 
 """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
 
@@ -195,7 +234,7 @@ MP_form = "freeMP"  # Choose from MPforms_list above
 
 # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
 q_mass_g_s_dict = {
-    "Ocean_Surface_Water": 0,
+    "Ocean_Surface_Water": 1,
     "Ocean_Mixed_Water": 0,
     "Ocean_Column_Water": 0,
     "Coast_Surface_Water": 0,
@@ -211,8 +250,17 @@ q_mass_g_s_dict = {
     "Background_Soil": 0,
     "Agricultural_Soil_Surface": 0,
     "Agricultural_Soil": 0,
-    "Air": 1,
+    "Air": 0,
 }
+
+input_flow_filename = os.path.join(inputs_path, "inputFlows.csv")
+input_flows_df = pd.DataFrame(
+    list(q_mass_g_s_dict.items()), columns=["compartment", "q_mass_g_s"]
+)
+input_flows_df.to_csv(input_flow_filename, index=False)
+
+# input_flows_df = pd.read_csv(input_flow_filename)
+# q_mass_g_s_dict=input_flows_df.set_index('compartment')['q_mass_g_s'].to_dict()
 
 saveName = (
     MP_composition

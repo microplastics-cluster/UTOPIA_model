@@ -8,7 +8,9 @@ import pandas as pd
 import itertools
 
 
-def create_inputsTable_UTOPIA(inputs_path, model_lists):
+def create_inputsTable_UTOPIA(
+    inputs_path, model_lists, thalf_deg_d_dict, alpha_hetr_dict
+):
     compNames = model_lists["compartmentNames_list"]
     mpFormsLabels = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
     # sizeBins = ["x01um", "um", "x10um", "x100um", "mm"]
@@ -43,13 +45,6 @@ def create_inputsTable_UTOPIA(inputs_path, model_lists):
     # Assumptions:
     # Heteroaggregated particles degrade 10 times slower than the free MPs
     # Biofouled particles degrade 5 times slower than the free MPs
-
-    thalf_deg_d_dict = {
-        "freeMP": 5000,
-        "heterMP": 50000,
-        "biofMP": 25000,
-        "heterBiofMP": 100000,
-    }
 
     for key in thalf_deg_d_dict:
         cond = dataFrame_inputs["MPform"] == key
@@ -410,8 +405,8 @@ def create_inputsTable_UTOPIA(inputs_path, model_lists):
     "Heteroaggegation happens to free and biofouled particles. It is hypothesized that biofilm increases the attachment efficiency of a plastic particle, reflected in two times higher values of  for biofiouled plastic particles compared to the pristine form. We assumed there is no heteroaggregation in the sediment or any soil compartment and neither in air"
     # REF value: Besseling et al. 2017
 
-    alpha_heter_Free = 0.01
-    alpha_heter_biof = alpha_heter_Free * 2
+    alpha_heter_Free = float(alpha_hetr_dict["freeMP"])
+    alpha_heter_biof = float(alpha_hetr_dict["biofMP"])
 
     cond_alpha1 = (dataFrame_inputs["MPform"] == "freeMP") & (
         (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
