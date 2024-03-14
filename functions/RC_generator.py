@@ -645,6 +645,7 @@ def sea_spray_aerosol(particle):
     # to be formulated
 
     k_sea_spray_aerosol = 2.36e-25
+
     return k_sea_spray_aerosol
 
 

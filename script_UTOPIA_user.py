@@ -99,18 +99,18 @@ if N_sizeBins == 5:
             [
                 [0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0],
-                [0.1, 0.9, 0, 0, 0],
-                [0.01, 0.09, 0.9, 0, 0],
-                [0.001, 0.009, 0.09, 0.9, 0],
+                [0, 1, 0, 0, 0],
+                [0, 0, 1, 0, 0],
+                [0, 0, 0, 1, 0],
             ]
         ),
         "erosive_fragmentation": np.array(
             [
                 [0, 0, 0, 0, 0],
                 [1, 0, 0, 0, 0],
-                [0.9, 0.1, 0, 0, 0],
-                [0.99, 0.009, 0.001, 0, 0],
-                [0.99, 0.009, 0.0009, 0.0001, 0],
+                [0.99, 0.01, 0, 0, 0],
+                [0.999, 0, 0.001, 0, 0],
+                [0.9999, 0, 0, 0.0001, 0],
             ]
         ),
         "mixed_fragmentation": np.array(
@@ -133,7 +133,7 @@ if N_sizeBins == 5:
         ),
     }
 
-    frag_style = "mixed_fragmentation"
+    frag_style = "sequential_fragmentation"
 
     fsd = frag_styles_dict[frag_style]
     sizes = [list(model_lists["dict_size_coding"].keys())]
