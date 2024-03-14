@@ -46,7 +46,6 @@ def model_run(
     (
         system_particle_object_list,
         SpeciesList,
-        process_inputs_df,
         spm,
         dict_comp,
         model_lists,
