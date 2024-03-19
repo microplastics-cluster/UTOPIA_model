@@ -29,8 +29,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 980
-MP_composition = "PE"
+MPdensity_kg_m3 = 1580
+MP_composition = "PVC"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -133,7 +133,7 @@ if N_sizeBins == 5:
         ),
     }
 
-    frag_style = "sequential_fragmentation"
+    frag_style = "mixed_fragmentation"
 
     fsd = frag_styles_dict[frag_style]
     sizes = [list(model_lists["dict_size_coding"].keys())]
