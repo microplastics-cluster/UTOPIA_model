@@ -123,12 +123,12 @@ def compartment_massBalance(
     # )
 
     # Mass balance per compartment
-    print(
-        "Difference inflow-outflow in "
-        + comp
-        + " is = "
-        + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag)
-    )
+    # print(
+    #     "Difference inflow-outflow in "
+    #     + comp
+    #     + " is = "
+    #     + str(emiss_flow_g_s + transport_input_flow - out_flow_comp_g_s - outputs_frag)
+    # )
     return {
         "Inflow": emiss_flow_g_s + transport_input_flow,
         "Outflow": out_flow_comp_g_s + outputs_frag,

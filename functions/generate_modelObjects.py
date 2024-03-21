@@ -23,7 +23,7 @@ def generate_objects(
 ):
     # Boxes
     UTOPIA = Box(boxName)
-    print(f"The model box {boxName} has been created")
+    # print(f"The model box {boxName} has been created")
 
     modelBoxes = [UTOPIA]
     # modelBoxes=instantiateBoxes_from_csv(boxFile)
@@ -79,9 +79,9 @@ def generate_objects(
     MP_biofouledParticles = []
     for i in MP_freeParticles:
         MP_biofouledParticles.append(ParticulatesBF(parentMP=i))
-    print(
-        f"The biofouled MP particles {[p.Pname for p in MP_biofouledParticles]} have been generated"
-    )
+    # print(
+    #     f"The biofouled MP particles {[p.Pname for p in MP_biofouledParticles]} have been generated"
+    # )
 
     ###Calculate biofMP volume
     for i in MP_biofouledParticles:
@@ -100,15 +100,15 @@ def generate_objects(
         PdimensionZ_um=0,
     )
     spm.calc_volume()
-    print(f"spm Volume: {spm.Pvolume_m3} m3")
-    print(f"Density of spm: {spm.Pdensity_kg_m3} kg_m3")
+    # print(f"spm Volume: {spm.Pvolume_m3} m3")
+    # print(f"Density of spm: {spm.Pdensity_kg_m3} kg_m3")
 
     MP_heteroaggregatedParticles = []
     for i in MP_freeParticles:
         MP_heteroaggregatedParticles.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
-    print(
-        f"The heteroaggregated MP particles {[p.Pname for p in MP_heteroaggregatedParticles]} have been generated"
-    )
+    # print(
+    #     f"The heteroaggregated MP particles {[p.Pname for p in MP_heteroaggregatedParticles]} have been generated"
+    # )
 
     ###Calculate heterMP volume
     for i in MP_heteroaggregatedParticles:
@@ -121,9 +121,9 @@ def generate_objects(
         MP_biofHeter.append(ParticulatesSPM(parentMP=i, parentSPM=spm))
     # for i in MP_biofHeter:
     #     print(f"Density of {i.Pname}: {i.Pdensity_kg_m3} kg_m3")
-    print(
-        f"The biofouled and heteroaggregated MP particles {[p.Pname for p in MP_biofHeter]} have been generated"
-    )
+    # print(
+    #     f"The biofouled and heteroaggregated MP particles {[p.Pname for p in MP_biofHeter]} have been generated"
+    # )
 
     ###Calculate biofHeterMP volume
     for i in MP_biofHeter:
@@ -155,9 +155,9 @@ def generate_objects(
             copy.deepcopy(comp)
         )  # Check if the use of copy is correct!!
 
-    print(
-        f"The compartments {[comp.Cname for comp in UTOPIA.compartments]} have been assigned to {UTOPIA.Bname } model box"
-    )
+    # print(
+    #     f"The compartments {[comp.Cname for comp in UTOPIA.compartments]} have been assigned to {UTOPIA.Bname } model box"
+    # )
 
     # Estimate volume of UTOPIA box by adding volumes of the compartments addedd
     # UTOPIA.calc_Bvolume_m3() #currently volume of soil and air boxess are missing, to be added to csv file
@@ -167,7 +167,7 @@ def generate_objects(
         for c in b.compartments:
             for p in particles:
                 c.add_particles(copy.deepcopy(p))
-        print(f"The particles have been added to the compartments of {b.Bname}")
+        # print(f"The particles have been added to the compartments of {b.Bname}")
 
     # List of particle objects in the system:
     system_particle_object_list = []

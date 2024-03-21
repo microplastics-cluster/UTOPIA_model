@@ -141,13 +141,13 @@ def model_run(
 
     # Total number of particles and Total mass
 
-    print("Distribution of mass in the system")
-    print(mf_shorted[:10])
-    df_massDistribution = mf_shorted[:10]
+    # print("Distribution of mass in the system")
+    # print(mf_shorted[:10])
+    # df_massDistribution = mf_shorted[:10]
 
-    print("distribution of particle number in the system")
-    print(nf_shorted[:10])
-    df_numberDistribution = nf_shorted[:10]
+    # print("distribution of particle number in the system")
+    # print(nf_shorted[:10])
+    # df_numberDistribution = nf_shorted[:10]
 
     # Mass distribution by compartment
     mass_frac_100 = []
@@ -218,7 +218,7 @@ def model_run(
 
     # Print compartment mass balance table
     comp_mass_balance_df = pd.DataFrame.from_dict(comp_mass_balance, orient="index")
-    print(comp_mass_balance_df)
+    # print(comp_mass_balance_df)
 
     comp_mass_balance_df["Mass balance"] = [
         comp_mass_balance_df["Inflow"][c] - comp_mass_balance_df["Outflow"][c]

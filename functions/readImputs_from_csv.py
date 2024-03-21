@@ -27,9 +27,9 @@ def instantiateParticles_from_csv(compFile):
             )
         )
 
-    print(
-        f"The free MP particles {[p.Pname for p in particlesObj_list]} have been generated"
-    )
+    # print(
+    #     f"The free MP particles {[p.Pname for p in particlesObj_list]} have been generated"
+    # )
 
     return particlesObj_list
 
@@ -174,7 +174,7 @@ def instantiate_compartments(inputs_path_file):
         waterComp_objects + sedimentComp_objects + soilComp_objects + airComp_objects
     )
 
-    print(f"The compartments {[c.Cname for c in Comp_objects]} have been generated")
+    # print(f"The compartments {[c.Cname for c in Comp_objects]} have been generated")
 
     return Comp_objects
 
@@ -230,4 +230,4 @@ def set_interactions(compartments, connexions_path_file):
         df_comp = comp_connex_df[["Compartments", c.Cname]].dropna()
         c.connexions = dict(zip(df_comp["Compartments"], df_comp[c.Cname]))
 
-    print("Connexions have been added")
+    # print("Connexions have been added")
