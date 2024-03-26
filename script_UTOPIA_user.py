@@ -463,6 +463,12 @@ comp_mass_balance_df["Concentration (N/m3)"] = [
 ]
 
 
+""" Generate mass and number distribution heatmaps"""
+
+
+plot_fractionDistribution_heatmap(Results_extended, fraction="mass_fraction")
+plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
+
 """ Estimate exposure indicators """
 
 # Overall residence time

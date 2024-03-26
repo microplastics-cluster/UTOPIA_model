@@ -282,9 +282,6 @@ def heteroaggregation(particle, spm):
     return k_hetAgg
 
 
-# k_hetAgg
-
-
 def heteroaggregate_breackup(particle, spm):
     """Assumption: the breack-up of heteroaggregates is 10E8 times slower than the formation of heteroaggregates"""
 
@@ -377,35 +374,17 @@ def heteroaggregate_breackup(particle, spm):
     return k_aggBreakup
 
 
-# k_aggBreakup
-
-
 def advective_transport(particle):
     k_adv = float(particle.Pcompartment.waterFlow_m3_s) / float(
         particle.Pcompartment.Cvolume_m3
     )
 
-    # if particle.Pcompartment.waterFlow_m3_s != "nan":
-    #     k_adv = float(particle.Pcompartment.waterFlow_m3_s) / float(particle.Pcompartment.Cvolume_m3)
-    # else:
-    #     k_adv = float(particle.Pcompartment.flowVelocity_m_s) * (
-    #         float(particle.Pcompartment.Cdepth_m)
-    #         * float(particle.Pcompartment.Cwidth_m)
-    #         / float(particle.Pcompartment.Cvolume_m3)
-    #     )
-    # advective transport
-
-    # Based on Praetorius et al. 2012: Kflow = v_riv_flow*(Aw1/Vw1)
-    # Being v_riv_flow the river flow velocity in ms-1, Aw1 is the crossectional
-    # area of the flowing water and Vw1 the volume of the box of moving water.
-
     return k_adv
 
 
 def mixing(particle, dict_comp):
-    # Currently turned off while developing the rigth process description
 
-    # Now adapted to UTOPIA's compartments and changed rates-- In progress--
+    # Now adapted to UTOPIA's compartments and changed rates
     # k_mix has to be multiplied by the compartment volume ratio calculated with the interacting compartment volume
 
     # k_mix_up = (
@@ -416,55 +395,53 @@ def mixing(particle, dict_comp):
     #     10**-3
     # )  # (2): <Handbook on Mixing in Rivers> Edited by J.C. Rutherford (Water and Soil Miscellaneous Publication No. 26. 1981. 60pp.ISSN 0110-4705)
 
-    # if particle.Pcompartment.Cname == "Ocean_Mixed_Water":
-    #     k_mix = [
-    #         k_mix_up
-    #         * float(dict_comp["Ocean_Surface_Water"].Cvolume_m3)
-    #         / float(particle.Pcompartment.Cvolume_m3),
-    #         k_mix_down
-    #     ]
-    #     # {"mix_up": k_mix_up, "mix_down": k_mix_down}
+    # Assuming that vertical mixing for the surface of the ocean and the coast is in the 1 hour time scale. The water in the surface will take 60 min to travel 50 m, half way trhough the mix layer (100m deep). 50m/60min = 0.83 m/min= 0.0138 m/s
 
-    # elif particle.Pcompartment.Cname in [
-    #     "Ocean_Column_Water",
-    #     "Coast_Column_Water",
-    #     "Bulk_Freshwater",
-    # ]:
-    #     connecting_comp = [
-    #         key
-    #         for key, value in particle.Pcompartment.connexions.items()
-    #         if (isinstance(value, list) and "mixing" in value)
-    #     ][0]
+    # FROM OECD tool: ocean water mixing to the depths of hell (Implies residence time in the mixed layer of 100 years, Wania and Mackay GloboPOP Value, Sci Tot Env. 1995) : 1.14 * 10 ^ -4 m/h=3.167E-8 m/s
 
-    #     k_mix = (
-    #         k_mix_up
-    #         * float(dict_comp[connecting_comp].Cvolume_m3)
-    #         / float(particle.Pcompartment.Cvolume_m3)
-    #     )
-    # elif particle.Pcompartment.Cname in [
-    #     "Ocean_Surface_Water",
-    #     "Coast_Surface_Water",
-    #     "Surface_Freshwater",
-    # ]:
-    #     connecting_comp = [
-    #         key
-    #         for key, value in particle.Pcompartment.connexions.items()
-    #         if (isinstance(value, list) and "mixing" in value)
-    #     ][0]
-    #     k_mix = (
-    #         k_mix_down
-    #         * float(dict_comp[connecting_comp].Cvolume_m3)
-    #         / float(particle.Pcompartment.Cvolume_m3)
-    #     )
-    # else:
-    #     k_mix = 0
+    # Assuming that vertical mixing of freshwater compartments is in the minutes timescale. The water in the surface will take 2 min to travel 5 m, half way trhough the mix layer (10m deep). 2m/5min = 0.4 m/min= 0.0067 m/s
 
-    k_mix = 0
+    flowRate_mixUP_ocean_m3_s = 0.0138 * float(
+        dict_comp["Ocean_Mixed_Water"].CsurfaceArea_m2
+    )
+
+    flowRate_mixDown_ocean_m3_s = 3.167e-8 * float(
+        dict_comp["Ocean_Mixed_Water"].CsurfaceArea_m2
+    )
+
+    flowRate_mix_coast_m3_s = 0.0138 * float(
+        dict_comp["Coast_Column_Water"].CsurfaceArea_m2
+    )
+
+    flowRateMix_freshWater_m3_s = 0.0067 * float(
+        dict_comp["Bulk_Freshwater"].CsurfaceArea_m2
+    )
+
+    if particle.Pcompartment.Cname == "Ocean_Mixed_Water":
+        k_mix_up = flowRate_mixUP_ocean_m3_s / float(particle.Pcompartment.Cvolume_m3)
+        k_mix_down = flowRate_mixDown_ocean_m3_s / float(
+            particle.Pcompartment.Cvolume_m3
+        )
+
+        k_mix = [k_mix_up, k_mix_down]
+        # {"mix_up": k_mix_up, "mix_down": k_mix_down}
+
+    elif particle.Pcompartment.Cname == "Ocean_Column_Water":
+        k_mix = flowRate_mixDown_ocean_m3_s / float(particle.Pcompartment.Cvolume_m3)
+
+    elif particle.Pcompartment.Cname == "Ocean_Surface_Water":
+        k_mix = flowRate_mixUP_ocean_m3_s / float(particle.Pcompartment.Cvolume_m3)
+
+    elif particle.Pcompartment.Cname in ["Coast_Column_Water", "Coast_Surface_Water"]:
+        k_mix = flowRate_mix_coast_m3_s / float(particle.Pcompartment.Cvolume_m3)
+    elif particle.Pcompartment.Cname in ["Surface_Freshwater", "Bulk_Freshwater"]:
+        k_mix = flowRateMix_freshWater_m3_s / float(particle.Pcompartment.Cvolume_m3)
+
+    else:
+        print("No mixing implemented for this compartment")
+        k_mix = 0
 
     return k_mix
-
-
-"""To be described for UTOPIA"""
 
 
 def biofouling(particle):
@@ -485,9 +462,6 @@ def biofouling(particle):
     return k_biof
 
 
-# k_biof
-
-
 def defouling(particle):
     # Defouling = degradation of Biofilm.
 
@@ -504,10 +478,6 @@ def defouling(particle):
         k_defoul = 1 / float(tbiof_degrade_d) / 24 / 60 / 60
 
     return k_defoul
-
-
-# for the sediment compartment rate constants for resuspension and
-# burial in deep sediment are calculated & degradation rate assigned
 
 
 def sediment_resuspension(particle):

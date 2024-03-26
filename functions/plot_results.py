@@ -243,3 +243,96 @@ def results_extended_by_compartment_to_csv(path, results_dict):
         df_results.to_excel(writer, sheet_name=comp, index=False)
     # Save the file
     writer.save()
+
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def plot_fractionDistribution_heatmap(Results_extended, fraction):
+    # Define the order for the MP_Form labels
+    mp_form_order = [
+        "freeMP",
+        "heterMP",
+        "biofMP",
+        "heterBiofMP",
+    ]  # Replace with your desired order
+
+    # Define the order for the Compartment labels
+    compartment_order = [
+        "Ocean_Surface_Water",
+        "Ocean_Mixed_Water",
+        "Ocean_Column_Water",
+        "Coast_Surface_Water",
+        "Coast_Column_Water",
+        "Surface_Freshwater",
+        "Bulk_Freshwater",
+        "Sediment_Freshwater",
+        "Sediment_Ocean",
+        "Sediment_Coast",
+        "Urban_Soil_Surface",
+        "Urban_Soil",
+        "Background_Soil_Surface",
+        "Background_Soil",
+        "Agricultural_Soil_Surface",
+        "Agricultural_Soil",
+        "Air",
+    ]  # Replace with your desired order
+
+    # Pivot the DataFrame to have one row per combination of MP_Form, Compartment, and Size_Fraction_um
+    pivot_table = Results_extended.pivot_table(
+        index=["MP_Form", "Size_Fraction_um"],
+        columns="Compartment",
+        values="mass_fraction",
+        aggfunc="mean",
+    )
+
+    # Reorder the rows based on mp_form_order and columns based on compartment_order
+    pivot_table = pivot_table.loc[mp_form_order, compartment_order]
+
+    # Apply log scale to the pivot table
+    pivot_table_log = np.log10(pivot_table)
+
+    # Replace -inf values with NaN
+    pivot_table_log.replace(-np.inf, np.nan, inplace=True)
+    # Define a custom colormap with grey color for NaN values
+    cmap = sns.color_palette("viridis", as_cmap=True)
+    cmap.set_bad("grey")
+
+    # Plot the heatmap with logarithmic scale and custom colormap
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(
+        pivot_table_log,
+        cmap=cmap,
+        cbar=True,
+        cbar_kws={"label": "log10_mass_fraction"},
+        annot=False,
+        linewidths=0.5,
+        linecolor="grey",
+    )
+
+    # Set compartment labels to cover all size fractions underneath
+    compartment_labels = pivot_table.columns
+    compartment_label_positions = np.arange(len(compartment_labels)) + 0.5
+    plt.xticks(
+        ticks=compartment_label_positions, labels=compartment_labels, rotation=90
+    )
+
+    # Set MP_Form and Size_Fraction_um labels
+    row_labels = [
+        f"{mp_form} - {size_frac_um}" for mp_form, size_frac_um in pivot_table.index
+    ]
+    row_label_positions = np.arange(len(pivot_table.index)) + 0.5
+    plt.yticks(ticks=row_label_positions, labels=row_labels, rotation=0)
+
+    plt.title(
+        "Heatmap of log10 ("
+        + fraction
+        + " by MP_Form, Compartment, and Size_Fraction_um"
+    )
+    plt.xlabel("Compartment")
+    plt.ylabel("MP_Form - Size_Fraction_um")
+
+    plt.tight_layout()
+    plt.show()
