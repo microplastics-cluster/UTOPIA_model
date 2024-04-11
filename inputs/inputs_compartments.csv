@@ -4,8 +4,8 @@ Ocean_Mixed_Water,1,1.47E+08,278,0.02,1,3.44E+16,100,3.44E+14
 Ocean_Column_Water,1,0,278,0.02,1,1.03E+18,3000,3.44E+14
 Coast_Surface_Water,7,2.94E+05,278,0.02,10,8.83E+11,0.1,8.83E+12
 Coast_Column_Water,7,1.47E+08,278,0.02,1,4.42E+14,50,8.83E+12
-Surface_Freshwater,30,1.27E+06,278,1.3,10,9.05E+11,0.1,9.05E+12
-Bulk_Freshwater,30,1.27E+06,278,1.3,10,2.72E+14,30,9.05E+12
+Surface_Freshwater,30,1.27E+06,278,0.1,10,9.05E+11,0.1,9.05E+12
+Bulk_Freshwater,30,1.27E+06,278,0.1,10,2.72E+14,10,9.05E+12
 Sediment_Freshwater,nan,nan,nan,nan,nan,2.72E+11,0.03,9.05E+12
 Sediment_Ocean,nan,nan,nan,nan,nan,1.03E+13,0.03,3.44E+14
 Sediment_Coast,nan,nan,nan,nan,nan,2.65E+11,0.03,8.83E+12

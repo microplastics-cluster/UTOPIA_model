@@ -14,8 +14,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 ## Define microplastics physical properties
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
-MPdensity_kg_m3 = 980
-MP_composition = "PE"
+MPdensity_kg_m3 = 1980
+MP_composition = "PVC"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -122,27 +122,56 @@ particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 
 MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 
-## Compartments:
 
-compList = [
-    "Ocean_Surface_Water",
-    "Ocean_Mixed_Water",
-    "Ocean_Column_Water",
-    "Coast_Surface_Water",
-    "Coast_Column_Water",
-    "Surface_Freshwater",
-    "Bulk_Freshwater",
-    "Sediment_Freshwater",
-    "Sediment_Ocean",
-    "Sediment_Coast",
-    "Urban_Soil_Surface",
-    "Urban_Soil",
-    "Background_Soil_Surface",
-    "Background_Soil",
-    "Agricultural_Soil_Surface",
-    "Agricultural_Soil",
-    "Air",
-]
+# Generate objects
+(
+    system_particle_object_list,
+    SpeciesList,
+    spm,
+    dict_comp,
+    model_lists,
+    particles_df,
+) = generate_objects(
+    inputs_path,
+    boxName=boxName,
+    MPforms_list=MPforms_list,
+    comp_impFile_name=comp_impFile_name,
+    comp_interactFile_name=comp_interactFile_name,
+    mp_imputFile_name=mp_imputFile_name,
+    spm_diameter_um=spm_diameter_um,
+    spm_density_kg_m3=spm_density_kg_m3,
+)
+
+surfComp_list = [c for c in dict_comp if "Surface" in c]
+particle_compartmentCoding = dict(
+    zip(
+        model_lists["compartmentNames_list"],
+        list(range(len(model_lists["compartmentNames_list"]))),
+    )
+)
+comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
+
+"""Estimate rate constants per particle"""
+
+for particle in system_particle_object_list:
+    generate_rateConstants(particle, spm, dict_comp, fsd)
+
+#### Original results with no time limit
+
+## create rate constants table:
+RC_df = create_rateConstants_table(system_particle_object_list)
+df4 = RC_df.fillna(0)
+
+# Plot rate constants
+
+"""(FIX RC for wet deposition, now its given as a list of rate constants per surface compartment only for dry deposition and wet depossition is turned off)This needs to be fixed also for the matrix of interactions and estimation of flows"""
+
+"""Build Matrix of interactions"""
+
+interactions_df = fillInteractions_fun_OOP(
+    system_particle_object_list, SpeciesList, surfComp_list
+)
+
 
 # input flow (in g per second)
 
@@ -157,8 +186,7 @@ input_flow_g_s = 1
 saveOpt = "Notsave"  # "save" or "Notsave"
 
 
-for comp in compList:
-    compartment = comp
+for compartment in model_lists["compartmentNames_list"]:
     # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
     q_mass_g_s_dict = {
         "Ocean_Surface_Water": 0,
@@ -193,13 +221,6 @@ for comp in compList:
         + compartment
     )
 
-    particle_compartmentCoding = dict(
-        zip(
-            compList,
-            list(range(len(compList))),
-        )
-    )
-    comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
     sp_imputs = []
     q_mass_g_s = []
     for compartment in q_mass_g_s_dict.keys():
@@ -216,23 +237,20 @@ for comp in compList:
     imput_flows_g_s = dict(zip(sp_imputs, q_mass_g_s))
 
     model_run(
-        inputs_path,
-        boxName,
-        MPforms_list,
-        mp_imputFile_name,
-        comp_impFile_name,
-        comp_interactFile_name,
-        spm_diameter_um,
-        spm_density_kg_m3,
-        fsd,
+        model_lists,
+        comp_dict_inverse,
+        particle_compartmentCoding,
+        system_particle_object_list,
+        interactions_df,
         q_mass_g_s,
         imput_flows_g_s,
         particle_forms_coding,
         size_dict,
         MP_form_dict_reverse,
-        size_bin,
+        dict_comp,
+        surfComp_list,
         compartment,
-        MP_form,
         saveName,
         saveOpt,
+        df4,
     )

@@ -284,7 +284,7 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
     pivot_table = Results_extended.pivot_table(
         index=["MP_Form", "Size_Fraction_um"],
         columns="Compartment",
-        values="mass_fraction",
+        values=fraction,
         aggfunc="mean",
     )
 
@@ -296,6 +296,16 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
 
     # Replace -inf values with NaN
     pivot_table_log.replace(-np.inf, np.nan, inplace=True)
+
+    # Stablish a lower limit
+    # Set the lower limit for the values
+    lower_limit = -20
+
+    # Replace values below the lower limit with NaN
+    pivot_table_log = pivot_table_log.applymap(
+        lambda x: np.nan if x < lower_limit else x
+    )
+
     # Define a custom colormap with grey color for NaN values
     cmap = sns.color_palette("viridis", as_cmap=True)
     cmap.set_bad("grey")

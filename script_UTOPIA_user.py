@@ -18,6 +18,8 @@ from functions.fill_interactions_Knames import *
 from functions.exposure_indicators_calculation import *
 from functions.generate_MPinputs_table import *
 from functions.save_results import *
+from model_run import *
+from functions.loop_CTD_calculation import *
 
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
@@ -154,7 +156,7 @@ else:
 # optionally the user can type its own fsd matrix following the desciption above
 
 
-## Weahering processes input parameters
+## Weathering processes input parameters
 
 # Generate the process inputs table based on the given model structure (created model boxes, compartments and particles)
 
@@ -233,8 +235,12 @@ MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 MP_form = "freeMP"  # Choose from MPforms_list above
 
 # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+
+input_flow_g_s = 1
+
+
 q_mass_g_s_dict = {
-    "Ocean_Surface_Water": 1,
+    "Ocean_Surface_Water": 0,
     "Ocean_Mixed_Water": 0,
     "Ocean_Column_Water": 0,
     "Coast_Surface_Water": 0,
@@ -250,7 +256,7 @@ q_mass_g_s_dict = {
     "Background_Soil": 0,
     "Agricultural_Soil_Surface": 0,
     "Agricultural_Soil": 0,
-    "Air": 0,
+    "Air": input_flow_g_s,
 }
 
 input_flow_filename = os.path.join(inputs_path, "inputFlows.csv")
@@ -270,6 +276,19 @@ saveName = (
     + str(size_dict[size_bin])
     + "_nm_"
 )
+
+# Print model run summary
+
+print("Model run: ")
+print("Emissions flow (g/s): ", input_flow_g_s)
+desired_key = next(key for key, value in q_mass_g_s_dict.items() if value > 0)
+print("Recieving compartment/s: ", desired_key)
+print("Emitted MP density (kg/m3): ", MPdensity_kg_m3)
+print("Emitted MP shape: ", shape)
+print("Emitted MP form: ", MP_form)
+print("Emitted MP size (um): ", size_dict[size_bin])
+print("Selected fragmentation style: ", frag_style)
+
 
 """Estimate rate constants per particle"""
 
@@ -421,8 +440,10 @@ mass_dist_comp["Concentration_num_m3"] = num_conc
 
 from functions.generate_compartmentFlows_tables import *
 
-# Estimate outflows
-tables_outputFlows = estimate_outFlows(system_particle_object_list, dict_comp)
+# Estimate outflows in mass (g/s) amd number/second
+(tables_outputFlows, tables_outputFlows_number) = estimate_outFlows(
+    system_particle_object_list, dict_comp
+)
 
 
 # Estimate imput flows from transport from other compartments
@@ -471,8 +492,110 @@ plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
 
 """ Estimate exposure indicators """
 
-# Overall residence time
-overall_residence_time_calculation(tables_outputFlows, Results_extended)
+# Overall persistance (Pov) and Overall residence time (Tov) in years:
+
+(
+    Pov_mass_years,
+    Pov_num_years,
+    Pov_size_dict_sec,
+    Tov_mass_years,
+    Tov_num_years,
+    Tov_size_dict_sec,
+) = Exposure_indicators_calculation(
+    tables_outputFlows,
+    tables_outputFlows_number,
+    Results_extended,
+    size_dict,
+    dict_comp,
+)
+
+# Caracteristic travel distance (CDT) (m):
+
+# To calculate CTD we need to estimate it by emitting into the especific movile compartment. We will calculate CTD derived from emmiting to each compartment and taking the higest value:
+CTD_mass_list = []
+CTD_number_list = []
+for CDT_comp in [
+    "Ocean_Surface_Water",
+    "Ocean_Mixed_Water",
+    "Coast_Surface_Water",
+    "Coast_Column_Water",
+    "Surface_Freshwater",
+    "Bulk_Freshwater",
+    "Air",
+]:
+    # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+    q_mass_g_s_dict_CTD = {
+        "Ocean_Surface_Water": 0,
+        "Ocean_Mixed_Water": 0,
+        "Ocean_Column_Water": 0,
+        "Coast_Surface_Water": 0,
+        "Coast_Column_Water": 0,
+        "Surface_Freshwater": 0,
+        "Bulk_Freshwater": 0,
+        "Sediment_Freshwater": 0,
+        "Sediment_Ocean": 0,
+        "Sediment_Coast": 0,
+        "Urban_Soil_Surface": 0,
+        "Urban_Soil": 0,
+        "Background_Soil_Surface": 0,
+        "Background_Soil": 0,
+        "Agricultural_Soil_Surface": 0,
+        "Agricultural_Soil": 0,
+        "Air": 0,
+    }
+    q_mass_g_s_dict_CTD[CDT_comp] = input_flow_g_s
+
+    sp_imputs_CTD = []
+    q_mass_g_s_CTD = []
+    for compartment in q_mass_g_s_dict_CTD.keys():
+        sp_imputs_CTD.append(
+            size_bin
+            + particle_forms_coding[MP_form]
+            + str(particle_compartmentCoding[compartment])
+            + "_"
+            + boxName
+        )
+        q_mass_g_s_CTD.append(q_mass_g_s_dict_CTD[compartment])
+
+    imput_flows_g_s_CTD = dict(zip(sp_imputs_CTD, q_mass_g_s_CTD))
+
+    CTD_km = model_run_CTD(
+        system_particle_object_list,
+        CDT_comp,
+        imput_flows_g_s_CTD,
+        interactions_df,
+        q_mass_g_s_CTD,
+        size_dict,
+        MP_form_dict_reverse,
+        comp_dict_inverse,
+        dict_comp,
+    )
+
+    CTD_mass_list.append(CTD_km[0])
+    CTD_number_list.append(CTD_km[1])
+
+CTD_df = pd.DataFrame(
+    index=[
+        "Ocean_Surface_Water",
+        "Ocean_Mixed_Water",
+        "Coast_Surface_Water",
+        "Coast_Column_Water",
+        "Surface_Freshwater",
+        "Bulk_Freshwater",
+        "Air",
+    ]
+)
+
+CTD_df["CTD_mass_km"] = CTD_mass_list
+CTD_df["CTD_particle_number_km"] = CTD_number_list
+
+print("Characteristic mass travel distance (CDT): ", CTD_df["CTD_mass_km"].max(), " km")
+
+print(
+    "Characteristic particle number travel distance (CDT): ",
+    CTD_df["CTD_particle_number_km"].max(),
+    " km",
+)
 
 
 # Save results

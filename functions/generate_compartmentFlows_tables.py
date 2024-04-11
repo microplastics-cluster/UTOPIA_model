@@ -2,30 +2,44 @@ import pandas as pd
 
 
 def estimate_outFlows(system_particle_object_list, dict_comp):
-    # Estimate outflows
+    # Estimate mass outflows
     for p in system_particle_object_list:
         p.outFlow_mass_g_s = {}
+        p.outFlow_number_g_s = {}
         for c in p.RateConstants:
             if type(p.RateConstants[c]) == list:
                 p.outFlow_mass_g_s[c] = [R * p.Pmass_g_SS for R in p.RateConstants[c]]
+                p.outFlow_number_g_s[c] = [R * p.Pnum_SS for R in p.RateConstants[c]]
             else:
                 p.outFlow_mass_g_s[c] = p.RateConstants[c] * p.Pmass_g_SS
+                p.outFlow_number_g_s[c] = p.RateConstants[c] * p.Pnum_SS
 
     # Tables of output flows per compartmet
-    tables_outputFlows = {}
+    tables_outputFlows_mass = {}
+    tables_outputFlows_number = {}
     for c in list(dict_comp.keys()):
-        part_dic = {}
+        part_dic_mass = {}
+        part_dic_number = {}
         for p in system_particle_object_list:
             if p.Pcompartment.Cname == c:
-                part_dic[p.Pcode] = pd.DataFrame.from_dict(
+                part_dic_mass[p.Pcode] = pd.DataFrame.from_dict(
                     p.outFlow_mass_g_s, orient="index"
                 )
-        tables_outputFlows[c] = pd.concat(part_dic, axis=1).transpose()
-    for k in tables_outputFlows:
-        tables_outputFlows[k] = (
-            tables_outputFlows[k].reset_index(level=1).drop("level_1", axis=1)
+                part_dic_number[p.Pcode] = pd.DataFrame.from_dict(
+                    p.outFlow_number_g_s, orient="index"
+                )
+        tables_outputFlows_mass[c] = pd.concat(part_dic_mass, axis=1).transpose()
+        tables_outputFlows_number[c] = pd.concat(part_dic_number, axis=1).transpose()
+
+    for k in tables_outputFlows_mass:
+        tables_outputFlows_mass[k] = (
+            tables_outputFlows_mass[k].reset_index(level=1).drop("level_1", axis=1)
         )
-    return tables_outputFlows
+        tables_outputFlows_number[k] = (
+            tables_outputFlows_number[k].reset_index(level=1).drop("level_1", axis=1)
+        )
+
+    return tables_outputFlows_mass, tables_outputFlows_number
 
 
 # Estimate imput flows from transport from other compartments

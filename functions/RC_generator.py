@@ -496,6 +496,7 @@ def sediment_resuspension(particle):
 
 def burial(particle):
     # Currenlty place holder values. To be revisited
+
     # When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
     burial_dict = {
         "Sediment_Freshwater": 2.7e-10,
@@ -621,6 +622,11 @@ def sea_spray_aerosol(particle):
 
 def sequestration_deep_soils(particle):
     # to be formulated
+
+    # From The OECD tool: MTC3sink = 0.05 * MTCsconv (m/h)soil solids convection to the center of the earth. MTCsconv = 4.54 * 10 ^-7 (m/h)'soil side solid phase convection MTC
+
+    # K_burial=MTC3sink (m/s) *SA (m2)/V(m3)
+
     # Default value taken from SimpleBox for Plastics Removal rate from soil in s-1
     k_sequestration_deep_soils = 2.71e-9
 

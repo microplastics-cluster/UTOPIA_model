@@ -18,81 +18,28 @@ from functions.fill_interactions_Knames import *
 from functions.exposure_indicators_calculation import *
 from functions.save_results import *
 from functions.generate_compartmentFlows_tables import *
+from functions.exposure_indicators_calculation import *
 
 
 def model_run(
-    inputs_path,
-    boxName,
-    MPforms_list,
-    mp_imputFile_name,
-    comp_impFile_name,
-    comp_interactFile_name,
-    spm_diameter_um,
-    spm_density_kg_m3,
-    fsd,
+    model_lists,
+    comp_dict_inverse,
+    particle_compartmentCoding,
+    system_particle_object_list,
+    interactions_df,
     q_mass_g_s,
     imput_flows_g_s,
     particle_forms_coding,
     size_dict,
     MP_form_dict_reverse,
-    size_bin,
+    dict_comp,
+    surfComp_list,
     compartment,
-    MP_form,
     saveName,
     saveOpt,
+    df4,
 ):
-
-    # Generate objects
-    (
-        system_particle_object_list,
-        SpeciesList,
-        spm,
-        dict_comp,
-        model_lists,
-        particles_df,
-    ) = generate_objects(
-        inputs_path,
-        boxName=boxName,
-        MPforms_list=MPforms_list,
-        comp_impFile_name=comp_impFile_name,
-        comp_interactFile_name=comp_interactFile_name,
-        mp_imputFile_name=mp_imputFile_name,
-        spm_diameter_um=spm_diameter_um,
-        spm_density_kg_m3=spm_density_kg_m3,
-    )
-
-    surfComp_list = [c for c in dict_comp if "Surface" in c]
-
-    """Estimate rate constants per particle"""
-
-    for particle in system_particle_object_list:
-        generate_rateConstants(particle, spm, dict_comp, fsd)
-
-    #### Original results with no time limit
-
-    ## create rate constants table:
-    RC_df = create_rateConstants_table(system_particle_object_list)
-    df4 = RC_df.fillna(0)
-
-    # Plot rate constants
-
-    """(FIX RC for wet deposition, now its given as a list of rate constants per surface compartment only for dry deposition and wet depossition is turned off)This needs to be fixed also for the matrix of interactions and estimation of flows"""
-
-    """Build Matrix of interactions"""
-
-    interactions_df = fillInteractions_fun_OOP(
-        system_particle_object_list, SpeciesList, surfComp_list
-    )
-
     """SOLVE SYSTEM OF ODES"""
-
-    particle_compartmentCoding = dict(
-        zip(
-            model_lists["compartmentNames_list"],
-            list(range(len(model_lists["compartmentNames_list"]))),
-        )
-    )
-    comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
 
     R, PartMass_t0 = solve_ODES_SS(
         system_particle_object_list=system_particle_object_list,
@@ -143,11 +90,11 @@ def model_run(
 
     # print("Distribution of mass in the system")
     # print(mf_shorted[:10])
-    # df_massDistribution = mf_shorted[:10]
+    df_massDistribution = mf_shorted[:10]
 
     # print("distribution of particle number in the system")
     # print(nf_shorted[:10])
-    # df_numberDistribution = nf_shorted[:10]
+    df_numberDistribution = nf_shorted[:10]
 
     # Mass distribution by compartment
     mass_frac_100 = []
@@ -197,8 +144,10 @@ def model_run(
 
     # Estimate mass flows due to the different particle fate process (transfer between compartments, elimination and transformation processes)
 
-    # Estimate outflows
-    tables_outputFlows = estimate_outFlows(system_particle_object_list, dict_comp)
+    # Estimate outflows in mass (g/s) and number/second
+    (tables_outputFlows, tables_outputFlows_number) = estimate_outFlows(
+        system_particle_object_list, dict_comp
+    )
 
     # Estimate imput flows from transport from other compartments
     tables_inputFlows = estimate_inFlows(tables_outputFlows, dict_comp, surfComp_list)
@@ -239,8 +188,31 @@ def model_run(
 
     """ Estimate exposure indicators """
 
-    # Overall residence time
-    overall_residence_time_calculation(tables_outputFlows, Results_extended)
+    # Exposure indicators
+    (
+        Pov_mass_years,
+        Pov_num_years,
+        Pov_size_dict_sec,
+        Tov_mass_years,
+        Tov_num_years,
+        Tov_size_dict_sec,
+    ) = Exposure_indicators_calculation(
+        tables_outputFlows,
+        tables_outputFlows_number,
+        Results_extended,
+        size_dict,
+        dict_comp,
+    )
+    # Caracteristic travel distance
+
+    CTD_mass_km, CTD_number_km = calculate_CTD(
+        Pov_mass_years, Results_extended, dict_comp, Pov_num_years, compartment
+    )
+
+    """ Generate mass and number distribution heatmaps"""
+
+    plot_fractionDistribution_heatmap(Results_extended, fraction="mass_fraction")
+    plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
 
     # Save results
 

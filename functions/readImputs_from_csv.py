@@ -165,6 +165,7 @@ def instantiate_compartments(inputs_path_file):
                     Cname=c.get("Cname"),
                     Cvolume_m3=c.get("Cvolume_m3"),
                     CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
+                    flowVelocity_m_s=c.get("flowVelocity_m_s"),
                 )
             )
         else:
