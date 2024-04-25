@@ -9,10 +9,10 @@ Bulk_Freshwater,,,,,,"settling,mixing",,sediment_resuspension,,,,,,,,,
 Sediment_Freshwater,,,,,,,settling,,,,,,,,,,
 Sediment_Coast,,,,,settling,,,,,,,,,,,,
 Sediment_Ocean,,,settling,,,,,,,,,,,,,,
-Urban_Soil_Surface,,,,,,,,,,,,,,,,,"dry_depossition,wet_depossition"
-Urban_Soil,,,,,,,,,,,"percolation,tillage",,,,,,
-Background_Soil_Surface,,,,,,,,,,,,,,,,,"dry_depossition,wet_depossition"
-Background_Soil,,,,,,,,,,,,,"percolation,tillage",,,,
-Agricultural_Soil_Surface,,,,,,,,,,,,,,,,,"dry_depossition,wet_depossition"
-Agricultural_Soil,,,,,,,,,,,,,,,tillage,,
+Urban_Soil_Surface,,,,,,,,,,,,soil_convection,,,,,"dry_depossition,wet_depossition"
+Urban_Soil,,,,,,,,,,,"percolation,soil_convection",,,,,,
+Background_Soil_Surface,,,,beaching,,,,,,,,,,soil_convection,,,"dry_depossition,wet_depossition"
+Background_Soil,,,,,,,,,,,,,"percolation,soil_convection",,,,
+Agricultural_Soil_Surface,,,,,,,,,,,,,,,,soil_convection,"dry_depossition,wet_depossition"
+Agricultural_Soil,,,,,,,,,,,,,,,"percolation,soil_convection",,
 Air,sea_spray_aerosol,,,sea_spray_aerosol,,,,,,,soil_air_resuspension,,soil_air_resuspension,,soil_air_resuspension,,

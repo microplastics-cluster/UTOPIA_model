@@ -163,6 +163,7 @@ def instantiate_compartments(inputs_path_file):
             airComp_objects.append(
                 compartment_air(
                     Cname=c.get("Cname"),
+                    Cdepth_m=c.get("Cdepth_m"),
                     Cvolume_m3=c.get("Cvolume_m3"),
                     CsurfaceArea_m2=c.get("CsurfaceArea_m2"),
                     flowVelocity_m_s=c.get("flowVelocity_m_s"),

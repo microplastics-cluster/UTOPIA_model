@@ -99,6 +99,7 @@ def change_RC_value(system_particle_object_list, rc_name, rc_val):
 # function to convert mass to number
 def mass_to_num(mass_g, volume_m3, density_kg_m3):
     number = mass_g / 1000 / density_kg_m3 / volume_m3
+    # number of particles has always to be integer?
     return number
 
 

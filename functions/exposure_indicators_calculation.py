@@ -9,7 +9,11 @@ def Exposure_indicators_calculation(
     Results_extended,
     size_dict,
     dict_comp,
+    system_particle_object_list,
 ):
+    #### EXPOSURE INDICATORS ####
+    # When estimating the exposure indicators we do not take on account the Column Water and Ocean Sediment compartments. This is to mantain consistency with the OECD tool as there the particles going deeper than 100 m into the ocean are considered lossess, therefore we also use that as a boundary in our system. Also in this way we prevent the ocean sediment and column water from driving the POV and residence times values. However our emission fraction estimates do take this compartmets into consideration and the MPs fate into the whole UTOPIA systme is reflected there.
+
     """Overall persistance (years)"""
 
     # Overall persistance for the plastic material in all size classes:
@@ -18,31 +22,39 @@ def Exposure_indicators_calculation(
 
     discorporation_flows = []
     for k in tables_outputFlows:
-        discorporation_flows.append(sum(tables_outputFlows[k].k_discorporation))
+        if k != "Ocean_Column_Water" and k != "Sediment_Ocean":
+            discorporation_flows.append(sum(tables_outputFlows[k].k_discorporation))
 
-    Pov_mass_sec = sum(Results_extended["mass_g"]) / sum(discorporation_flows)
+    # remove ocean column water and ocean sediment results
+    comp_outBoundares = ["Ocean_Column_Water", "Sediment_Ocean"]
+    Results_extended_EI = Results_extended[
+        ~Results_extended["Compartment"].isin(comp_outBoundares)
+    ]
+
+    Pov_mass_sec = sum(Results_extended_EI["mass_g"]) / sum(discorporation_flows)
 
     Pov_mass_days = Pov_mass_sec / 86400
     Pov_mass_years = Pov_mass_days / 365
 
-    print("Overall mass persistence (years): " + str(Pov_mass_years))
+    print("Overall mass persistence (years): " + str(int(Pov_mass_years)))
 
     # Overall number persistence
 
     discorporation_flows_num = []
     for k in tables_outputFlows_number:
-        discorporation_flows_num.append(
-            sum(tables_outputFlows_number[k].k_discorporation)
-        )
+        if k != "Ocean_Column_Water" and k != "Sediment_Ocean":
+            discorporation_flows_num.append(
+                sum(tables_outputFlows_number[k].k_discorporation)
+            )
 
-    Pov_num_sec = sum(Results_extended["number_of_particles"]) / sum(
+    Pov_num_sec = sum(Results_extended_EI["number_of_particles"]) / sum(
         discorporation_flows_num
     )
 
     Pov_num_days = Pov_num_sec / 86400
     Pov_num_years = Pov_num_days / 365
 
-    print("Overall particle number persistence (years): " + str(Pov_num_years))
+    print("Overall particle number persistence (years): " + str(int(Pov_num_years)))
 
     # Overall persistence specific to each size class are mass and number independent:
 
@@ -51,14 +63,15 @@ def Exposure_indicators_calculation(
     for size in size_list:
         discorporation_fargmentation_flows = []
         for k in tables_outputFlows:
-            outputFlow_df = tables_outputFlows[k]
-            sliced_df = outputFlow_df[outputFlow_df.index.str[0] == size]
-            discorporation_fargmentation_flows.append(
-                sum(sliced_df.k_fragmentation) + sum(sliced_df.k_discorporation)
-            )
+            if k != "Ocean_Column_Water" and k != "Sediment_Ocean":
+                outputFlow_df = tables_outputFlows[k]
+                sliced_df = outputFlow_df[outputFlow_df.index.str[0] == size]
+                discorporation_fargmentation_flows.append(
+                    sum(sliced_df.k_fragmentation) + sum(sliced_df.k_discorporation)
+                )
 
         mass_sizeFraction = sum(
-            Results_extended[Results_extended.index.str[0] == size].mass_g
+            Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
         )
 
         Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
@@ -68,11 +81,13 @@ def Exposure_indicators_calculation(
             "Overall persistence of size "
             + str(size_dict[size])
             + " um (years): "
-            + str(Pov_size_years)
+            + str(int(Pov_size_years))
         )
         Pov_size_dict_sec[size] = Pov_size_sec
 
     """ Overall residence time (years)"""  # Includes burial in the deep sediment and will also inlcude sequestration in the deep soils once the transport process in the soil compartments are included
+
+    # With the new system boundaries wew will acount for the sequestrtation in deep soils and burial into coast and frahwater sediment but for the Ocean sediment we do not take the k_burial  but the settling into the ocean column water compartment as well as mixing. (We exclude theOcean column water and ocean sediment from the system boundaryíes in these calculations)
 
     systemloss_flows_mass = []
     systemloss_flows_number = []
@@ -82,7 +97,7 @@ def Exposure_indicators_calculation(
         #     systemloss_flows.append(
         #         sum(tables_outputFlows[k].k_sequestration_deep_soils)
         #     )
-        if "Sediment" in k:
+        if k in ["Sediment_Freshwater", "Sediment_Coast"]:
             systemloss_flows_mass.append(
                 sum(tables_outputFlows[k].k_discorporation)
                 + sum(tables_outputFlows[k].k_burial)
@@ -91,14 +106,51 @@ def Exposure_indicators_calculation(
                 sum(tables_outputFlows_number[k].k_discorporation)
                 + sum(tables_outputFlows_number[k].k_burial)
             )
+        elif k == "Ocean_Mixed_Water":
+            # Calculate net flow lossess from the Ocean Midex water compartment through deep ocean
+            flow_mix_down_mass = []
+            flow_mix_down_number = []
+            flow_mix_up_mass = []
+            flow_mix_up_number = []
+            flow_rising_mass = []
+            flow_rising_number = []
+            for p in system_particle_object_list:
+                if p.Pcompartment.Cname == "Ocean_Mixed_Water":
+                    flow_mix_down_mass.append(
+                        p.RateConstants["k_mixing"][1] * p.Pmass_g_SS
+                    )
+                    flow_mix_down_number.append(
+                        p.RateConstants["k_mixing"][1] * p.Pnum_SS
+                    )
+                elif p.Pcompartment.Cname == "Ocean_Column_Water":
+                    flow_mix_up_mass.append(p.RateConstants["k_mixing"] * p.Pmass_g_SS)
+                    flow_mix_up_number.append(p.RateConstants["k_mixing"] * p.Pnum_SS)
+                    flow_rising_mass.append(p.RateConstants["k_rising"] * p.Pmass_g_SS)
+                    flow_rising_number.append(p.RateConstants["k_rising"] * p.Pnum_SS)
+
+            systemloss_flows_mass.append(
+                sum(tables_outputFlows[k].k_discorporation)
+                + sum(tables_outputFlows[k].k_settling)
+                + sum(flow_mix_down_mass)
+                - sum(flow_mix_up_mass)
+                - sum(flow_rising_mass)
+            )
+            systemloss_flows_number.append(
+                sum(tables_outputFlows_number[k].k_discorporation)
+                + sum(tables_outputFlows_number[k].k_settling)
+                + sum(flow_mix_down_number)
+                - sum(flow_mix_up_number)
+                - sum(flow_rising_number)
+            )
+
         else:
             systemloss_flows_mass.append(sum(tables_outputFlows[k].k_discorporation))
             systemloss_flows_number.append(
                 sum(tables_outputFlows_number[k].k_discorporation)
             )
 
-    Tov_mass_sec = sum(Results_extended["mass_g"]) / sum(systemloss_flows_mass)
-    Tov_num_sec = sum(Results_extended["number_of_particles"]) / sum(
+    Tov_mass_sec = sum(Results_extended_EI["mass_g"]) / sum(systemloss_flows_mass)
+    Tov_num_sec = sum(Results_extended_EI["number_of_particles"]) / sum(
         systemloss_flows_number
     )
 
@@ -107,10 +159,17 @@ def Exposure_indicators_calculation(
     Tov_mass_years = Tov_mass_days / 365
     Tov_num_years = Tov_num_days / 365
 
-    print("Overall mass residence time (years): " + str(Tov_mass_years))
-    print("Overall particle number residence time (years): " + str(Tov_num_years))
+    print(
+        "Overall residence time is calculated assuming the model boundaries to be at 100 m depth into the Ocean, 30 cm into the sediments and 0.1 m into the soil. Particles travelling deeper are considered losses"
+    )
+
+    print("Overall mass residence time (years): " + str(int(Tov_mass_years)))
+    print("Overall particle number residence time (years): " + str(int(Tov_num_years)))
 
     # Overall residence time specific to each size class (mass and number independent):
+
+    # To be adapted to new systems boundaries
+
     Tov_size_dict_sec = {}
     for size in size_list:
         systemloss_flows_size = []

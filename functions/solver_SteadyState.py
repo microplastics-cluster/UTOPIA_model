@@ -7,6 +7,8 @@ def solve_ODES_SS(
 ):
     SpeciesList = [p.Pcode for p in system_particle_object_list]
 
+    # Set initial mass of particles to 0
+    # Set SS mass of particles to =???
     if sum(imput_flows_g_s.values()) != 0:
         # set mass of particles for all particles in the system as zero
         m_t0 = []

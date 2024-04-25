@@ -308,7 +308,7 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
 
     # Define a custom colormap with grey color for NaN values
     cmap = sns.color_palette("viridis", as_cmap=True)
-    cmap.set_bad("grey")
+    cmap.set_bad("white")
 
     # Plot the heatmap with logarithmic scale and custom colormap
     plt.figure(figsize=(12, 8))

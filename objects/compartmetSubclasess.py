@@ -118,6 +118,7 @@ class compartment_surfaceSea_water(Compartment):
             "rising",
             "mixing",
             "sea_spray_aerosol",
+            "beaching",
         ]
 
 
@@ -185,9 +186,9 @@ class compartment_soil_surface(Compartment):
             "discorporation",
             "fragmentation",
             "runoff_transport",
-            "tillage",
             "percolation",
             "soil_air_resuspension",
+            "soil_convection",
         ]
         # self.earthworm_density_in_m3 = earthworm_density_in_m3
         # self.Qrunoff_m3 = Qrunoff_m3
@@ -210,6 +211,7 @@ class compartment_deep_soil(Compartment):
             "discorporation",
             "fragmentation",
             "sequestration_deep_soils",
+            "soil_convection",
         ]
 
 

@@ -510,25 +510,44 @@ def burial(particle):
 
 
 def soil_air_resuspension(particle):
-    # To be formulated
-    # default value talen from SimpleBox for Plastics as trasnfer rate soil-air in s-1
-    # If it would be compartment dependent we can sue a dictionary with values: now we use the same values for all soil surface compartments
-    sa_resusp_dic = {
-        "Urban_Soil_Surface": 4.68e-24,
-        "Background_Soil_Surface": 4.68e-24,
-        "Agricultural_Soil_Surface": 4.68e-24,
-    }
+    # REF: BETR global approach for soil-air resuspension (10^-10 m/h)
 
-    k_sa_reusp = sa_resusp_dic[particle.Pcompartment.Cname]
+    k_sa_reusp = 10e-10 * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
 
     return k_sa_reusp
 
 
-def tillage(particle):
-    # vertical mixing of particles in soil via physical mixing of top soil
-    # defines transport between soil surface and deeper layers
-    # to be defined/formulated
-    pass
+def soil_convection(particle):
+    # Mixing of soil particles via bioturbation and freeze/thaw cycles
+
+    MTCsconv = 4.54e-7
+    # From the OECD Tool: MTCsconv = 4.54 * 10 ^-7 (m/h)'soil side solid phase convection MTC
+
+    k_soil_convection = MTCsconv * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+
+    # if particle.Pcompartment.Cname in [
+    #     "Urban_Soil_Surface",
+    #     "Background_Soil_Surface",
+    #     "Agricultural_Soil_Surface",
+    # ]:
+    #     k_soil_convection = (
+    #         C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #     )
+    # elif particle.Pcompartment.Cname in [
+    #     "Urban_Soil",
+    #     "Agricultural_Soil",
+    #     "Background_Soil",
+    # ]:
+    #     k_soil_conv = C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #     k_soil_conv_down = (
+    #         (1 / 20) * C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #     )
+    #     k_soil_convection = [k_soil_conv, k_soil_conv_down]
+
+    # else:
+    #     k_soil_convection = 0
+
+    return k_soil_convection
 
 
 def percolation(particle):
@@ -568,6 +587,22 @@ def runoff_transport(particle):
     k_runoff = k_runoff.tolist()
 
     return k_runoff
+
+
+def beaching(particle):
+    # Transport from surface coastal water to background soil surface.
+    # We assume that beaching rate is 1/30 of the transport rate of plastic to open ocean based on https://doi.org/10.1038/s41561-023-01216-0
+
+    if particle.Pcompartment.Cname == "Coast_Surface_Water":
+
+        k_adv = float(particle.Pcompartment.waterFlow_m3_s) / float(
+            particle.Pcompartment.Cvolume_m3
+        )
+        k_beaching = (1 / 30) * k_adv
+    else:
+        k_beaching = 0
+
+    return k_beaching
 
 
 def wind_trasport(particle):
@@ -612,10 +647,9 @@ def wet_depossition(particle, dict_comp):
 
 def sea_spray_aerosol(particle):
     # paticles resuspension from ocean and coastal surface waters to air
-    # Default value taken from SimpleBox for Plastics transfer rate water-air (s-1)
-    # to be formulated
+    # REF: BETR global approach for ocean-air resuspension (10^-10 m/h)
 
-    k_sea_spray_aerosol = 2.36e-25
+    k_sea_spray_aerosol = 10e-10 * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
 
     return k_sea_spray_aerosol
 
@@ -625,9 +659,12 @@ def sequestration_deep_soils(particle):
 
     # From The OECD tool: MTC3sink = 0.05 * MTCsconv (m/h)soil solids convection to the center of the earth. MTCsconv = 4.54 * 10 ^-7 (m/h)'soil side solid phase convection MTC
 
+    MTCsconv = 4.54e-7
+
     # K_burial=MTC3sink (m/s) *SA (m2)/V(m3)
 
-    # Default value taken from SimpleBox for Plastics Removal rate from soil in s-1
-    k_sequestration_deep_soils = 2.71e-9
+    k_sequestration_deep_soils = (
+        0.05 * MTCsconv * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    )
 
     return k_sequestration_deep_soils

@@ -193,12 +193,16 @@ alpha_heter_filename = os.path.join(inputs_path, "alpha_heter.csv")
 alpha_heter_df = pd.read_csv(alpha_heter_filename)
 alpha_hetr_dict = alpha_heter_df.set_index("MP_form")["alpha_heter"].to_dict()
 
-# Timescale for fragmentation of the biggest size fraction (mp5): tfrag_gen_d
+# Timescale for fragmentation of the biggest size fraction (mp5) in free form in the water surface: t_frag_gen_FreeSurfaceWater
 
-# t_frag_gen_df=
+t_frag_gen_FreeSurfaceWater = 36.5  # in days
 
 process_inputs_df = create_inputsTable_UTOPIA(
-    inputs_path, model_lists, thalf_deg_d_dict, alpha_hetr_dict
+    inputs_path,
+    model_lists,
+    thalf_deg_d_dict,
+    alpha_hetr_dict,
+    t_frag_gen_FreeSurfaceWater,
 )
 
 """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
@@ -337,6 +341,15 @@ for compartment in q_mass_g_s_dict.keys():
 
 imput_flows_g_s = dict(zip(sp_imputs, q_mass_g_s))
 
+q_num_s = [
+    mass_to_num(v, p.Pvolume_m3, p.Pdensity_kg_m3) if v != 0 else 0
+    for k, v in zip(imput_flows_g_s.keys(), imput_flows_g_s.values())
+    for p in system_particle_object_list
+    if k == p.Pcode
+]
+
+# imput_flows_num_s = dict(zip(sp_imputs, q_num_s))
+
 
 R, PartMass_t0 = solve_ODES_SS(
     system_particle_object_list=system_particle_object_list,
@@ -447,7 +460,9 @@ from functions.generate_compartmentFlows_tables import *
 
 
 # Estimate imput flows from transport from other compartments
-tables_inputFlows = estimate_inFlows(tables_outputFlows, dict_comp, surfComp_list)
+(tables_inputFlows, tables_inputFlows_num) = estimate_inFlows(
+    tables_outputFlows, tables_outputFlows_number, dict_comp, surfComp_list
+)
 
 
 ## Compartment mass balance
@@ -492,6 +507,48 @@ plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
 
 """ Estimate exposure indicators """
 
+# For estimating exposure indicators we need to make emissions to targeted compartments.
+
+# Run model with emissions to specific compartments to estimate the emission fractions
+from functions.model_run_by_comp import *
+
+model_results = {}
+dispersing_comp_list = [
+    "Air",
+    "Ocean_Mixed_Water",
+    "Ocean_Surface_Water",
+]
+for dispersing_comp in dispersing_comp_list:
+    model_results[dispersing_comp] = run_model_comp(
+        dispersing_comp,
+        input_flow_g_s,
+        interactions_df,
+        MP_form,
+        size_bin,
+        particle_forms_coding,
+        particle_compartmentCoding,
+        system_particle_object_list,
+        comp_dict_inverse,
+        dict_comp,
+        size_dict,
+        MP_form_dict_reverse,
+        surfComp_list,
+    )
+
+
+#### EXPOSURE INDICATORS ####
+from functions.emission_fractions_calculation import *
+
+emission_fractions_calculations(
+    Results_extended,
+    model_results,
+    dispersing_comp_list,
+    dict_comp,
+    input_flow_g_s,
+    q_num_s,
+)
+
+
 # Overall persistance (Pov) and Overall residence time (Tov) in years:
 
 (
@@ -507,13 +564,16 @@ plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
     Results_extended,
     size_dict,
     dict_comp,
+    system_particle_object_list,
 )
 
 # Caracteristic travel distance (CDT) (m):
 
-# To calculate CTD we need to estimate it by emitting into the especific movile compartment. We will calculate CTD derived from emmiting to each compartment and taking the higest value:
+# To calculate CTD we need to estimate it by emitting into the especific mobile compartment. We will calculate CTD derived from emmiting to each compartment and taking the higest value:
 CTD_mass_list = []
 CTD_number_list = []
+
+
 for CDT_comp in [
     "Ocean_Surface_Water",
     "Ocean_Mixed_Water",

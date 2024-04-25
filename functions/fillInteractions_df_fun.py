@@ -31,6 +31,7 @@ def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList, surfComp_
 
 def eliminationProcesses(system_particle_object_list, SpeciesList):
     # Estimate losses (diagonal):the diagonal of the dataframe corresponds to the losses of each species
+    # Add soil_convection as elimination process from deep soil compartments
 
     """create the array of values for the diagonal wich is the sum of all RC corresponding to one species:"""
 

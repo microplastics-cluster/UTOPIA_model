@@ -1,15 +1,17 @@
 # creates a pandas dataframe of process parameters inputs for all the particles in the system
 # (regarding combination of sizes, MPforms and compartments)
 
-# If the systems consist on several model boxes a further
-# element has to be added to the function
 
 import pandas as pd
 import itertools
 
 
 def create_inputsTable_UTOPIA(
-    inputs_path, model_lists, thalf_deg_d_dict, alpha_hetr_dict
+    inputs_path,
+    model_lists,
+    thalf_deg_d_dict,
+    alpha_hetr_dict,
+    t_frag_gen_FreeSurfaceWater,
 ):
     compNames = model_lists["compartmentNames_list"]
     mpFormsLabels = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
@@ -63,7 +65,7 @@ def create_inputsTable_UTOPIA(
     # Fragmentation in the lower water compartments and in the surface of the sediment takes 10 times more time than in the surface water
     # Fragmentation in the sediment compartments take 100 times more time than in the surface water compartments
 
-    t_frag_gen_FreeSurfaceWater = 36.5
+    # t_frag_gen_FreeSurfaceWater = 36.5
     factor_biofilm = 2
     factor_heter = 100
     factor_deepWater_soilSurface = 10
@@ -496,6 +498,8 @@ def create_inputsTable_UTOPIA(
 #     flow_velocity_ocean_m_s = 0.002  # Ref: from The OECD Pov and LRTP Screening Tool (Version 2.2). F. Wegmann et al(2009), Environmental Modeling & Software 24, 228-237.
 
 #     freshWater_discharge_km3_yr = 37288  # The river-based estimate of global continental discharge presented here is 37 288 ± 662 km3 yr−1. Ref: Dai, A. and Trenberth, K. (2002). Estimates of Freshwater Discharge from Continents: Latitudinal and Seasonal Variations. Journal of Hydrometeorology 3(6) pp. 660-687.
+
+# Freshwater velocity: 0.1 m/s per second is the velocity in the middle of the Hgulström curve (what Hidrologists use for representing an average river)
 
 #     depth_coastSurface_water_m = 0.1
 #     continental_shell_depth_m = 50
