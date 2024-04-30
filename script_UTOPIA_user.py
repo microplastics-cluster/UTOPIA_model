@@ -31,7 +31,7 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 1580
+MPdensity_kg_m3 = 1980
 MP_composition = "PVC"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
@@ -243,6 +243,8 @@ MP_form = "freeMP"  # Choose from MPforms_list above
 input_flow_g_s = 1
 
 
+emiss_comp = "Air"
+
 q_mass_g_s_dict = {
     "Ocean_Surface_Water": 0,
     "Ocean_Mixed_Water": 0,
@@ -260,8 +262,10 @@ q_mass_g_s_dict = {
     "Background_Soil": 0,
     "Agricultural_Soil_Surface": 0,
     "Agricultural_Soil": 0,
-    "Air": input_flow_g_s,
+    "Air": 0,
 }
+
+q_mass_g_s_dict[emiss_comp] = input_flow_g_s
 
 input_flow_filename = os.path.join(inputs_path, "inputFlows.csv")
 input_flows_df = pd.DataFrame(
@@ -518,6 +522,7 @@ dispersing_comp_list = [
     "Ocean_Mixed_Water",
     "Ocean_Surface_Water",
 ]
+
 for dispersing_comp in dispersing_comp_list:
     model_results[dispersing_comp] = run_model_comp(
         dispersing_comp,
@@ -536,17 +541,47 @@ for dispersing_comp in dispersing_comp_list:
     )
 
 
+# # Run model with emissions to specific compartments of the targeted size bin to estimate the particle number dispersion fractions
+# model_results_size_bin = {}
+# for size in size_dict:
+#     model_results_size_bin[size] = {}
+#     for dispersing_comp in dispersing_comp_list:
+#         model_results_size_bin[size][dispersing_comp] = run_model_comp(
+#             dispersing_comp,
+#             input_flow_g_s,
+#             interactions_df,
+#             MP_form,
+#             size_bin=size,
+#             particle_forms_coding=particle_forms_coding,
+#             particle_compartmentCoding=particle_compartmentCoding,
+#             system_particle_object_list=system_particle_object_list,
+#             comp_dict_inverse=comp_dict_inverse,
+#             dict_comp=dict_comp,
+#             size_dict=size_dict,
+#             MP_form_dict_reverse=MP_form_dict_reverse,
+#             surfComp_list=surfComp_list,
+#         )
+
+
 #### EXPOSURE INDICATORS ####
 from functions.emission_fractions_calculation import *
 
-emission_fractions_calculations(
+
+# Estimate emission fractions for the setted emission scenario
+
+emission_fractions_mass_data = emission_fractions_calculations(
     Results_extended,
     model_results,
     dispersing_comp_list,
     dict_comp,
     input_flow_g_s,
     q_num_s,
+    size_dict,
+    emiss_comp,
 )
+
+
+plot_emission_fractions(emission_fractions_mass_data, emiss_comp)
 
 
 # Overall persistance (Pov) and Overall residence time (Tov) in years:
@@ -649,11 +684,15 @@ CTD_df = pd.DataFrame(
 CTD_df["CTD_mass_km"] = CTD_mass_list
 CTD_df["CTD_particle_number_km"] = CTD_number_list
 
-print("Characteristic mass travel distance (CDT): ", CTD_df["CTD_mass_km"].max(), " km")
+print(
+    "Characteristic mass travel distance (CDT): ",
+    round(CTD_df["CTD_mass_km"].max(), 1),
+    " km",
+)
 
 print(
     "Characteristic particle number travel distance (CDT): ",
-    CTD_df["CTD_particle_number_km"].max(),
+    round(CTD_df["CTD_particle_number_km"].max(), 1),
     " km",
 )
 
