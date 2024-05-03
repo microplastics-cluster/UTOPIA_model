@@ -93,10 +93,11 @@ def Exposure_indicators_calculation(
     systemloss_flows_number = []
 
     for k in tables_outputFlows:
-        # if "Soil" in k:
-        #     systemloss_flows.append(
-        #         sum(tables_outputFlows[k].k_sequestration_deep_soils)
-        #     )
+        if k in ["Urban_Soil", "Background_Soil", "Agricultural_Soil"]:
+            systemloss_flows_mass.append(
+                sum(tables_outputFlows[k].k_discorporation)
+                + sum(tables_outputFlows[k].k_sequestration_deep_soils)
+            )
         if k in ["Sediment_Freshwater", "Sediment_Coast"]:
             systemloss_flows_mass.append(
                 sum(tables_outputFlows[k].k_discorporation)
@@ -143,11 +144,13 @@ def Exposure_indicators_calculation(
                 - sum(flow_rising_number)
             )
 
-        else:
+        elif k != "Ocean_Column_Water" and k != "Sediment_Ocean":
             systemloss_flows_mass.append(sum(tables_outputFlows[k].k_discorporation))
             systemloss_flows_number.append(
                 sum(tables_outputFlows_number[k].k_discorporation)
             )
+        else:
+            pass
 
     Tov_mass_sec = sum(Results_extended_EI["mass_g"]) / sum(systemloss_flows_mass)
     Tov_num_sec = sum(Results_extended_EI["number_of_particles"]) / sum(
@@ -163,12 +166,14 @@ def Exposure_indicators_calculation(
         "Overall residence time is calculated assuming the model boundaries to be at 100 m depth into the Ocean, 30 cm into the sediments and 0.1 m into the soil. Particles travelling deeper are considered losses"
     )
 
-    print("Overall mass residence time (years): " + str(int(Tov_mass_years)))
-    print("Overall particle number residence time (years): " + str(int(Tov_num_years)))
+    print("Overall mass residence time (years): " + str(round(Tov_mass_years, 1)))
+
+    print(
+        "Overall particle number residence time (years): "
+        + str(round(Tov_num_years, 1))
+    )
 
     # Overall residence time specific to each size class (mass and number independent):
-
-    # To be adapted to new systems boundaries
 
     Tov_size_dict_sec = {}
     for size in size_list:
@@ -176,25 +181,56 @@ def Exposure_indicators_calculation(
         for k in tables_outputFlows:
             outputFlow_df = tables_outputFlows[k]
             sliced_df = outputFlow_df[outputFlow_df.index.str[0] == size]
-            # if "Soil" in k:
-            #     systemloss_flows_size.append(
-            #         sum(sliced_df.k_fragmentation)
-            #         + sum(sliced_df.k_discorporation)
-            #         + sum(sliced_df.k_sequestration_deep_soils)
-            #     )
-            if "Sediment" in k:
+            if k in ["Urban_Soil", "Background_Soil", "Agricultural_Soil"]:
+                systemloss_flows_size.append(
+                    sum(sliced_df.k_fragmentation)
+                    + sum(sliced_df.k_discorporation)
+                    + sum(sliced_df.k_sequestration_deep_soils)
+                )
+            elif k in ["Sediment_Freshwater", "Sediment_Coast"]:
                 systemloss_flows_size.append(
                     sum(sliced_df.k_fragmentation)
                     + sum(sliced_df.k_discorporation)
                     + sum(sliced_df.k_burial)
                 )
-            else:
+            elif k == "Ocean_Mixed_Water":
+                # Calculate net flow lossess from the Ocean Midex water compartment through deep ocean
+                flow_mix_down = []
+                flow_mix_up = []
+                flow_rising = []
+                for p in system_particle_object_list:
+                    if p.Pcode[0] == size:
+                        if p.Pcompartment.Cname == "Ocean_Mixed_Water":
+                            flow_mix_down.append(
+                                p.RateConstants["k_mixing"][1] * p.Pmass_g_SS
+                            )
+                        elif p.Pcompartment.Cname == "Ocean_Column_Water":
+                            flow_mix_up.append(
+                                p.RateConstants["k_mixing"] * p.Pmass_g_SS
+                            )
+                            flow_rising.append(
+                                p.RateConstants["k_rising"] * p.Pmass_g_SS
+                            )
+
+                systemloss_flows_size.append(
+                    sum(sliced_df.k_fragmentation)
+                    + sum(sliced_df.k_discorporation)
+                    + sum(sliced_df.k_settling)
+                    + sum(flow_mix_down)
+                    - sum(flow_mix_up)
+                    - sum(flow_rising)
+                )
+
+            elif k != "Ocean_Column_Water" and k != "Sediment_Ocean":
                 systemloss_flows_size.append(
                     sum(sliced_df.k_fragmentation) + sum(sliced_df.k_discorporation)
                 )
 
+            else:
+                pass
+
         mass_sizeFraction = sum(
-            Results_extended[Results_extended.index.str[0] == size].mass_g
+            Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
         )
 
         Tov_size_sec = mass_sizeFraction / sum(systemloss_flows_size)
@@ -204,7 +240,7 @@ def Exposure_indicators_calculation(
             "Overall residence time of size "
             + str(size_dict[size])
             + " um (years): "
-            + str(Tov_size_years)
+            + str(round(Tov_size_years, 2))
         )
         Tov_size_dict_sec[size] = Tov_size_sec
 
@@ -233,20 +269,28 @@ def calculate_CTD(Pov_mass_years, Results_extended, dict_comp, Pov_num_years, CD
 
     # CDT of particles mass and number
 
+    # remove ocean column water and ocean sediment results (new model boundaries)
+    comp_outBoundares = ["Ocean_Column_Water", "Sediment_Ocean"]
+    Results_extended_EI = Results_extended[
+        ~Results_extended["Compartment"].isin(comp_outBoundares)
+    ]
+
     CTD_mass_m = (
         (Pov_mass_years * 365 * 24 * 60 * 60)
-        * sum(Results_extended[Results_extended["Compartment"] == CDT_comp].mass_g)
-        / sum(Results_extended["mass_g"])
+        * sum(
+            Results_extended_EI[Results_extended_EI["Compartment"] == CDT_comp].mass_g
+        )
+        / sum(Results_extended_EI["mass_g"])
         * float(dict_comp[CDT_comp].flowVelocity_m_s)
     )
     CTD_number_m = (
         (Pov_num_years * 365 * 24 * 60 * 60)
         * sum(
-            Results_extended[
-                Results_extended["Compartment"] == CDT_comp
+            Results_extended_EI[
+                Results_extended_EI["Compartment"] == CDT_comp
             ].number_of_particles
         )
-        / sum(Results_extended["number_of_particles"])
+        / sum(Results_extended_EI["number_of_particles"])
         * float(dict_comp[CDT_comp].flowVelocity_m_s)
     )
 

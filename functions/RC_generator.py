@@ -499,9 +499,9 @@ def burial(particle):
 
     # When no depth parameter available assign burail rate taken from SimpleBox for Plastics model
     burial_dict = {
-        "Sediment_Freshwater": 2.7e-10,
-        "Sediment_Coast": 2.7e-11,
-        "Sediment_Ocean": 2.7e-12,
+        "Sediment_Freshwater": 2.7e-9,
+        "Sediment_Coast": 1e-9,
+        "Sediment_Ocean": 5e-10,
     }
 
     k_burial = burial_dict[particle.Pcompartment.Cname]
@@ -512,7 +512,17 @@ def burial(particle):
 def soil_air_resuspension(particle):
     # REF: BETR global approach for soil-air resuspension (10^-10 m/h)
 
-    k_sa_reusp = 10e-10 * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    sar_rate = 10e-10 / 60 / 60
+
+    sar_rate_dict = {
+        "a": sar_rate,
+        "b": sar_rate,
+        "c": sar_rate,
+        "d": sar_rate / 100,
+        "e": sar_rate / 1e4,
+    }
+
+    k_sa_reusp = sar_rate / float(particle.Pcompartment.Cdepth_m)
 
     return k_sa_reusp
 
@@ -620,9 +630,20 @@ def dry_depossition(particle, dict_comp):
 
     # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
+    # Based on figure 6.4 in the Handbook of Chemical Mass Transport in the Environment (2011).
+
     dd_rate = 7.91e-6
+
+    dd_rate_dict = {
+        "e": dd_rate * 1000,
+        "d": dd_rate * 100,
+        "c": dd_rate,
+        "b": dd_rate / 100,
+        "a": dd_rate / 1e4,
+    }
+
     k_dry_depossition = [
-        dd_rate
+        dd_rate_dict[particle.Pcode[0]]
         * (
             float(dict_comp[c].CsurfaceArea_m2)
             / float(dict_comp["Air"].CsurfaceArea_m2)
@@ -649,7 +670,23 @@ def sea_spray_aerosol(particle):
     # paticles resuspension from ocean and coastal surface waters to air
     # REF: BETR global approach for ocean-air resuspension (10^-10 m/h)
 
-    k_sea_spray_aerosol = 10e-10 * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    ssa_rate = 10e-10 / 60 / 60
+
+    k_sea_spray_aerosol = ssa_rate / float(particle.Pcompartment.Cdepth_m)
+
+    ssa_rate_dict = {
+        "a": ssa_rate,
+        "b": ssa_rate,
+        "c": ssa_rate,
+        "d": ssa_rate / 100,
+        "e": ssa_rate / 1e4,
+    }
+
+    k_sea_spray_aerosol = ssa_rate_dict[particle.Pcode[0]] / float(
+        particle.Pcompartment.Cdepth_m
+    )
+
+    # k_sea_spray_aerosol = 0
 
     return k_sea_spray_aerosol
 

@@ -299,7 +299,8 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
 
     # Stablish a lower limit
     # Set the lower limit for the values
-    lower_limit = -20
+    lower_limit = -14
+    upper_limit = np.nanmax(pivot_table_log)
 
     # Replace values below the lower limit with NaN
     pivot_table_log = pivot_table_log.applymap(
@@ -320,6 +321,8 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
         annot=False,
         linewidths=0.5,
         linecolor="grey",
+        vmin=lower_limit,
+        vmax=upper_limit,
     )
 
     # Set compartment labels to cover all size fractions underneath
@@ -341,8 +344,8 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
         + fraction
         + " by MP_Form, Compartment, and Size_Fraction_um"
     )
-    plt.xlabel("Compartment")
-    plt.ylabel("MP_Form - Size_Fraction_um")
+    plt.xlabel("Compartment", fontsize=14)
+    plt.ylabel("MP_Form - Size_Fraction_um", fontsize=14)
 
     plt.tight_layout()
     plt.show()
