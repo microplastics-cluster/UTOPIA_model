@@ -60,9 +60,9 @@ spm_density_kg_m3 = 2000
 
 ## choose input files to load
 
-comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
+comp_impFile_name = "inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
 comp_interactFile_name = (
-    "\compartment_interactions.csv"  # Fixed, should not be modified
+    "compartment_interactions.csv"  # Fixed, should not be modified
 )
 # mp_imputFile_name = os.path.join(inputs_path, "inputs_microplastics.csv") #Choose one existing input file to load
 
@@ -585,7 +585,7 @@ emission_fractions_mass_data['Air']= {'Emission Fraction': ['φ1', 'φ2_1', 'φ2
    9.281127262978989e-09,
    6.303355739814205e-05,
    1.3210601592814777e-11]}
-emission_fractions_mass_data['Ocean_Surface_Water']=
+emission_fractions_mass_data['Ocean_Surface_Water']= \
 {'Emission Fraction': ['φ1', 'φ2_1', 'φ2_2', 'φ2_3', 'φ2_4'],
  'y': [-inf,
   -17.918100204315905,

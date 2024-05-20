@@ -22,6 +22,7 @@ def store_results(
     MP_form_dict_reverse,
     size_dict,
     comp_mass_balance_df,
+    is_dynamic=False
 ):
 
     # check whether directory already exists
@@ -70,34 +71,34 @@ def store_results(
     # Plot results in Total number of particles and Total mass
 
     # Create Steady State results folders:
-    path_SteadyState_mass = os.path.join(path_run, "SteadyState_mass_distribution")
-    path_SteadyState_number = os.path.join(path_run, "SteadyState_number_distribution")
+    path_mass = os.path.join(path_run, f"{'Dynamic' if is_dynamic else 'SteadyState'}_mass_distribution")
+    path_number = os.path.join(path_run, f"{'Dynamic' if is_dynamic else 'SteadyState'}_number_distribution")
 
     # check whether directory already exists
-    if not os.path.exists(path_SteadyState_mass):
-        os.mkdir(path_SteadyState_mass)
-        print("Folder %s created!" % path_SteadyState_mass)
+    if not os.path.exists(path_mass):
+        os.mkdir(path_mass)
+        print("Folder %s created!" % path_mass)
     else:
-        print("Folder %s already exists" % path_SteadyState_mass)
+        print("Folder %s already exists" % path_mass)
 
-    if not os.path.exists(path_SteadyState_number):
-        os.mkdir(path_SteadyState_number)
-        print("Folder %s created!" % path_SteadyState_number)
+    if not os.path.exists(path_number):
+        os.mkdir(path_number)
+        print("Folder %s created!" % path_number)
     else:
-        print("Folder %s already exists" % path_SteadyState_number)
+        print("Folder %s already exists" % path_number)
 
     for comp in Results_comp_organiced:
         plot_bySize_total_number_particles(
             Results_comp_organiced,
             comp,
             model_lists["dict_size_coding"],
-            path=path_SteadyState_number,
+            path=path_number,
         )
         plot_bySize_total_mass(
             results_dict=Results_comp_organiced,
             comp_name=comp,
             dict_size_coding=model_lists["dict_size_coding"],
-            path=path_SteadyState_mass,
+            path=path_mass,
         )
         # plot_by(
         #     results_dict=Results_comp_organiced,
@@ -108,13 +109,13 @@ def store_results(
 
     # Save the table of mass distribution
     massDitribution_filename = os.path.join(
-        path_SteadyState_mass, "SS_mass_distribution.csv"
+        path_mass, f"{'Dynamic' if is_dynamic else 'SS'}_mass_distribution.csv"
     )
     df_massDistribution.to_csv(massDitribution_filename)
 
     # Save the table of number distribution
     numberDitribution_filename = os.path.join(
-        path_SteadyState_number, "SS_number_distribution.csv"
+        path_number, f"{'Dynamic' if is_dynamic else 'SS'}_number_distribution.csv"
     )
     df_numberDistribution.to_csv(numberDitribution_filename)
 
@@ -129,7 +130,7 @@ def store_results(
     plt.xticks(rotation=90)
     # Save the plot
     massDistribPlot_filename = os.path.join(
-        path_SteadyState_mass, "mass_by_compartment.png"
+        path_mass, "mass_by_compartment.png"
     )
     plt.savefig(massDistribPlot_filename, bbox_inches="tight")
     plt.show()
@@ -145,7 +146,7 @@ def store_results(
     plt.xticks(rotation=90)
     # Save the plot
     numberDistribPlot_filename = os.path.join(
-        path_SteadyState_number, "number_by_compartment.png"
+        path_number, "number_by_compartment.png"
     )
     plt.savefig(numberDistribPlot_filename, bbox_inches="tight")
     plt.show()

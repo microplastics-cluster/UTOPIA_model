@@ -1,7 +1,7 @@
 # creates a pandas dataframe of process parameters inputs for all the particles in the system
 # (regarding combination of sizes, MPforms and compartments)
 
-
+import os
 import pandas as pd
 import itertools
 
@@ -446,7 +446,7 @@ def create_inputsTable_UTOPIA(
 
     # Output dataFrame_inputs as csv file
 
-    dataFrame_inputs.to_csv(inputs_path + "\processInputs_table.csv", index=False)
+    dataFrame_inputs.to_csv(os.path.join(inputs_path, "processInputs_table.csv"), index=False)
 
     return dataFrame_inputs
 

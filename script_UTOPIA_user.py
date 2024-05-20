@@ -1,5 +1,6 @@
 import copy
 import os
+import sys
 from datetime import datetime
 
 import pandas as pd
@@ -11,6 +12,7 @@ from functions.fillInteractions_df_fun import *
 from functions.generate_modelObjects import *
 from functions.generateRateConstants_particles import *
 from functions.solver_SteadyState import *
+from functions.solver_Dynamic import solve_ODES_Dynamic
 from functions.extract_results import *
 from functions.plot_results import *
 from functions.massBalance import *
@@ -24,6 +26,8 @@ from functions.loop_CTD_calculation import *
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
+# Is this a dynamic run?
+is_dynamic = True if (len(sys.argv) > 1) and (sys.argv[1] == 'dynamic') else False
 
 """Define run parameters"""
 
@@ -59,9 +63,9 @@ spm_density_kg_m3 = 2000
 
 ## choose input files to load
 
-comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
+comp_impFile_name = "inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
 comp_interactFile_name = (
-    "\compartment_interactions.csv"  # Fixed, should not be modified
+    "compartment_interactions.csv"  # Fixed, should not be modified
 )
 # mp_imputFile_name = os.path.join(inputs_path, "inputs_microplastics.csv") #Choose one existing input file to load
 
@@ -288,6 +292,7 @@ saveName = (
 # Print model run summary
 
 print("Model run: ")
+print("Run type:", "Dynamic" if is_dynamic else "Steady state")
 print("Emissions flow (g/s): ", input_flow_g_s)
 desired_key = next(key for key, value in q_mass_g_s_dict.items() if value > 0)
 print("Recieving compartment/s: ", desired_key)
@@ -354,13 +359,24 @@ q_num_s = [
 
 # imput_flows_num_s = dict(zip(sp_imputs, q_num_s))
 
-
-R, PartMass_t0 = solve_ODES_SS(
-    system_particle_object_list=system_particle_object_list,
-    q_num_s=0,
-    imput_flows_g_s=imput_flows_g_s,
-    interactions_df=interactions_df,
-)
+# If the user has specified they want a dynamic solution (by
+# passing "dynamic" as the first command line argument), then
+# solve the problem dynamically. Otherwise, use the steady
+# state solution
+if is_dynamic:
+    R, PartMass_t0 = solve_ODES_Dynamic(
+        system_particle_object_list=system_particle_object_list,
+        q_num_s=0,
+        imput_flows_g_s=imput_flows_g_s,
+        interactions_df=interactions_df
+    )
+else:
+    R, PartMass_t0 = solve_ODES_SS(
+        system_particle_object_list=system_particle_object_list,
+        q_num_s=0,
+        imput_flows_g_s=imput_flows_g_s,
+        interactions_df=interactions_df,
+    )
 
 # Reformat results (R) dataframe
 R["Size_Fraction_um"] = [size_dict[x[0]] for x in R.index]
@@ -731,6 +747,7 @@ store_results(
     MP_form_dict_reverse,
     size_dict,
     comp_mass_balance_df,
+    is_dynamic
 )
 
 """ Generate PDF report """  ## WORK IN PROGRESS

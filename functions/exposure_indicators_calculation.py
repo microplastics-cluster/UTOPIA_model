@@ -74,7 +74,11 @@ def Exposure_indicators_calculation(
             Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
         )
 
-        Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
+        sum_dis_frag_flows = sum(discorporation_fargmentation_flows)
+        if sum_dis_frag_flows != 0.0:
+            Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
+        else:
+            Pov_size_sec = 0.0
         Pov_size_days = Pov_size_sec / 86400
         Pov_size_years = Pov_size_days / 365
         print(
