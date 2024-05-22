@@ -533,7 +533,7 @@ def soil_convection(particle):
     MTCsconv = 4.54e-7
     # From the OECD Tool: MTCsconv = 4.54 * 10 ^-7 (m/h)'soil side solid phase convection MTC
 
-    k_soil_convection = MTCsconv * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    k_soil_convection = (MTCsconv / (60 * 60)) / float(particle.Pcompartment.Cdepth_m)
 
     # if particle.Pcompartment.Cname in [
     #     "Urban_Soil_Surface",
@@ -541,16 +541,16 @@ def soil_convection(particle):
     #     "Agricultural_Soil_Surface",
     # ]:
     #     k_soil_convection = (
-    #         C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #         (C_massTransfer_m_h /(60 * 60 ))/ float(particle.Pcompartment.Cdepth_m)
     #     )
     # elif particle.Pcompartment.Cname in [
     #     "Urban_Soil",
     #     "Agricultural_Soil",
     #     "Background_Soil",
     # ]:
-    #     k_soil_conv = C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #     k_soil_conv = (C_massTransfer_m_h /( 60 * 60)) / float(particle.Pcompartment.Cdepth_m)
     #     k_soil_conv_down = (
-    #         (1 / 20) * C_massTransfer_m_h * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    #         (1 / 20) * (C_massTransfer_m_h /( 60 * 60 )/ float(particle.Pcompartment.Cdepth_m))
     #     )
     #     k_soil_convection = [k_soil_conv, k_soil_conv_down]
 
@@ -574,12 +574,18 @@ def percolation(particle):
 def runoff_transport(particle):
     # transport from top soil layers to surface waters ["Coast_Surface_Water","Surface_Freshwater"] via runoff water
     # to be formulated
+
+    # REF: BETR global approach for MTCsoilrunoff = 2.3 * 10 ^ -8  (m/h) 'soil solids runoff rate  (Scheringer, P230)
+
     runooff_dict = {
-        "Urban_Soil_Surface": 4.69e-9,
-        "Background_Soil_Surface": 4.69e-9,
-        "Agricultural_Soil_Surface": 4.69e-9,
+        "Urban_Soil_Surface": 2.3e-8,
+        "Background_Soil_Surface": 2.3e-8,
+        "Agricultural_Soil_Surface": 2.3e-8,
     }
-    runoff_rate = runooff_dict[particle.Pcompartment.Cname]
+    runoff_rate = (
+        runooff_dict[particle.Pcompartment.Cname]
+        / float(particle.Pcompartment.Cdepth_m)
+    ) / (60 * 60)
 
     # The total amount of runoff will be distributed into the recieving compartments according to the following matrix
     fro = np.array([[0, 1], [0, 1], [0, 1]])
@@ -624,9 +630,6 @@ def wind_trasport(particle):
 
 def dry_depossition(particle, dict_comp):
     # particles depossition from air to soil or water compartments
-    # to be formulated
-    # Default value taken from SimpleBox for Plastics rate constant dry depossition 2.16E-6 (s-1).
-    # Will be reformulated to be made size class and recieving compartment dependent
 
     # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
@@ -700,8 +703,8 @@ def sequestration_deep_soils(particle):
 
     # K_burial=MTC3sink (m/s) *SA (m2)/V(m3)
 
-    k_sequestration_deep_soils = (
-        0.05 * MTCsconv * 60 * 60 / float(particle.Pcompartment.Cdepth_m)
+    k_sequestration_deep_soils = (0.05 * MTCsconv / (60 * 60)) / float(
+        particle.Pcompartment.Cdepth_m
     )
 
     return k_sequestration_deep_soils
