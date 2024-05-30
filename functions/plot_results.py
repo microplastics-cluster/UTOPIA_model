@@ -317,7 +317,7 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
         pivot_table_log,
         cmap=cmap,
         cbar=True,
-        cbar_kws={"label": "log10_mass_fraction"},
+        cbar_kws={"label": "log10 (" + fraction + ") "},
         annot=False,
         linewidths=0.5,
         linecolor="grey",

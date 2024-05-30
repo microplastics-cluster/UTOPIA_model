@@ -32,7 +32,7 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
 MPdensity_kg_m3 = 980
-MP_composition = "PVC"
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -243,7 +243,7 @@ MP_form = "freeMP"  # Choose from MPforms_list above
 input_flow_g_s = 1
 
 
-emiss_comp = "Air"
+emiss_comp = "Coast_Surface_Water"
 
 q_mass_g_s_dict = {
     "Ocean_Surface_Water": 0,
@@ -282,7 +282,7 @@ saveName = (
     + MP_form
     + "_"
     + str(size_dict[size_bin])
-    + "_nm_"
+    + "_nm_"+ frag_style 
 )
 
 # Print model run summary
@@ -290,7 +290,7 @@ saveName = (
 print("Model run: ")
 print("Emissions flow (g/s): ", input_flow_g_s)
 desired_key = next(key for key, value in q_mass_g_s_dict.items() if value > 0)
-print("Recieving compartment/s: ", desired_key)
+print("Receiving compartment/s: ", desired_key)
 print("Emitted MP density (kg/m3): ", MPdensity_kg_m3)
 print("Emitted MP shape: ", shape)
 print("Emitted MP form: ", MP_form)
