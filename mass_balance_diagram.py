@@ -42,11 +42,11 @@ def generate_mas_balance_diagram(model_lists, Results):
     G = nx.DiGraph()
 
     # Add nodes with mass concentration as node attribute
-    for node, concentration in nodes.items():
+    for node, concentration in concentration_values.items():
         G.add_node(node, concentration=concentration)
 
     # Add edges with mass flux as edge attribute
-    for edge in edges:
+    for edge in connections:
         G.add_edge(edge[0], edge[1], flux=edge[2])
 
     # Manually specify positions for the nodes in a grid-like layout
@@ -70,7 +70,7 @@ def generate_mas_balance_diagram(model_lists, Results):
     nx.draw_networkx_edge_labels(
         G,
         pos,
-        edge_labels={(edge[0], edge[1]): str(edge[2]) for edge in edges},
+        edge_labels={(edge[0], edge[1]): str(edge[2]) for edge in connections},
         font_color="red",
     )
 

@@ -1,7 +1,7 @@
 # Extension of RS_generator module from the FUll Multi containing functions to calculate all rate constants
 
 
-###So far programmed so that if a parameter value for estimating a rate constant is missing (i.e. NOne or nan), the rate constant is equal to zero....this has to be fixed!! Example,when no depth ogf a compartment is given the rate constant of burial or resuspension is equal to 0
+###So far programmed so that if a parameter value for estimating a rate constant is missing (i.e. NOne or nan), the rate constant is equal to zero....this has to be fixed!! Example,when no depth of a compartment is given the rate constant of burial or resuspension is equal to 0
 
 import math
 import pandas as pd
