@@ -631,6 +631,8 @@ def wind_trasport(particle):
 def dry_depossition(particle, dict_comp):
     # particles depossition from air to soil or water compartments
 
+    # CORRECT NAMING in all the code!!
+
     # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
     # Based on figure 6.4 in the Handbook of Chemical Mass Transport in the Environment (2011).
@@ -661,7 +663,7 @@ def wet_depossition(particle, dict_comp):
     # Currently turned off
     # particles depossition from air to soil or water compartments via rainfall
     # wont be formulated as function of rainfall intensity but dependent on the average rain events per year. we asume that any rain event will trigger the depossition of the particles regardless of rainfall intensity
-    # Default value taken from SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event nd duration...so mean rate of depossition will be used
+    # IN  SimpleBox for Plastics rate constant wet depossition 1.17E-1(s-1) Has to be corrected by the number of wet event and duration...so mean rate of depossition will be used
     # wd_rate=?
     # k_dry_depossition = wd_rate*float(particle.Pcompartment.CsurfaceArea_m2)/float(dict_comp["Air"].CsurfaceArea_m2)
 

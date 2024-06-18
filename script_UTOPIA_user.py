@@ -58,7 +58,7 @@ v_a = 2.0e-16  # Volume of 1 algal cell [m-3]
 r_a = ((3.0 / 4.0) * (v_a / math.pi)) ** (1.0 / 3.0)  # radius of algae [m]
 
 spm_radius_um = r_a * 1e6
-spm_density_kg_m3 = 1.388  # REF
+spm_density_kg_m3 = 1388  # REF: Kooi et al. (2017)
 
 
 ## choose input files to load
@@ -408,14 +408,14 @@ Results_comp_organiced = extract_by_aggSt(Results_comp_dict, particle_forms_codi
 
 # Total number of particles and Total mass
 
-print("Distribution of mass in the system")
-print(mf_shorted[:10])
-df_massDistribution = mf_shorted[:10]
+# print("Distribution of mass in the system")
+# print(mf_shorted[:10])
+# df_massDistribution = mf_shorted[:10]
 
 
-print("distribution of particle number in the system")
-print(nf_shorted[:10])
-df_numberDistribution = nf_shorted[:10]
+# print("distribution of particle number in the system")
+# print(nf_shorted[:10])
+# df_numberDistribution = nf_shorted[:10]
 
 # Mass distribution by compartment
 mass_frac_100 = []

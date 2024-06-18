@@ -475,31 +475,50 @@ def create_inputsTable_UTOPIA(
 #         "Air",
 #     ]
 
+#     #Total Surface Area of the earth and water and land percentages based on the OECD POV and LRTP Screening Tool
+
 #     earth_SA_m2 = 5.10e14
 #     land_SA_m2 = earth_SA_m2 * 0.29
 #     water_SA_m2 = earth_SA_m2 * 0.71
-#     """Total Surface Area of the earth and water and land percentages taken form OECD tool"""
+#
 
+#     # 2.5% represent the freshwater surface (from rivers, lakes, glaciers and groundwater), and 97.5% represent saline water from oceans and seas.
+#     # REF: Kundzewicz, Zbigniew W. "Global  freshwater resources for sustainable development." Ecohydrology & Hydrobiology 7.2 (2007): 125-134.
+#
 #     freshWater_SA_m2 = water_SA_m2 * 0.025
 #     oceanSeaWater_SA_m2 = water_SA_m2 * 0.975
-#     """"""
 
-#     coastWater_SA_m2 = oceanSeaWater_SA_m2 * 0.025
-#     oceanWater_SA_m2 = oceanSeaWater_SA_m2 * 0.975
 
+#     # The coastal waters of the world can be considered as those areas of seas and oceans that occur from the coastline to a depth of 200 m. They occupy only approximately 7.6 percent of the world’s oceans. REF: Kevern L.,et al. 4.9 - The impact of climate change on coastal fisheries and aquaculture. Treatise on Estuarine and Coastal Science, Volume 4, 2024, Pages 226-263. (https://doi.org/10.1016/B978-0-323-90798-9.00008-1)
+
+#     coastWater_SA_m2 = oceanSeaWater_SA_m2 * 7.6/100
+#     oceanWater_SA_m2 = oceanSeaWater_SA_m2 * (100-7.6)/100
+
+#     # 38% of the land area is developed for agriculture (Ref: FAO 2020. Land use in agriculture by the numbers (https://www.fao.org/sustainability/news/detail/en/c/1274219/))
 #     agri_land_SA_m2 = (
 #         land_SA_m2 * 0.38
-#     )  # Ref: FAO 2020. Land use in agriculture by the numbers (https://www.fao.org/sustainability/news/detail/en/c/1274219/)
-#     urban_land_SA_m2 = (
-#         land_SA_m2 * 0.02
-#     )  # Liu, Z., He, C., Zhou, Y. and Wu, J., 2014. How much of the world’s land has been urbanized, really? A hierarchical framework for avoiding confusion. Landscape Ecology, 29, pp.763-771.
-#     background_land_SA_m2 = land_SA_m2 * 0.60
+#     )
 
-#     flow_velocity_ocean_m_s = 0.002  # Ref: from The OECD Pov and LRTP Screening Tool (Version 2.2). F. Wegmann et al(2009), Environmental Modeling & Software 24, 228-237.
+#     The global Urban Area is estimated as 3 % of the total land area. REF: # Liu, Z., He, C., Zhou, Y. and Wu, J., 2014. How much of the world’s land has been urbanized, really? A hierarchical framework for avoiding confusion. Landscape Ecology, 29, pp.763-771.
+
+#     urban_land_SA_m2 = (
+#         land_SA_m2 * 0.03
+#     )
+
+#     background_land_SA_m2 = land_SA_m2 -agri_land_SA_m2 - urban_land_SA_m2
+
+#     flow_velocity_ocean_m_s = 0.02  # Ref: from The OECD Pov and LRTP Screening Tool (Version 2.2). F. Wegmann et al(2009), Environmental Modeling & Software 24, 228-237.
+#     flow_velocity_ocean_surace_m_s = 0.03 # For the surface layer (first 5 m depth) of the ocean water we asume a higher flow velocity due to waves action.
+#     flow_velocity_ocean_mixed_m_s = 0.01 # For the mixed layer (up to 100 m depth) of the ocean water we asume a lower flow velocity.
+#     flow_velocity_ocean_column_m_s = 0 # We asume no flow in the deeper layer of the ocean (below 100m depth).
+
+#     flow_velocity_coast_surface_m_s = 0.06  # In the coastal waters we assume double the flow velocity than in ocean waters (depth of coast surface comparment assumed to be 2.5m)
+#     flow_velocity_coast_column_m_s = 0.02  # Coast column watr compartment depth is 50 m
 
 #     freshWater_discharge_km3_yr = 37288  # The river-based estimate of global continental discharge presented here is 37 288 ± 662 km3 yr−1. Ref: Dai, A. and Trenberth, K. (2002). Estimates of Freshwater Discharge from Continents: Latitudinal and Seasonal Variations. Journal of Hydrometeorology 3(6) pp. 660-687.
 
 # Freshwater velocity: 0.1 m/s per second is the velocity in the middle of the Hgulström curve (what Hidrologists use for representing an average river)
+#     flow_velocity_freshwater_m_s = 0.1
 
 #     depth_coastSurface_water_m = 0.1
 #     continental_shell_depth_m = 50

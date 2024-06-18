@@ -16,12 +16,14 @@ def Exposure_indicators_calculation(
 
     """Overall persistance (years)"""
 
-    # Overall persistance for the plastic material in all size classes:
+    # Overall persistance for the plastic material in all size classes and table of overall persistance per compartment:
 
     # Overall mass persistence
 
     discorporation_flows = []
+    discorporation_flows_all = []
     for k in tables_outputFlows:
+        discorporation_flows_all.append(sum(tables_outputFlows[k].k_discorporation))
         if k != "Ocean_Column_Water" and k != "Sediment_Ocean":
             discorporation_flows.append(sum(tables_outputFlows[k].k_discorporation))
 
@@ -38,10 +40,28 @@ def Exposure_indicators_calculation(
 
     print("Overall mass persistence (years): " + str(int(Pov_mass_years)))
 
+    # Table of discorporation flows per compartment
+    Pov_comp_years = []
+    for c in tables_outputFlows.keys():
+        Pov_comp_years.append(
+            sum(Results_extended[Results_extended["Compartment"] == c]["mass_g"])
+            / sum(tables_outputFlows[c].k_discorporation)
+            / 86400
+            / 365
+        )
+
+    Pov_Tov_comp_df = pd.DataFrame(
+        {"Compartment": tables_outputFlows.keys(), "Pov_years(mass)": Pov_comp_years}
+    )
+
     # Overall number persistence
 
     discorporation_flows_num = []
+    discorporation_flows_num_all = []
     for k in tables_outputFlows_number:
+        discorporation_flows_num_all.append(
+            sum(tables_outputFlows_number[k].k_discorporation)
+        )
         if k != "Ocean_Column_Water" and k != "Sediment_Ocean":
             discorporation_flows_num.append(
                 sum(tables_outputFlows_number[k].k_discorporation)
@@ -55,6 +75,22 @@ def Exposure_indicators_calculation(
     Pov_num_years = Pov_num_days / 365
 
     print("Overall particle number persistence (years): " + str(int(Pov_num_years)))
+
+    # Table of discorporation flows per compartment in number
+    Pov_comp_years_num = []
+    for c in tables_outputFlows.keys():
+        Pov_comp_years_num.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == c][
+                    "number_of_particles"
+                ]
+            )
+            / sum(tables_outputFlows_number[c].k_discorporation)
+            / 86400
+            / 365
+        )
+
+    Pov_Tov_comp_df["Pov_years(particle_number)"] = Pov_comp_years_num
 
     # Overall persistence specific to each size class are mass and number independent:
 
