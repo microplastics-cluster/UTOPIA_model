@@ -86,25 +86,25 @@ def store_results(
     else:
         print("Folder %s already exists" % path_SteadyState_number)
 
-    for comp in Results_comp_organiced:
-        plot_bySize_total_number_particles(
-            Results_comp_organiced,
-            comp,
-            model_lists["dict_size_coding"],
-            path=path_SteadyState_number,
-        )
-        plot_bySize_total_mass(
-            results_dict=Results_comp_organiced,
-            comp_name=comp,
-            dict_size_coding=model_lists["dict_size_coding"],
-            path=path_SteadyState_mass,
-        )
-        # plot_by(
-        #     results_dict=Results_comp_organiced,
-        #     comp_name=comp,
-        #     dict_size_coding=model_lists["dict_size_coding"],
-        #     plot_by="concentration_g_m3",
-        # )
+    # for comp in Results_comp_organiced:
+    #     plot_bySize_total_number_particles(
+    #         Results_comp_organiced,
+    #         comp,
+    #         model_lists["dict_size_coding"],
+    #         path=path_SteadyState_number,
+    #     )
+    #     plot_bySize_total_mass(
+    #         results_dict=Results_comp_organiced,
+    #         comp_name=comp,
+    #         dict_size_coding=model_lists["dict_size_coding"],
+    #         path=path_SteadyState_mass,
+    #     )
+    # plot_by(
+    #     results_dict=Results_comp_organiced,
+    #     comp_name=comp,
+    #     dict_size_coding=model_lists["dict_size_coding"],
+    #     plot_by="concentration_g_m3",
+    # )
 
     # Save the table of mass distribution
     massDitribution_filename = os.path.join(
@@ -112,44 +112,44 @@ def store_results(
     )
     df_massDistribution.to_csv(massDitribution_filename)
 
-    # Save the table of number distribution
-    numberDitribution_filename = os.path.join(
-        path_SteadyState_number, "SS_number_distribution.csv"
-    )
-    df_numberDistribution.to_csv(numberDitribution_filename)
+    # # Save the table of number distribution
+    # numberDitribution_filename = os.path.join(
+    #     path_SteadyState_number, "SS_number_distribution.csv"
+    # )
+    # df_numberDistribution.to_csv(numberDitribution_filename)
 
-    # Plot Mass distribution by compartment and save compartment mass distribution table
+    # # Plot Mass distribution by compartment and save compartment mass distribution table
 
-    sns.barplot(data=mass_dist_comp, x="Compartments", y="%_mass").set(
-        title="Mass distribution"
-    )
-    plt.ylabel("% of total mass")
-    plt.yscale("log")
-    # plt.ylim(0.01, 100)
-    plt.xticks(rotation=90)
-    # Save the plot
-    massDistribPlot_filename = os.path.join(
-        path_SteadyState_mass, "mass_by_compartment.png"
-    )
-    plt.savefig(massDistribPlot_filename, bbox_inches="tight")
-    plt.show()
-    plt.close()
+    # sns.barplot(data=mass_dist_comp, x="Compartments", y="%_mass").set(
+    #     title="Mass distribution"
+    # )
+    # plt.ylabel("% of total mass")
+    # plt.yscale("log")
+    # # plt.ylim(0.01, 100)
+    # plt.xticks(rotation=90)
+    # # Save the plot
+    # massDistribPlot_filename = os.path.join(
+    #     path_SteadyState_mass, "mass_by_compartment.png"
+    # )
+    # plt.savefig(massDistribPlot_filename, bbox_inches="tight")
+    # plt.show()
+    # plt.close()
 
-    # Plot Number distribution by compartment
-    sns.barplot(data=mass_dist_comp, x="Compartments", y="%_number").set(
-        title="Particle number distribution"
-    )
-    plt.ylabel("% of total number")
-    plt.yscale("log")
-    # plt.ylim(0.01, 100)
-    plt.xticks(rotation=90)
-    # Save the plot
-    numberDistribPlot_filename = os.path.join(
-        path_SteadyState_number, "number_by_compartment.png"
-    )
-    plt.savefig(numberDistribPlot_filename, bbox_inches="tight")
-    plt.show()
-    plt.close()
+    # # Plot Number distribution by compartment
+    # sns.barplot(data=mass_dist_comp, x="Compartments", y="%_number").set(
+    #     title="Particle number distribution"
+    # )
+    # plt.ylabel("% of total number")
+    # plt.yscale("log")
+    # # plt.ylim(0.01, 100)
+    # plt.xticks(rotation=90)
+    # # Save the plot
+    # numberDistribPlot_filename = os.path.join(
+    #     path_SteadyState_number, "number_by_compartment.png"
+    # )
+    # plt.savefig(numberDistribPlot_filename, bbox_inches="tight")
+    # plt.show()
+    # plt.close()
 
     table_total_mass_number_distribution = os.path.join(
         path_run, "total_distribution_byCompartment.csv"

@@ -177,7 +177,7 @@ else:
 #     "heterBiofMP": 100000,
 # } #default values
 
-# # Save the fsd matrix
+
 # t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
 # t_half_deg_df = pd.DataFrame(list(thalf_deg_d_dict.items()), columns=['MP_form', 'thalf_deg_d'])
 # t_half_deg_df.to_csv(t_half_deg_filename,index=False)
