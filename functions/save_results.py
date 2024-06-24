@@ -22,6 +22,11 @@ def store_results(
     MP_form_dict_reverse,
     size_dict,
     comp_mass_balance_df,
+    fig_mass,
+    titlename_figmass,
+    fig_num,
+    titlename_fignum,
+    emiss_fract_fig,
 ):
 
     # check whether directory already exists
@@ -66,25 +71,33 @@ def store_results(
     results_extended_by_compartment_to_csv(
         path=path_run, results_dict=Results_comp_dict
     )
+    ## Plot heatmaps of mass and number distribution
+
+    fig_mass.savefig(path_run + "/" + titlename_figmass + ".png")
+    fig_num.savefig(path_run + "/" + titlename_fignum + ".png")
+
+    ## Save Emission Fractions figure
+
+    emiss_fract_fig.savefig(path_run + "/Emission_Fractions.png")
 
     # Plot results in Total number of particles and Total mass
 
     # Create Steady State results folders:
-    path_SteadyState_mass = os.path.join(path_run, "SteadyState_mass_distribution")
-    path_SteadyState_number = os.path.join(path_run, "SteadyState_number_distribution")
+    # path_SteadyState_mass = os.path.join(path_run, "SteadyState_mass_distribution")
+    # path_SteadyState_number = os.path.join(path_run, "SteadyState_number_distribution")
 
     # check whether directory already exists
-    if not os.path.exists(path_SteadyState_mass):
-        os.mkdir(path_SteadyState_mass)
-        print("Folder %s created!" % path_SteadyState_mass)
-    else:
-        print("Folder %s already exists" % path_SteadyState_mass)
+    # if not os.path.exists(path_SteadyState_mass):
+    #     os.mkdir(path_SteadyState_mass)
+    #     print("Folder %s created!" % path_SteadyState_mass)
+    # else:
+    #     print("Folder %s already exists" % path_SteadyState_mass)
 
-    if not os.path.exists(path_SteadyState_number):
-        os.mkdir(path_SteadyState_number)
-        print("Folder %s created!" % path_SteadyState_number)
-    else:
-        print("Folder %s already exists" % path_SteadyState_number)
+    # if not os.path.exists(path_SteadyState_number):
+    #     os.mkdir(path_SteadyState_number)
+    #     print("Folder %s created!" % path_SteadyState_number)
+    # else:
+    #     print("Folder %s already exists" % path_SteadyState_number)
 
     # for comp in Results_comp_organiced:
     #     plot_bySize_total_number_particles(
@@ -107,10 +120,10 @@ def store_results(
     # )
 
     # Save the table of mass distribution
-    massDitribution_filename = os.path.join(
-        path_SteadyState_mass, "SS_mass_distribution.csv"
-    )
-    df_massDistribution.to_csv(massDitribution_filename)
+    # massDitribution_filename = os.path.join(
+    #     path_SteadyState_mass, "SS_mass_distribution.csv"
+    # )
+    # df_massDistribution.to_csv(massDitribution_filename)
 
     # # Save the table of number distribution
     # numberDitribution_filename = os.path.join(

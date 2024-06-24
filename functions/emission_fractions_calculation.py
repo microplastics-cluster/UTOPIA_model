@@ -286,8 +286,10 @@ def plot_emission_fractions(emission_fractions_data, emiss_comp):
 
     # Set the legend outside the plot and at the bottom
     plt.legend(loc="center left", bbox_to_anchor=(1, 0.5), fontsize=14)
-
+    plt.tight_layout()
+    fig = plt.gcf()
     plt.show()
+    return fig
 
 
 def plot_emission_fractions_multi(emission_fractions_data_list, emiss_comp_list):

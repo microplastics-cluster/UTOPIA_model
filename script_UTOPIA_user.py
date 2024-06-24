@@ -31,8 +31,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 1580
-MP_composition = "PVC"
+MPdensity_kg_m3 = 980
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -410,12 +410,12 @@ Results_comp_organiced = extract_by_aggSt(Results_comp_dict, particle_forms_codi
 
 # print("Distribution of mass in the system")
 # print(mf_shorted[:10])
-# df_massDistribution = mf_shorted[:10]
+df_massDistribution = mf_shorted[:10]
 
 
 # print("distribution of particle number in the system")
 # print(nf_shorted[:10])
-# df_numberDistribution = nf_shorted[:10]
+df_numberDistribution = nf_shorted[:10]
 
 # Mass distribution by compartment
 mass_frac_100 = []
@@ -511,8 +511,12 @@ comp_mass_balance_df["Concentration (N/m3)"] = [
 """ Generate mass and number distribution heatmaps"""
 
 
-plot_fractionDistribution_heatmap(Results_extended, fraction="mass_fraction")
-plot_fractionDistribution_heatmap(Results_extended, fraction="number_fraction")
+fig_mass, titlename_figmass = plot_fractionDistribution_heatmap(
+    Results_extended, fraction="mass_fraction"
+)
+fig_num, titlename_fignum = plot_fractionDistribution_heatmap(
+    Results_extended, fraction="number_fraction"
+)
 
 """ Estimate exposure indicators """
 
@@ -586,7 +590,7 @@ emission_fractions_mass_data = emission_fractions_calculations(
 )
 
 
-plot_emission_fractions(emission_fractions_mass_data, emiss_comp)
+emiss_fract_fig = plot_emission_fractions(emission_fractions_mass_data, emiss_comp)
 
 
 # Overall persistance (Pov) and Overall residence time (Tov) in years:
@@ -736,6 +740,11 @@ store_results(
     MP_form_dict_reverse,
     size_dict,
     comp_mass_balance_df,
+    fig_mass,
+    titlename_figmass,
+    fig_num,
+    titlename_fignum,
+    emiss_fract_fig,
 )
 
 """ Generate PDF report """  ## WORK IN PROGRESS

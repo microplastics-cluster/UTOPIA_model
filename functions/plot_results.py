@@ -338,14 +338,17 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
     ]
     row_label_positions = np.arange(len(pivot_table.index)) + 0.5
     plt.yticks(ticks=row_label_positions, labels=row_labels, rotation=0)
-
-    plt.title(
+    titlename = (
         "Heatmap of log10 ("
         + fraction
         + " by MP_Form, Compartment, and Size_Fraction_um"
     )
+    plt.title(titlename)
     plt.xlabel("Compartment", fontsize=14)
     plt.ylabel("MP_Form - Size_Fraction_um", fontsize=14)
-
     plt.tight_layout()
+
+    fig = plt.gcf()
     plt.show()
+
+    return fig, titlename
