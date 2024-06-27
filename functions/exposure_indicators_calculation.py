@@ -294,7 +294,7 @@ import os
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from model_run import *
+from functions.model_run import *
 from functions.generate_MPinputs_table import *
 
 

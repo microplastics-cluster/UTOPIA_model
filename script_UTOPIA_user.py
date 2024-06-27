@@ -18,8 +18,8 @@ from functions.fill_interactions_Knames import *
 from functions.exposure_indicators_calculation import *
 from functions.generate_MPinputs_table import *
 from functions.save_results import *
-from model_run import *
 from functions.loop_CTD_calculation import *
+from functions.generate_compartmentFlows_tables import *
 
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
@@ -31,8 +31,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 980
-MP_composition = "PE"
+MPdensity_kg_m3 = 999
+MP_composition = "PA"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -459,8 +459,6 @@ mass_dist_comp["Concentration_num_m3"] = num_conc
 ### MASS BALANCE PER COMPARTMENT###
 
 # Estimate mass flows due to the different particle fate process (transfer between compartments, elimination and transformation processes)
-
-from functions.generate_compartmentFlows_tables import *
 
 # Estimate outflows in mass (g/s) amd number/second
 (tables_outputFlows, tables_outputFlows_number) = estimate_outFlows(
