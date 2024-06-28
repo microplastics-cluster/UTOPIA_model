@@ -471,6 +471,35 @@ mass_dist_comp["Concentration_num_m3"] = num_conc
     tables_outputFlows, tables_outputFlows_number, dict_comp, surfComp_list
 )
 
+# Decode index in input and output flow tables
+flows_dict_mass = dict()
+flows_dict_mass["input_flows"] = {}
+flows_dict_mass["output_flows"] = {}
+
+# Decode index in input and output flow tables
+for comp in tables_outputFlows.keys():
+    df1 = tables_outputFlows[comp].copy()
+    MP_size_df1 = []
+    MP_form_df1 = []
+    for x in df1.index:
+        MP_size_df1.append(size_dict[x[0]])
+        MP_form_df1.append(MP_form_dict_reverse[x[1:2]])
+
+    df1.insert(0, "MP_size", MP_size_df1)
+    df1.insert(1, "MP_form", MP_form_df1)
+    flows_dict_mass["output_flows"][comp] = df1
+
+for comp in tables_inputFlows:
+    df2 = tables_inputFlows[comp].copy()
+    MP_size_df2 = []
+    MP_form_df2 = []
+    for y in df2.index:
+        MP_size_df2.append(size_dict[y[0]])
+        MP_form_df2.append(MP_form_dict_reverse[y[1:2]])
+    df2.insert(0, "MP_size", MP_size_df2)
+    df2.insert(1, "MP_form", MP_form_df2)
+    flows_dict_mass["input_flows"][comp] = df2
+
 
 ## Compartment mass balance
 
