@@ -103,6 +103,10 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
 
 ## Instalation guidelines
 
+### Getting started for Windows
+
+Download the repository to your computer by clicking on the green CODE button on the rigth of the repository screen.
+
 ### Create, activate, and download dependencies with a virtual environment using venv
 
 # Create a virtual environment named 'venv'
