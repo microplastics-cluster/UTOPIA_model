@@ -33,8 +33,33 @@ The UTOPIA model is being developed based on experiences and knowledge acquired 
 
 Description of the workflow followed to develope UTOPIA
 
-### 1- Select input parameters through interactive voila dashboards to generate input csv files 
-(to be done)
+### 1- Select input parameters
+Go to the file script_UTOPIA_user.py and follow the instructions given in the code. Currently it is possible to modify:
+
+  Microplastics properties:
+
+  - MPdensity_kg_m3 (L34)
+  - MP_composition (L35) (Has to match the defined density)
+  - big_bin_diameter_um (we recomend using the default value but cna be modified within the limits from 10000 um to 1000 um)
+
+  Compartment properties:
+
+  To do so one should copy the inputs_compartments.csv file and modify its values without changing the format of the file. Once a new file is generated this can be saved with a new name and the new name should be provided in line 66 of the script_UTOPIA_user.py file assigned to comp_impFile_name.
+
+  Plastic weathering properties:
+
+  - Select a fragmentation style form the ones defined in frag_styles_dict (L103) by updating the name of the selected style in line 142 (frag_style=)
+
+  Emission scenario:
+  describe the porperties of the emitted plastic particles (particle size and form) and the recieving compartment/s and its flow of emission/s
+
+  - size_bin: choose a size fraction from the size_dict dictionary (if chosen the default settings: a= 0.5 um, b= 5 um, c= 50 um, d= 500 um, e= 5000 um)
+  - MP_form: Choose from MPforms_list (freeMP,heterMP,biofMP and heterBiofMP)
+  - If emission are targeted to a single compartment the user should define:
+    - input_flow_g_s
+    - emiss_comp
+  - If there are emissions into several compartments the suer should add the corresponding input flows per compartment in the dictionary q_mass_g_s_dict (L252). Note that if this second option is chossen the user should double check that the inputs above match the enission scenario targeted.
+
 
 ### 2- Generate model objects by reading on input files:
 
@@ -54,7 +79,6 @@ Description of the workflow followed to develope UTOPIA
   
 ### 4-Parameterise concentrations/emissions
 
-(to be done)
 
 ### 5-Generate model processes input parameters table based on the stablished model structure (key parameters such as attachment efficiency, degradation times, fragmentation times, etc.)
 
@@ -69,13 +93,13 @@ Description of the workflow followed to develope UTOPIA
 
 ### 8-Solve mass balance (in steady state for UTOPIA)
 
-### 9-Results presentation through interactive voila dashboards?
+### 9-Plot and save results
 
   -Mass and particle number concentrations
   -Mass and numbers distribution as fraction of the total mass or total number
   -Exposure metrics (Overall persistence, characteristic travel distance, transfer efficiency)
+  -Emission fractions
 
-(to be done)
 
 ## Instalation guidelines
 
