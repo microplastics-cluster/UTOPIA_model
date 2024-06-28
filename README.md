@@ -109,16 +109,16 @@ Download the repository to your computer by clicking on the green CODE button on
 
 ### Create, activate, and download dependencies with a virtual environment using venv
 
-# Create a virtual environment named 'venv'
+### Create a virtual environment named 'venv'
 python -m venv venv
 
-# Activate the virtual environment on Windows
+### Activate the virtual environment on Windows
 venv\Scripts\activate
 
-# Install requirements
+### Install requirements
 pip install -r requirements.txt
 
-# Run server 
+### Run server 
 ```bash
 python script_UTOPIA_user.py
 ```
