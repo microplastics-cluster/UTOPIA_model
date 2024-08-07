@@ -697,7 +697,6 @@ def sea_spray_aerosol(particle):
 
 
 def sequestration_deep_soils(particle):
-    # to be formulated
 
     # From The OECD tool: MTC3sink = 0.05 * MTCsconv (m/h)soil solids convection to the center of the earth. MTCsconv = 4.54 * 10 ^-7 (m/h)'soil side solid phase convection MTC
 

@@ -20,6 +20,7 @@ from functions.generate_MPinputs_table import *
 from functions.save_results import *
 from functions.loop_CTD_calculation import *
 from functions.generate_compartmentFlows_tables import *
+from functions.emission_fractions_calculation import *
 
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
@@ -139,7 +140,7 @@ if N_sizeBins == 5:
         ),
     }
 
-    frag_style = "mixed_fragmentation"
+    frag_style = "no_fragmentation"
 
     fsd = frag_styles_dict[frag_style]
     sizes = [list(model_lists["dict_size_coding"].keys())]
@@ -577,33 +578,9 @@ for dispersing_comp in dispersing_comp_list:
     )
 
 
-# # Run model with emissions to specific compartments of the targeted size bin to estimate the particle number dispersion fractions
-# model_results_size_bin = {}
-# for size in size_dict:
-#     model_results_size_bin[size] = {}
-#     for dispersing_comp in dispersing_comp_list:
-#         model_results_size_bin[size][dispersing_comp] = run_model_comp(
-#             dispersing_comp,
-#             input_flow_g_s,
-#             interactions_df,
-#             MP_form,
-#             size_bin=size,
-#             particle_forms_coding=particle_forms_coding,
-#             particle_compartmentCoding=particle_compartmentCoding,
-#             system_particle_object_list=system_particle_object_list,
-#             comp_dict_inverse=comp_dict_inverse,
-#             dict_comp=dict_comp,
-#             size_dict=size_dict,
-#             MP_form_dict_reverse=MP_form_dict_reverse,
-#             surfComp_list=surfComp_list,
-#         )
-
-
 #### EXPOSURE INDICATORS ####
-from functions.emission_fractions_calculation import *
 
-
-# Estimate emission fractions for the setted emission scenario
+# Estimate emission fractions for the chosen emission scenario
 
 emission_fractions_mass_data = emission_fractions_calculations(
     Results_extended,
