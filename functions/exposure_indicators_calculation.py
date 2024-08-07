@@ -40,15 +40,20 @@ def Exposure_indicators_calculation(
 
     print("Overall mass persistence (years): " + str(int(Pov_mass_years)))
 
-    # Table of discorporation flows per compartment
+    # Table of overall mass persistences per compartment
     Pov_comp_years = []
     for c in tables_outputFlows.keys():
-        Pov_comp_years.append(
-            sum(Results_extended[Results_extended["Compartment"] == c]["mass_g"])
-            / sum(tables_outputFlows[c].k_discorporation)
-            / 86400
-            / 365
-        )
+        if sum(Results_extended[Results_extended["Compartment"] == c]["mass_g"]) == 0:
+            Pov_comp_years.append(
+                "NaN"
+            )  # When there is no mass in the compartment Pov has no value (marked as NAN)
+        else:
+            Pov_comp_years.append(
+                sum(Results_extended[Results_extended["Compartment"] == c]["mass_g"])
+                / sum(tables_outputFlows[c].k_discorporation)
+                / 86400
+                / 365
+            )
 
     Pov_Tov_comp_df = pd.DataFrame(
         {"Compartment": tables_outputFlows.keys(), "Pov_years(mass)": Pov_comp_years}
@@ -79,20 +84,34 @@ def Exposure_indicators_calculation(
     # Table of discorporation flows per compartment in number
     Pov_comp_years_num = []
     for c in tables_outputFlows.keys():
-        Pov_comp_years_num.append(
+        if (
             sum(
                 Results_extended[Results_extended["Compartment"] == c][
                     "number_of_particles"
                 ]
             )
-            / sum(tables_outputFlows_number[c].k_discorporation)
-            / 86400
-            / 365
-        )
+            == 0
+        ):
+            Pov_comp_years_num.append(
+                "NaN"
+            )  # When there is no number in the compartment Pov has no value (marked as NAN)
+        else:
+            Pov_comp_years_num.append(
+                sum(
+                    Results_extended[Results_extended["Compartment"] == c][
+                        "number_of_particles"
+                    ]
+                )
+                / sum(tables_outputFlows_number[c].k_discorporation)
+                / 86400
+                / 365
+            )
 
     Pov_Tov_comp_df["Pov_years(particle_number)"] = Pov_comp_years_num
 
     # Overall persistence specific to each size class are mass and number independent:
+
+    # NOTE! When the mass is only present in one size fraction then the Pov has to be equal to the overall Pov and mas and number Pov should be the same
 
     size_list = ["a", "b", "c", "d", "e"]
     Pov_size_dict_sec = {}
@@ -109,6 +128,11 @@ def Exposure_indicators_calculation(
         mass_sizeFraction = sum(
             Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
         )
+        if (
+            mass_sizeFraction == 0
+        ):  ## If there are no particles of a specific size fraction in the system one does not need to estimate Pov
+            Pov_size_dict_sec[size] = "NaN"
+            continue
 
         Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
         Pov_size_days = Pov_size_sec / 86400
@@ -121,9 +145,8 @@ def Exposure_indicators_calculation(
         )
         Pov_size_dict_sec[size] = Pov_size_sec
 
-    """ Overall residence time (years)"""  # Includes burial in the deep sediment and will also inlcude sequestration in the deep soils once the transport process in the soil compartments are included
-
-    # With the new system boundaries wew will acount for the sequestrtation in deep soils and burial into coast and frahwater sediment but for the Ocean sediment we do not take the k_burial  but the settling into the ocean column water compartment as well as mixing. (We exclude theOcean column water and ocean sediment from the system boundaryíes in these calculations)
+    """ Overall residence time (years)"""
+    # With the new system boundaries wew acount for sequestration in deep soils and burial into coast and frehwater sediment but for the Ocean sediment we do not take burial but the settling into the ocean column water compartment as well as mixing. (We exclude the Ocean column water and ocean sediment from the system boundaries in these calculations)
 
     systemloss_flows_mass = []
     systemloss_flows_number = []
@@ -209,10 +232,21 @@ def Exposure_indicators_calculation(
         + str(round(Tov_num_years, 1))
     )
 
+    # NOTE: When only one size class pressent, should the residence time be the same in particle number and in mass?? !!! TO check!!!
+
     # Overall residence time specific to each size class (mass and number independent):
 
     Tov_size_dict_sec = {}
     for size in size_list:
+
+        mass_sizeFraction = sum(
+            Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
+        )
+
+        if mass_sizeFraction == 0:
+            Tov_size_dict_sec[size] = "NaN"
+            continue
+
         systemloss_flows_size = []
         for k in tables_outputFlows:
             outputFlow_df = tables_outputFlows[k]
@@ -264,10 +298,6 @@ def Exposure_indicators_calculation(
 
             else:
                 pass
-
-        mass_sizeFraction = sum(
-            Results_extended_EI[Results_extended_EI.index.str[0] == size].mass_g
-        )
 
         Tov_size_sec = mass_sizeFraction / sum(systemloss_flows_size)
         Tov_size_days = Tov_size_sec / 86400
@@ -347,75 +377,3 @@ def calculate_CTD(Pov_mass_years, Results_extended, dict_comp, Pov_num_years, CD
     )
 
     return (CTD_mass_m / 1000, CTD_number_m / 1000)
-
-    # CTD_mass_dic_km = {}
-    # CTD_number_dic_km = {}
-    # for m in [
-    #     "Ocean_Surface_Water",
-    #     "Ocean_Mixed_Water",
-    #     "Coast_Surface_Water",
-    #     "Coast_Column_Water",
-    #     "Surface_Freshwater",
-    #     "Bulk_Freshwater",
-    #     "Air",
-    # ]:
-    #     CTD_mass_m = (
-    #         (Pov_mass_years * 365 * 24 * 60 * 60)
-    #         * sum(Results_extended[Results_extended["Compartment"] == m].mass_g)
-    #         / sum(Results_extended["mass_g"])
-    #         * float(dict_comp[m].flowVelocity_m_s)
-    #     )
-    #     CTD_number_m = (
-    #         (Pov_num_years * 365 * 24 * 60 * 60)
-    #         * sum(
-    #             Results_extended[
-    #                 Results_extended["Compartment"] == m
-    #             ].number_of_particles
-    #         )
-    #         / sum(Results_extended["number_of_particles"])
-    #         * float(dict_comp[m].flowVelocity_m_s)
-    #     )
-    #     CTD_mass_km = CTD_mass_m / 1000
-    #     CTD_mass_dic_km[m] = CTD_mass_km
-    #     CTD_number_dic_km[m] = CTD_number_m / 1000
-
-    #     data_CTD = {
-    #         "CTD_mass_km": CTD_mass_dic_km.values(),
-    #         "CTD_number_km": CTD_number_dic_km.values(),
-    #     }
-    #     CTD_df = pd.DataFrame(data=data_CTD, index=CTD_mass_dic_km.keys())
-
-    #     print(CTD_df)
-
-    #     # print("Characteristic mass travel distance for " + m + " (km): " + str(CTD_mass_km))
-    #     # print("Characteristic particle number travel distance for " + m + " (km): " + str(CTD_number_m/1000))
-
-    # Characteristic travel distance per size class
-
-    # CTD_data_dic_km = {}
-    # for m in [
-    #     "Ocean_Surface_Water",
-    #     "Ocean_Mixed_Water",
-    #     "Coast_Surface_Water",
-    #     "Coast_Column_Water",
-    #     "Surface_Freshwater",
-    #     "Bulk_Freshwater",
-    #     "Air",
-    # ]:
-    #     Results_extended_m = Results_extended[Results_extended["Compartment"] == m]
-    #     CTD_size_km = []
-    #     for size in size_list:
-    #         CTD_size_m = (
-    #             Pov_size_dict_sec[size]
-    #             * sum(
-    #                 Results_extended_m[Results_extended_m.index.str[0] == size].mass_g
-    #             )
-    #             / sum(Results_extended[Results_extended.index.str[0] == size].mass_g)
-    #             * float(dict_comp[m].flowVelocity_m_s)
-    #         )
-    #         CTD_size_km.append(CTD_size_m / 1000)
-    #     CTD_data_dic_km[m] = CTD_size_km
-    # CTD_size_df_km = pd.DataFrame(
-    #     CTD_data_dic_km, index=[size_dict[i] for i in size_list]
-    # )
-    # print(CTD_size_df_km)

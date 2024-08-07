@@ -236,7 +236,10 @@ def plot_emission_fractions(emission_fractions_data, emiss_comp):
 
     data = {
         "x": ["$\phi_1$", "$\phi_21$", "$\phi_22$", "$\phi_23$", "$\phi_24$"],
-        "y": [np.log10(x) for x in emission_fractions_data["y"]],
+        "y": [
+            np.log10(x) if x > 0 else np.log10(1e-20)
+            for x in emission_fractions_data["y"]
+        ],
         "category": [
             "$\phi_1$",
             "$\phi_21$:Remote Ocean Surface",
