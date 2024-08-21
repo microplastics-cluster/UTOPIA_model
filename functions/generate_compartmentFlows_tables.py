@@ -68,7 +68,7 @@ def estimate_inFlows(
                     ]
 
                     for proc in inpProc:
-                        if proc == "dry_depossition":
+                        if proc == "dry_deposition":
                             position = surfComp_list.index(comp)
                             df_inflows["k_" + proc] = df_inflows["k_" + proc].apply(
                                 lambda x: x[position] if isinstance(x, list) else x

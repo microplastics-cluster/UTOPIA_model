@@ -9,10 +9,10 @@ Bulk_Freshwater,30,1.18E+06,278,0.1,10,9.05E+13,10,9.05E+12
 Sediment_Freshwater,nan,nan,nan,nan,nan,9.05E+11,0.1,9.05E+12
 Sediment_Ocean,nan,nan,nan,nan,nan,1.03E+13,0.03,3.44E+14
 Sediment_Coast,nan,nan,nan,nan,nan,8.83E+11,0.1,8.83E+12
-Urban_Soil_Surface,nan,nan,nan,nan,nan,5.62E+11,0.01,5.62E+13
-Urban_Soil,nan,nan,nan,nan,nan,5.62E+12,0.1,5.62E+13
+Beaches_Soil_Surface,nan,nan,nan,nan,nan,5.62E+11,0.01,5.62E+13
+Beaches_Deep_Soil,nan,nan,nan,nan,nan,5.62E+12,0.1,5.62E+13
 Background_Soil_Surface,nan,nan,nan,nan,nan,8.88E+11,0.01,8.88E+13
 Background_Soil,nan,nan,nan,nan,nan,8.88E+12,0.1,8.88E+13
-Agricultural_Soil_Surface,nan,nan,nan,nan,nan,5.92E+11,0.2,2.96E+12
-Agricultural_Soil,nan,nan,nan,nan,nan,2.96E+11,0.1,2.96E+12
+Impacted_Soil_Surface,nan,nan,nan,nan,nan,5.92E+11,0.2,2.96E+12
+Impacted_Soil,nan,nan,nan,nan,nan,2.96E+11,0.1,2.96E+12
 Air,nan,nan,nan,4,nan,3.06E+18,6000,5.10E+14

@@ -32,12 +32,12 @@ def run_model_comp(
         "Sediment_Freshwater": 0,
         "Sediment_Ocean": 0,
         "Sediment_Coast": 0,
-        "Urban_Soil_Surface": 0,
-        "Urban_Soil": 0,
+        "Beaches_Soil_Surface": 0,
+        "Beaches_Deep_Soil": 0,
         "Background_Soil_Surface": 0,
         "Background_Soil": 0,
-        "Agricultural_Soil_Surface": 0,
-        "Agricultural_Soil": 0,
+        "Impacted_Soil_Surface": 0,
+        "Impacted_Soil": 0,
         "Air": 0,
     }
     q_mass_g_s_dict[recieving_comp] = input_flow_g_s

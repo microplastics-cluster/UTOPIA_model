@@ -14,14 +14,13 @@ from functions.solver_SteadyState import *
 from functions.extract_results import *
 from functions.plot_results import *
 from functions.massBalance import *
-from functions.fill_interactions_Knames import *
 from functions.exposure_indicators_calculation import *
 from functions.generate_MPinputs_table import *
 from functions.save_results import *
 from functions.loop_CTD_calculation import *
 from functions.generate_compartmentFlows_tables import *
 from functions.emission_fractions_calculation import *
-
+from helpers.helpers import *
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
@@ -32,8 +31,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 999
-MP_composition = "PA"
+MPdensity_kg_m3 = 980
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -208,6 +207,7 @@ process_inputs_df = create_inputsTable_UTOPIA(
     thalf_deg_d_dict,
     alpha_hetr_dict,
     t_frag_gen_FreeSurfaceWater,
+    save_op="notSave",
 )
 
 """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
@@ -229,7 +229,7 @@ import string
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 
-size_bin = "e"  # Chosse from size_dict
+size_bin = "d"  # Chosse from size_dict
 
 
 # Aggregation state (MP form):
@@ -241,14 +241,14 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 
-MP_form = "freeMP"  # Choose from MPforms_list above
+MP_form = "heterBiofMP"  # Choose from MPforms_list above
 
 # input flow (in g per second) for each compartment the User should specify here the input flows per compartment
 
 input_flow_g_s = 1
 
 
-emiss_comp = "Coast_Surface_Water"
+emiss_comp = "Ocean_Surface_Water"
 
 q_mass_g_s_dict = {
     "Ocean_Surface_Water": 0,
@@ -261,12 +261,12 @@ q_mass_g_s_dict = {
     "Sediment_Freshwater": 0,
     "Sediment_Ocean": 0,
     "Sediment_Coast": 0,
-    "Urban_Soil_Surface": 0,
-    "Urban_Soil": 0,
+    "Beaches_Soil_Surface": 0,
+    "Beaches_Deep_Soil": 0,
     "Background_Soil_Surface": 0,
     "Background_Soil": 0,
-    "Agricultural_Soil_Surface": 0,
-    "Agricultural_Soil": 0,
+    "Impacted_Soil_Surface": 0,
+    "Impacted_Soil": 0,
     "Air": 0,
 }
 
@@ -307,7 +307,7 @@ print("Selected fragmentation style: ", frag_style)
 """Estimate rate constants per particle"""
 
 for particle in system_particle_object_list:
-    generate_rateConstants(particle, spm, dict_comp, fsd)
+    generate_rateConstants(particle, spm, dict_comp, fsd, process_inputs_df)
 
 
 ## create rate constants table:
@@ -598,6 +598,7 @@ emiss_fract_fig = plot_emission_fractions(emission_fractions_mass_data, emiss_co
 
 
 # Overall persistance (Pov) and Overall residence time (Tov) in years:
+print_output = "True"
 
 (
     Pov_mass_years,
@@ -613,7 +614,9 @@ emiss_fract_fig = plot_emission_fractions(emission_fractions_mass_data, emiss_co
     size_dict,
     dict_comp,
     system_particle_object_list,
+    print_output,
 )
+
 
 # Caracteristic travel distance (CDT) (m):
 
@@ -643,12 +646,12 @@ for CDT_comp in [
         "Sediment_Freshwater": 0,
         "Sediment_Ocean": 0,
         "Sediment_Coast": 0,
-        "Urban_Soil_Surface": 0,
-        "Urban_Soil": 0,
+        "Beaches_Soil_Surface": 0,
+        "Beaches_Deep_Soil": 0,
         "Background_Soil_Surface": 0,
         "Background_Soil": 0,
-        "Agricultural_Soil_Surface": 0,
-        "Agricultural_Soil": 0,
+        "Impacted_Soil_Surface": 0,
+        "Impacted_Soil": 0,
         "Air": 0,
     }
     q_mass_g_s_dict_CTD[CDT_comp] = input_flow_g_s

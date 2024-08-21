@@ -12,16 +12,16 @@ import numpy as np
 # import file storing required constants
 from helpers.globalConstants import *
 
-# Read input data file
+# # Read input data file
 
-process_inputs_df = pd.read_csv(
-    filepath_or_buffer=os.path.join(
-        os.path.dirname(__file__), "../inputs/processInputs_table.csv"
-    )
-)
+# process_inputs_df = pd.read_csv(
+#     filepath_or_buffer=os.path.join(
+#         os.path.dirname(__file__), "../inputs/processInputs_table.csv"
+#     )
+# )
 
 
-def discorporation(particle):
+def discorporation(particle, process_inputs_df):
     # degradation estimations
     # discorporation state will be given as output after runing
     # the model with no discorporation. degradation state will be given in time units as residence time in the compartment
@@ -47,7 +47,7 @@ def discorporation(particle):
     return k_deg
 
 
-def fragmentation(particle, fsd):
+def fragmentation(particle, fsd, process_inputs_df):
 
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
     # for fragmentation of pristine particles in the largest (x=5000μm => mp5 => e) size class.
@@ -195,7 +195,7 @@ def rising(particle):
     return k_rise
 
 
-def heteroaggregation(particle, spm):
+def heteroaggregation(particle, spm, process_inputs_df):
     if (particle.Pform == "freeMP") or (particle.Pform == "biofMP"):
         # heteroaggregation rate constants
         """heteroaggregation requires to particles to collide and interact
@@ -282,7 +282,7 @@ def heteroaggregation(particle, spm):
     return k_hetAgg
 
 
-def heteroaggregate_breackup(particle, spm):
+def heteroaggregate_breackup(particle, spm, process_inputs_df):
     """Assumption: the breack-up of heteroaggregates is 10E8 times slower than the formation of heteroaggregates"""
 
     if (particle.Pform == "heterMP") or (particle.Pform == "heterBiofMP"):
@@ -444,7 +444,7 @@ def mixing(particle, dict_comp):
     return k_mix
 
 
-def biofouling(particle):
+def biofouling(particle, process_inputs_df):
     cond_biof = (
         (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
         & (process_inputs_df["MPform"] == particle.Pform)
@@ -462,7 +462,7 @@ def biofouling(particle):
     return k_biof
 
 
-def defouling(particle):
+def defouling(particle, process_inputs_df):
     # Defouling = degradation of Biofilm.
 
     cond_defoul = (
@@ -544,8 +544,8 @@ def soil_convection(particle):
     #         (C_massTransfer_m_h /(60 * 60 ))/ float(particle.Pcompartment.Cdepth_m)
     #     )
     # elif particle.Pcompartment.Cname in [
-    #     "Urban_Soil",
-    #     "Agricultural_Soil",
+    #     "Beaches_Deep_Soil",
+    #     "Impacted_Soil",
     #     "Background_Soil",
     # ]:
     #     k_soil_conv = (C_massTransfer_m_h /( 60 * 60)) / float(particle.Pcompartment.Cdepth_m)
@@ -578,9 +578,9 @@ def runoff_transport(particle):
     # REF: BETR global approach for MTCsoilrunoff = 2.3 * 10 ^ -8  (m/h) 'soil solids runoff rate  (Scheringer, P230)
 
     runooff_dict = {
-        "Urban_Soil_Surface": 2.3e-8,
+        "Beaches_Soil_Surface": 2.3e-8,
         "Background_Soil_Surface": 2.3e-8,
-        "Agricultural_Soil_Surface": 2.3e-8,
+        "Impacted_Soil_Surface": 2.3e-8,
     }
     runoff_rate = (
         runooff_dict[particle.Pcompartment.Cname]
@@ -588,12 +588,12 @@ def runoff_transport(particle):
     ) / (60 * 60)
 
     # The total amount of runoff will be distributed into the recieving compartments according to the following matrix
-    fro = np.array([[0, 1], [0, 1], [0, 1]])
+    fro = np.array([[0, 1], [0, 1], [1, 0]])
     # number row corresponds to the soil emiting compartment
     soilSurf_dic = {
-        "Urban_Soil_Surface": 0,
+        "Impacted_Soil_Surface": 0,
         "Background_Soil_Surface": 1,
-        "Agricultural_Soil_Surface": 2,
+        "Beaches_Soil_Surface": 2,
     }
     # column number corresponds to the recieving compartment
 
@@ -628,7 +628,7 @@ def wind_trasport(particle):
     return k_wind_transport
 
 
-def dry_depossition(particle, dict_comp):
+def dry_deposition(particle, dict_comp):
     # particles depossition from air to soil or water compartments
 
     # CORRECT NAMING in all the code!!
@@ -659,7 +659,7 @@ def dry_depossition(particle, dict_comp):
     return k_dry_depossition
 
 
-def wet_depossition(particle, dict_comp):
+def wet_deposition(particle, dict_comp):
     # Currently turned off
     # particles depossition from air to soil or water compartments via rainfall
     # wont be formulated as function of rainfall intensity but dependent on the average rain events per year. we asume that any rain event will trigger the depossition of the particles regardless of rainfall intensity
@@ -672,7 +672,7 @@ def wet_depossition(particle, dict_comp):
 
 
 def sea_spray_aerosol(particle):
-    # paticles resuspension from ocean and coastal surface waters to air
+    # particles resuspension from ocean and coastal surface waters to air
     # REF: BETR global approach for ocean-air resuspension (10^-10 m/h)
 
     ssa_rate = 10e-10 / 60 / 60

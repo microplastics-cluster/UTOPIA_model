@@ -1,4 +1,10 @@
 import pandas as pd
+import os
+from datetime import datetime
+import pandas as pd
+import numpy as np
+from functions.model_run import *
+from functions.generate_MPinputs_table import *
 
 size_list = ["a", "b", "c", "d", "e"]
 
@@ -10,6 +16,7 @@ def Exposure_indicators_calculation(
     size_dict,
     dict_comp,
     system_particle_object_list,
+    print_output,
 ):
     #### EXPOSURE INDICATORS ####
     # When estimating the exposure indicators we do not take on account the Column Water and Ocean Sediment compartments. This is to mantain consistency with the OECD tool as there the particles going deeper than 100 m into the ocean are considered lossess, therefore we also use that as a boundary in our system. Also in this way we prevent the ocean sediment and column water from driving the POV and residence times values. However our emission fraction estimates do take this compartmets into consideration and the MPs fate into the whole UTOPIA systme is reflected there.
@@ -38,7 +45,10 @@ def Exposure_indicators_calculation(
     Pov_mass_days = Pov_mass_sec / 86400
     Pov_mass_years = Pov_mass_days / 365
 
-    print("Overall mass persistence (years): " + str(int(Pov_mass_years)))
+    if print_output == "True":
+        print("Overall mass persistence (years): " + str(int(Pov_mass_years)))
+    else:
+        pass
 
     # Table of overall mass persistences per compartment
     Pov_comp_years = []
@@ -79,7 +89,10 @@ def Exposure_indicators_calculation(
     Pov_num_days = Pov_num_sec / 86400
     Pov_num_years = Pov_num_days / 365
 
-    print("Overall particle number persistence (years): " + str(int(Pov_num_years)))
+    if print_output == "True":
+        print("Overall particle number persistence (years): " + str(int(Pov_num_years)))
+    else:
+        pass
 
     # Table of discorporation flows per compartment in number
     Pov_comp_years_num = []
@@ -122,7 +135,13 @@ def Exposure_indicators_calculation(
                 outputFlow_df = tables_outputFlows[k]
                 sliced_df = outputFlow_df[outputFlow_df.index.str[0] == size]
                 discorporation_fargmentation_flows.append(
-                    sum(sliced_df.k_fragmentation) + sum(sliced_df.k_discorporation)
+                    sum(
+                        [
+                            ele if type(ele) != list else sum(ele)
+                            for ele in sliced_df.k_fragmentation
+                        ]
+                    )
+                    + sum(sliced_df.k_discorporation)
                 )
 
         mass_sizeFraction = sum(
@@ -137,12 +156,12 @@ def Exposure_indicators_calculation(
         Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
         Pov_size_days = Pov_size_sec / 86400
         Pov_size_years = Pov_size_days / 365
-        print(
-            "Overall persistence of size "
-            + str(size_dict[size])
-            + " um (years): "
-            + str(int(Pov_size_years))
-        )
+        # print(
+        #     "Overall persistence of size "
+        #     + str(size_dict[size])
+        #     + " um (years): "
+        #     + str(int(Pov_size_years))
+        # )
         Pov_size_dict_sec[size] = Pov_size_sec
 
     """ Overall residence time (years)"""
@@ -152,7 +171,7 @@ def Exposure_indicators_calculation(
     systemloss_flows_number = []
 
     for k in tables_outputFlows:
-        if k in ["Urban_Soil", "Background_Soil", "Agricultural_Soil"]:
+        if k in ["Beaches_Deep_Soil", "Background_Soil", "Impacted_Soil"]:
             systemloss_flows_mass.append(
                 sum(tables_outputFlows[k].k_discorporation)
                 + sum(tables_outputFlows[k].k_sequestration_deep_soils)
@@ -221,16 +240,19 @@ def Exposure_indicators_calculation(
     Tov_mass_years = Tov_mass_days / 365
     Tov_num_years = Tov_num_days / 365
 
-    print(
-        "Overall residence time is calculated assuming the model boundaries to be at 100 m depth into the Ocean, 30 cm into the sediments and 0.1 m into the soil. Particles travelling deeper are considered losses"
-    )
+    if print_output == "True":
+        print(
+            "Overall residence time is calculated assuming the model boundaries to be at 100 m depth into the Ocean, 30 cm into the sediments and 0.1 m into the soil. Particles travelling deeper are considered losses"
+        )
 
-    print("Overall mass residence time (years): " + str(round(Tov_mass_years, 1)))
+        print("Overall mass residence time (years): " + str(round(Tov_mass_years, 1)))
 
-    print(
-        "Overall particle number residence time (years): "
-        + str(round(Tov_num_years, 1))
-    )
+        print(
+            "Overall particle number residence time (years): "
+            + str(round(Tov_num_years, 1))
+        )
+    else:
+        pass
 
     # NOTE: When only one size class pressent, should the residence time be the same in particle number and in mass?? !!! TO check!!!
 
@@ -251,15 +273,25 @@ def Exposure_indicators_calculation(
         for k in tables_outputFlows:
             outputFlow_df = tables_outputFlows[k]
             sliced_df = outputFlow_df[outputFlow_df.index.str[0] == size]
-            if k in ["Urban_Soil", "Background_Soil", "Agricultural_Soil"]:
+            if k in ["Beaches_Deep_Soil", "Background_Soil", "Impacted_Soil"]:
                 systemloss_flows_size.append(
-                    sum(sliced_df.k_fragmentation)
+                    sum(
+                        [
+                            ele if type(ele) != list else sum(ele)
+                            for ele in sliced_df.k_fragmentation
+                        ]
+                    )
                     + sum(sliced_df.k_discorporation)
                     + sum(sliced_df.k_sequestration_deep_soils)
                 )
             elif k in ["Sediment_Freshwater", "Sediment_Coast"]:
                 systemloss_flows_size.append(
-                    sum(sliced_df.k_fragmentation)
+                    sum(
+                        [
+                            ele if type(ele) != list else sum(ele)
+                            for ele in sliced_df.k_fragmentation
+                        ]
+                    )
                     + sum(sliced_df.k_discorporation)
                     + sum(sliced_df.k_burial)
                 )
@@ -283,7 +315,12 @@ def Exposure_indicators_calculation(
                             )
 
                 systemloss_flows_size.append(
-                    sum(sliced_df.k_fragmentation)
+                    sum(
+                        [
+                            ele if type(ele) != list else sum(ele)
+                            for ele in sliced_df.k_fragmentation
+                        ]
+                    )
                     + sum(sliced_df.k_discorporation)
                     + sum(sliced_df.k_settling)
                     + sum(flow_mix_down)
@@ -293,7 +330,13 @@ def Exposure_indicators_calculation(
 
             elif k != "Ocean_Column_Water" and k != "Sediment_Ocean":
                 systemloss_flows_size.append(
-                    sum(sliced_df.k_fragmentation) + sum(sliced_df.k_discorporation)
+                    sum(
+                        [
+                            ele if type(ele) != list else sum(ele)
+                            for ele in sliced_df.k_fragmentation
+                        ]
+                    )
+                    + sum(sliced_df.k_discorporation)
                 )
 
             else:
@@ -302,12 +345,17 @@ def Exposure_indicators_calculation(
         Tov_size_sec = mass_sizeFraction / sum(systemloss_flows_size)
         Tov_size_days = Tov_size_sec / 86400
         Tov_size_years = Tov_size_days / 365
-        print(
-            "Overall residence time of size "
-            + str(size_dict[size])
-            + " um (years): "
-            + str(round(Tov_size_years, 2))
-        )
+
+        if print_output == "True":
+            print(
+                "Overall residence time of size "
+                + str(size_dict[size])
+                + " um (years): "
+                + str(round(Tov_size_years, 2))
+            )
+        else:
+            pass
+
         Tov_size_dict_sec[size] = Tov_size_sec
 
     return (
@@ -318,14 +366,6 @@ def Exposure_indicators_calculation(
         Tov_num_years,
         Tov_size_dict_sec,
     )
-
-
-import os
-from datetime import datetime
-import pandas as pd
-import numpy as np
-from functions.model_run import *
-from functions.generate_MPinputs_table import *
 
 
 def calculate_CTD(Pov_mass_years, Results_extended, dict_comp, Pov_num_years, CDT_comp):
@@ -360,20 +400,20 @@ def calculate_CTD(Pov_mass_years, Results_extended, dict_comp, Pov_num_years, CD
         * float(dict_comp[CDT_comp].flowVelocity_m_s)
     )
 
-    print(
-        "Characteristic travel distance (CDT) of particles mass (km) for "
-        + CDT_comp
-        + ": "
-        + str(CTD_mass_m / 1000)
-        + " km"
-    )
+    # print(
+    #     "Characteristic travel distance (CDT) of particles mass (km) for "
+    #     + CDT_comp
+    #     + ": "
+    #     + str(CTD_mass_m / 1000)
+    #     + " km"
+    # )
 
-    print(
-        "Characteristic travel distance (CDT) of particles number (km) for "
-        + CDT_comp
-        + ": "
-        + str(CTD_number_m / 1000)
-        + " km"
-    )
+    # print(
+    #     "Characteristic travel distance (CDT) of particles number (km) for "
+    #     + CDT_comp
+    #     + ": "
+    #     + str(CTD_number_m / 1000)
+    #     + " km"
+    # )
 
     return (CTD_mass_m / 1000, CTD_number_m / 1000)

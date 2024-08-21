@@ -69,8 +69,8 @@ def compartment_massBalance(
         "k_tillage",
         "k_soil_air_resuspension",
         "k_wind_trasport",
-        "k_dry_depossition",
-        "k_wet_depossition",
+        "k_dry_deposition",
+        "k_wet_deposition",
         "k_mixing",
     ]
     comp_loss_processess = loss_processess + transfer_processes
@@ -92,7 +92,7 @@ def compartment_massBalance(
     output_flows = tables_outputFlows[comp]
     # output_flows = output_flows.drop(["MP_size", "MP_form"], axis=1)
 
-    ##Take into account for dry depossition and wet depossition the sum of all output flows
+    ##Take into account for dry deposition and wet deposition the sum of all output flows
 
     for proc in output_flows:
         output_flows[proc] = output_flows[proc].apply(

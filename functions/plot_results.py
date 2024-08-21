@@ -271,12 +271,12 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
         "Sediment_Freshwater",
         "Sediment_Ocean",
         "Sediment_Coast",
-        "Urban_Soil_Surface",
-        "Urban_Soil",
+        "Beaches_Soil_Surface",
+        "Beaches_Deep_Soil",
         "Background_Soil_Surface",
         "Background_Soil",
-        "Agricultural_Soil_Surface",
-        "Agricultural_Soil",
+        "Impacted_Soil_Surface",
+        "Impacted_Soil",
         "Air",
     ]  # Replace with your desired order
 
