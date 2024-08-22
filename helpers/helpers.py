@@ -142,9 +142,10 @@ def extract_inflows_outflows(flows_dict_mass, comp, MP_form, MP_size):
     ]
     outflow_p = [round((v / sum(list_outflow_val)) * 100, 4) for v in list_outflow_val]
 
-    pd_outflows = pd.DataFrame(
-        {"Outflows": list_outflows, "Rate_g_s": list_outflow_val, "%": outflow_p}
-    )
+    pd_outflows = dict(zip(list_outflows, (list_outflow_val, outflow_p)))
+    # pd.DataFrame(
+    #     {"Outflows": list_outflows, "Rate_g_s": list_outflow_val, "%": outflow_p}
+    # )
 
     return pd_inputFlows, pd_outflows
 
