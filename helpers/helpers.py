@@ -190,3 +190,29 @@ def extract_inflows_outflows_comp(flows_dict_mass, comp):
     pd_outflows
 
     return pd_inputFlows, pd_outflows
+
+
+def generate_fsd_matrix(FI):
+    # Initialize a 5x5 matrix with zeros
+    matrix = np.zeros((5, 5))
+    c1 = 0.2
+    c2 = 0.15
+    c3 = 0.1
+
+    matrix[1, 0] = 1
+    matrix[2, 0] = 1 - FI
+    matrix[2, 1] = FI
+    if FI <= 0.5:
+        matrix[3, 1] = FI * 2 * c1
+        matrix[4, 1] = FI * 2 * c2
+        matrix[4, 2] = FI * 2 * c3
+    else:
+        matrix[3, 1] = c1 - ((FI - 0.5) * 2 * c1)
+        matrix[4, 1] = c2 - ((FI - 0.5) * 2 * c2)
+        matrix[4, 2] = c3 - ((FI - 0.5) * 2 * c3)
+    matrix[3, 0] = matrix[2, 0] + (0.5 * matrix[3, 1])
+    matrix[3, 2] = 1 - matrix[3, 0] - matrix[3, 1]
+    matrix[4, 0] = matrix[3, 0] + (0.5 * matrix[4, 1]) + (0.25 * matrix[4, 2])
+    matrix[4, 3] = 1 - matrix[4, 0] - matrix[4, 1] - matrix[4, 2]
+
+    return matrix

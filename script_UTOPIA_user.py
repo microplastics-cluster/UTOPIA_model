@@ -139,7 +139,7 @@ if N_sizeBins == 5:
         ),
     }
 
-    frag_style = "no_fragmentation"
+    frag_style = "mixed_fragmentation"
 
     fsd = frag_styles_dict[frag_style]
     sizes = [list(model_lists["dict_size_coding"].keys())]
@@ -229,7 +229,7 @@ import string
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 
-size_bin = "d"  # Chosse from size_dict
+size_bin = "b"  # Chosse from size_dict
 
 
 # Aggregation state (MP form):
@@ -419,11 +419,23 @@ df_massDistribution = mf_shorted[:10]
 df_numberDistribution = nf_shorted[:10]
 
 # Mass distribution by compartment
+mass_g = []
+paricle_number = []
 mass_frac_100 = []
 num_frac_100 = []
 mass_conc_g_m3 = []
 num_conc = []
 for comp in list(dict_comp.keys()):
+    mass_g.append(
+        sum(Results_extended[Results_extended["Compartment"] == comp]["mass_g"])
+    )
+    paricle_number.append(
+        sum(
+            Results_extended[Results_extended["Compartment"] == comp][
+                "number_of_particles"
+            ]
+        )
+    )
     mass_frac_100.append(
         sum(Results_extended[Results_extended["Compartment"] == comp]["mass_fraction"])
         * 100
@@ -451,6 +463,8 @@ for comp in list(dict_comp.keys()):
 
 mass_dist_comp = pd.DataFrame(columns=["Compartments"])
 mass_dist_comp["Compartments"] = list(dict_comp.keys())
+mass_dist_comp["mass_g"] = mass_g
+mass_dist_comp["number_of_particles"] = paricle_number
 mass_dist_comp["%_mass"] = mass_frac_100
 mass_dist_comp["%_number"] = num_frac_100
 mass_dist_comp["Concentration_g_m3"] = mass_conc_g_m3
@@ -473,33 +487,13 @@ mass_dist_comp["Concentration_num_m3"] = num_conc
 )
 
 # Decode index in input and output flow tables
-flows_dict_mass = dict()
-flows_dict_mass["input_flows"] = {}
-flows_dict_mass["output_flows"] = {}
+flows_dict_mass = generate_flows_dict(
+    tables_outputFlows, tables_inputFlows, size_dict, MP_form_dict_reverse
+)
 
-# Decode index in input and output flow tables
-for comp in tables_outputFlows.keys():
-    df1 = tables_outputFlows[comp].copy()
-    MP_size_df1 = []
-    MP_form_df1 = []
-    for x in df1.index:
-        MP_size_df1.append(size_dict[x[0]])
-        MP_form_df1.append(MP_form_dict_reverse[x[1:2]])
-
-    df1.insert(0, "MP_size", MP_size_df1)
-    df1.insert(1, "MP_form", MP_form_df1)
-    flows_dict_mass["output_flows"][comp] = df1
-
-for comp in tables_inputFlows:
-    df2 = tables_inputFlows[comp].copy()
-    MP_size_df2 = []
-    MP_form_df2 = []
-    for y in df2.index:
-        MP_size_df2.append(size_dict[y[0]])
-        MP_form_df2.append(MP_form_dict_reverse[y[1:2]])
-    df2.insert(0, "MP_size", MP_size_df2)
-    df2.insert(1, "MP_form", MP_form_df2)
-    flows_dict_mass["input_flows"][comp] = df2
+flows_dict_num = generate_flows_dict(
+    tables_outputFlows_number, tables_inputFlows_num, size_dict, MP_form_dict_reverse
+)
 
 
 ## Compartment mass balance
@@ -545,6 +539,44 @@ fig_mass, titlename_figmass = plot_fractionDistribution_heatmap(
 fig_num, titlename_fignum = plot_fractionDistribution_heatmap(
     Results_extended, fraction="number_fraction"
 )
+
+
+""" Add iput and output flows dict to results extended dataframe"""
+
+Results_extended = addFlows_to_results_df(
+    Results_extended, flows_dict_mass, flows_dict_num
+)
+
+Results_extended["Total_inflows_g_s"] = [
+    sum(Results_extended.iloc[i].inflows_g_s.values())
+    for i in range(len(Results_extended))
+]
+
+Results_extended["Total_outflows_g_s"] = [
+    sum(Results_extended.iloc[i].outflows_g_s.values())
+    for i in range(len(Results_extended))
+]
+
+Results_extended["Total_inflows_num_s"] = [
+    sum(Results_extended.iloc[i].inflows_num_s.values())
+    for i in range(len(Results_extended))
+]
+
+Results_extended["Total_outflows_num_s"] = [
+    sum(Results_extended.iloc[i].outflows_num_s.values())
+    for i in range(len(Results_extended))
+]
+
+""" Add iput and output flows dict to compartment results dataframe (mass_dist_comp)"""
+mass_dist_comp = addFlows_to_results_df_comp(
+    mass_dist_comp, flows_dict_mass, flows_dict_num
+)
+
+
+""" Add persistence and residence time to results extended dataframe"""
+
+Results_extended = calculate_persistence_residence_time(Results_extended)
+Results_extended_comp = calculate_persistence_residence_time_comp(mass_dist_comp)
 
 """ Estimate exposure indicators """
 

@@ -493,3 +493,64 @@ def calculate_persistence_residence_time(Results_extended):
     Results_extended["Persistence_time_num_years"] = persistence_number
 
     return Results_extended
+
+
+def calculate_persistence_residence_time_comp(mass_dist_comp):
+    ## Calculation of persistence and residence time of all particles (no size or MPform specification) per compartment
+    transf_list = [
+        "k_discorporation",
+        "k_fragmentation",
+        "k_heteroaggregation",
+        "k_heteroaggregate_breackup",
+        "k_biofouling",
+        "k_defouling",
+    ]
+    # For the calculation of the residence time we only take into account the transport flows as well as discorporation flows
+    residence_times_mass = []
+    residence_time_number = []
+    persistence_mass = []
+    persistence_number = []
+    for i in range(len(mass_dist_comp)):
+        if mass_dist_comp.iloc[i].mass_g == 0:
+            residence_times_mass.append(0)
+            persistence_mass.append(0)
+        else:
+            residence_times_mass.append(
+                mass_dist_comp.iloc[i].mass_g
+                / sum(
+                    [
+                        mass_dist_comp.iloc[i].outflows_g_s[c]
+                        for c in mass_dist_comp.iloc[i].outflows_g_s
+                        if c not in transf_list
+                    ]
+                )
+            )
+            persistence_mass.append(
+                mass_dist_comp.iloc[i].mass_g
+                / mass_dist_comp.iloc[i].outflows_g_s["k_discorporation"]
+            )
+        if mass_dist_comp.iloc[i].number_of_particles == 0:
+            residence_time_number.append(0)
+            persistence_number.append(0)
+        else:
+            residence_time_number.append(
+                mass_dist_comp.iloc[i].number_of_particles
+                / sum(
+                    [
+                        mass_dist_comp.iloc[i].outflows_num_s[c]
+                        for c in mass_dist_comp.iloc[i].outflows_num_s
+                        if c not in transf_list
+                    ]
+                )
+            )
+            persistence_number.append(
+                mass_dist_comp.iloc[i].number_of_particles
+                / mass_dist_comp.iloc[i].outflows_num_s["k_discorporation"]
+            )
+
+    mass_dist_comp["Residence_time_mass_years"] = residence_times_mass
+    mass_dist_comp["Residence_time_num_years"] = residence_time_number
+    mass_dist_comp["Persistence_time_mass_years"] = persistence_mass
+    mass_dist_comp["Persistence_time_num_years"] = persistence_number
+
+    return mass_dist_comp
