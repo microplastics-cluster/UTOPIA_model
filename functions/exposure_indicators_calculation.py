@@ -127,7 +127,7 @@ def Exposure_indicators_calculation(
     # NOTE! When the mass is only present in one size fraction then the Pov has to be equal to the overall Pov and mas and number Pov should be the same
 
     size_list = ["a", "b", "c", "d", "e"]
-    Pov_size_dict_sec = {}
+    Pov_size_dict_years = {}
     for size in size_list:
         discorporation_fargmentation_flows = []
         for k in tables_outputFlows:
@@ -150,7 +150,7 @@ def Exposure_indicators_calculation(
         if (
             mass_sizeFraction == 0
         ):  ## If there are no particles of a specific size fraction in the system one does not need to estimate Pov
-            Pov_size_dict_sec[size] = "NaN"
+            Pov_size_dict_years[size_dict[size]] = "NaN"
             continue
 
         Pov_size_sec = mass_sizeFraction / sum(discorporation_fargmentation_flows)
@@ -162,7 +162,7 @@ def Exposure_indicators_calculation(
         #     + " um (years): "
         #     + str(int(Pov_size_years))
         # )
-        Pov_size_dict_sec[size] = Pov_size_sec
+        Pov_size_dict_years[size_dict[size]] = Pov_size_years
 
     """ Overall residence time (years)"""
     # With the new system boundaries we acount for sequestration in deep soils and burial into coast and freshwater sediment but for the Ocean sediment we do not take burial but the settling into the ocean column water compartment as well as mixing. (We exclude the Ocean column water and ocean sediment from the system boundaries in these calculations)
@@ -258,7 +258,7 @@ def Exposure_indicators_calculation(
 
     # Overall residence time specific to each size class (mass and number independent):
 
-    Tov_size_dict_sec = {}
+    Tov_size_dict_years = {}
     for size in size_list:
 
         mass_sizeFraction = sum(
@@ -266,7 +266,7 @@ def Exposure_indicators_calculation(
         )
 
         if mass_sizeFraction == 0:
-            Tov_size_dict_sec[size] = "NaN"
+            Tov_size_dict_years[size_dict[size]] = "NaN"
             continue
 
         systemloss_flows_size = []
@@ -356,15 +356,15 @@ def Exposure_indicators_calculation(
         else:
             pass
 
-        Tov_size_dict_sec[size] = Tov_size_sec
+        Tov_size_dict_years[size_dict[size]] = Tov_size_years
 
     return (
         Pov_mass_years,
         Pov_num_years,
-        Pov_size_dict_sec,
+        Pov_size_dict_years,
         Tov_mass_years,
         Tov_num_years,
-        Tov_size_dict_sec,
+        Tov_size_dict_years,
     )
 
 

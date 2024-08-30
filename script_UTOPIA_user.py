@@ -635,10 +635,10 @@ print_output = "True"
 (
     Pov_mass_years,
     Pov_num_years,
-    Pov_size_dict_sec,
+    Pov_size_dict_years,
     Tov_mass_years,
     Tov_num_years,
-    Tov_size_dict_sec,
+    Tov_size_dict_years,
 ) = Exposure_indicators_calculation(
     tables_outputFlows,
     tables_outputFlows_number,
