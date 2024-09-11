@@ -12,6 +12,10 @@ def create_inputsTable_UTOPIA(
     thalf_deg_d_dict,
     alpha_hetr_dict,
     t_frag_gen_FreeSurfaceWater,
+    biof_frag_factor,
+    heter_frag_factor,
+    deepW_soilS_frag_factor,
+    sediment_frag_factor,
     save_op,
 ):
     compNames = model_lists["compartmentNames_list"]
@@ -53,7 +57,7 @@ def create_inputsTable_UTOPIA(
         cond = dataFrame_inputs["MPform"] == key
         dataFrame_inputs.loc[cond, "thalf_deg_d"] = thalf_deg_d_dict[key]
 
-    # Timescale for fragmentation of the 1000um size fraction (mp5): tfrag_gen_d
+    # Timescale for fragmentation of the 5000um size fraction (mp5): tfrag_gen_d
 
     "Old Assumption (Full Multi): fragmentation only occurs for free and biofouled MPs and the timescale depends on the compartment and aggregation state"
     "In UTOPIA we include fragmentation of the heteroaggregated MPs as being 100 slower than fragmentation of the Free MPs and breackup of biofouled and heteroaggregated will be two times slowed of those only heteroaggregated, following the same assumption as for free and biofouled. These values are used in the Domercq et al. 2021 paper and they are asumptions made from lack of current knowlegde"  #!Values to be revisited
@@ -67,10 +71,10 @@ def create_inputsTable_UTOPIA(
     # Fragmentation in the sediment compartments take 100 times more time than in the surface water compartments
 
     # t_frag_gen_FreeSurfaceWater = 36.5
-    factor_biofilm = 2
-    factor_heter = 100
-    factor_deepWater_soilSurface = 10
-    factor_sediment = 100
+    factor_biofilm = biof_frag_factor  # 2
+    factor_heter = heter_frag_factor  # 100
+    factor_deepWater_soilSurface = deepW_soilS_frag_factor  # 10
+    factor_sediment = sediment_frag_factor  # 100
 
     cond_frag = (
         (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
@@ -519,11 +523,13 @@ def create_inputsTable_UTOPIA(
 
 #     sandy_shoreline_km =(1.11*10**6)*0.31
 
-#     average_beach_width_m= 100 m
-#
+#     average_beach_width_m= 100 # Coastal Processes and Beaches
+# By: Andrew D. Short (Professor, School of Geosciences University of Sydney, Australia) © 2012 Nature Education
+# Citation: Short, A. D. (2012) Coastal Processes and Beaches. Nature Education Knowledge 3(10):15
+# #
 #     sandy_beaches_SA_m2 = sandy_shoreline_km * average_beach_width_m/1000
 
-#     background_land_SA_m2 = land_SA_m2 - impacted_land_SA_m2
+#     background_land_SA_m2 = land_SA_m2 - impacted_land_SA_m2-sandy_beaches_SA_m2
 
 #     flow_velocity_ocean_m_s = 0.02  # Ref: from The OECD Pov and LRTP Screening Tool (Version 2.2). F. Wegmann et al(2009), Environmental Modeling & Software 24, 228-237.
 #     flow_velocity_ocean_surace_m_s = 0.03 # For the surface layer (first 5 m depth) of the ocean water we asume a higher flow velocity due to waves action.

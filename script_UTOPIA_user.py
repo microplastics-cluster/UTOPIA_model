@@ -164,42 +164,53 @@ else:
 
 # Generate the process inputs table based on the given model structure (created model boxes, compartments and particles)
 
-## Degradation half time: thalf_deg_d
-"Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
-# Assumptions:
-# Heteroaggregated particles degrade 10 times slower than the free MPs
-# Biofouled particles degrade 5 times slower than the free MPs
+##### Define Weathering processes input parameters
 
-# thalf_deg_d_dict = {
-#     "freeMP": 5000,
-#     "heterMP": 50000,
-#     "biofMP": 25000,
-#     "heterBiofMP": 100000,
-# } #default values
+##### Degradation half time: thalf_deg_d
+
+# The model provides a default value for degradation time of Free MPs taken from Domercq et al. 2021 in the file (t_half_deg_free.csv):
+
+# The assumptions made for the definition of these degradation times: (NEW assumptions)
+#     - Heteroaggregated particles degrade 10 times slower than the free MPs
+#     - Biofouled particles degrade 2 times faster than the free MPs
+#     - Degradation rates are all the same for the different compartments??
+
+t_half_deg_free = 5000  # in days
+heter_deg_factor = 10
+biof_deg_factor = 1 / 2
+
+t_half_deg_heter = t_half_deg_free * heter_deg_factor
+t_half_deg_biof = t_half_deg_free * biof_deg_factor
+t_half_deg_biofHeter = t_half_deg_free * biof_deg_factor * heter_deg_factor
+
+thalf_deg_d_dict = {
+    "freeMP": t_half_deg_free,
+    "heterMP": t_half_deg_heter,
+    "biofMP": t_half_deg_biof,
+    "heterBiofMP": t_half_deg_biofHeter,
+}
 
 
 # t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
 # t_half_deg_df = pd.DataFrame(list(thalf_deg_d_dict.items()), columns=['MP_form', 'thalf_deg_d'])
 # t_half_deg_df.to_csv(t_half_deg_filename,index=False)
 
-
-# If user wants to modify the default thalf_deg_d_dict, they can do so here or through the csv file and upload it
-
-# Read the CSV file into a DataFrame
-t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
-t_half_deg_df = pd.read_csv(t_half_deg_filename)
-
-# Convert the DataFrame to a dictionary
-thalf_deg_d_dict = t_half_deg_df.set_index("MP_form")["thalf_deg_d"].to_dict()
-
 # Heteroaggregation attachment efficiency: alpha_heter.
 alpha_heter_filename = os.path.join(inputs_path, "alpha_heter.csv")
 alpha_heter_df = pd.read_csv(alpha_heter_filename)
 alpha_hetr_dict = alpha_heter_df.set_index("MP_form")["alpha_heter"].to_dict()
 
-# Timescale for fragmentation of the biggest size fraction (mp5) in free form in the water surface: t_frag_gen_FreeSurfaceWater
+# Timescale for fragmentation
+
+# The fragmentation timescales are deteremined from the stablished fragmentation half time of 36.5 days for the biggest size fraction in free form in the surface water compartments following the parameters chosen in Domercq et al. 2021.
+
+# In UTOPIA we include fragmentation of the heteroaggregated MPs as being 100 slower than fragmentation of the Free MPs and breackup of biofouled and heteroaggregated will be two times slowed of those only heteroaggregated, following the same assumption as for free and biofouled. These values are used in the Domercq et al. 2021 paper and they are asumptions made from lack of current knowlegde
 
 t_frag_gen_FreeSurfaceWater = 36.5  # in days
+biof_frag_factor = 2
+heter_frag_factor = 100
+deepW_soilS_frag_factor = 10
+sediment_frag_factor = 100
 
 process_inputs_df = create_inputsTable_UTOPIA(
     inputs_path,
@@ -207,7 +218,11 @@ process_inputs_df = create_inputsTable_UTOPIA(
     thalf_deg_d_dict,
     alpha_hetr_dict,
     t_frag_gen_FreeSurfaceWater,
-    save_op="notSave",
+    biof_frag_factor,
+    heter_frag_factor,
+    deepW_soilS_frag_factor,
+    sediment_frag_factor,
+    save_op="save",
 )
 
 """Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
@@ -229,7 +244,7 @@ import string
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 
-size_bin = "b"  # Chosse from size_dict
+size_bin = "e"  # Chosse from size_dict
 
 
 # Aggregation state (MP form):

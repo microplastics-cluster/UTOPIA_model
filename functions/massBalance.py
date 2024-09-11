@@ -72,6 +72,7 @@ def compartment_massBalance(
         "k_dry_deposition",
         "k_wet_deposition",
         "k_mixing",
+        "k_beaching",
     ]
     comp_loss_processess = loss_processess + transfer_processes
 
