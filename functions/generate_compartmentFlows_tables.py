@@ -285,3 +285,48 @@ def addFlows_to_results_df_comp(mass_dist_comp, flows_dict_mass, flows_dict_num)
     mass_dist_comp["outflows_num_s"] = outflows_num_list
 
     return mass_dist_comp
+
+
+def add_output_flow_conexions(
+    results_by_comp,
+    dict_comp,
+    outputflow_type="outflows_g_s",
+    inputflow_type="inflows_g_s",
+):
+    # Genrate table of output flows connexions beteen compartments to b used in the mass flow diagram (ti me developed)
+
+    outflow_conexions_g_s = []
+    for c in results_by_comp["Compartments"]:
+        conexions = dict_comp[c].connexions
+        outfows = results_by_comp[results_by_comp["Compartments"] == c][
+            outputflow_type
+        ].values[0]
+        outflow_conexions = {}
+        for key, value in conexions.items():
+            # Check if the value is a list or a single string
+            if isinstance(value, list):
+                # Create a dictionary for each element in the list
+                if c == "Ocean_Mixed_Water":
+                    inflows_col = results_by_comp[
+                        results_by_comp["Compartments"] == key
+                    ][inputflow_type].values[0]
+                    outflow_conexions[key] = {
+                        item: (
+                            inflows_col["k_" + item]
+                            if item == "mixing"
+                            else outfows["k_" + item]
+                        )
+                        for item in value
+                    }
+                else:
+                    outflow_conexions[key] = {
+                        item: outfows["k_" + item] for item in value
+                    }
+            else:
+                # If it's a single string, directly map it
+                outflow_conexions[key] = {value: outfows["k_" + value]}
+
+        # Print the modified dictionary
+        outflow_conexions_g_s.append(outflow_conexions)
+    results_by_comp["outflow_conexions_" + outputflow_type[9:]] = outflow_conexions_g_s
+    return results_by_comp

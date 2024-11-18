@@ -168,7 +168,7 @@ def sum_if_list(value):
 def plot_heatmap_RC(comp, rateConstants_df, path_RC):
     T = rateConstants_df[rateConstants_df["Compartment"] == comp]
 
-    selected_columns = T.columns[4:]
+    selected_columns = T.columns[3:]
     column1 = T["MP_form"]
     column2 = T["Size_Bin"]
 

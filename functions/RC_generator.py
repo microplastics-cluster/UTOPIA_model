@@ -29,6 +29,13 @@ def discorporation(particle, process_inputs_df):
     # Change process name from degradation
     # to discorporation from corporeal
 
+    ##discorporation should be particle size dependent so that the higuer the surface area to volume ratio of the particel the fastest the process should happen (therfore for smaller particles fagmentation should happen at faster rates)
+
+    # If we use the data from Pfohl et al. 2022 we would use a degradation rate of 6.3 x 10-6 but this is for particles of TPU-ether arom in the size range between 50-200um. We asume this value as discorporation rate for the 50 um MP plastics in free form
+
+    # k_desint_50um_h= 6.3*10**-6 #(in h-1)
+    # k_deg_free=k_desint_50um_h*(50/particle.diameter_um)
+
     """relates only to MP & NPs. Full degradation probably extremely slow
     possibly not significant for most simulations. But add anyway for scenario
     analysis or biodegradable polymers. Values currently placeholders
@@ -43,6 +50,10 @@ def discorporation(particle, process_inputs_df):
 
     # degradation rate constant
     k_deg = math.log(2) / (t_half_d * 24 * 60 * 60)
+
+    # * (
+    #     50**2 / (particle.diameter_um) ** 2
+    # )  # the discorporation rate is normalised to the surface area to volume ratio of the 50um particles since using t_half degradation rates derived from Pfohl et al. 2022 paper. this has already been included when building the table of input parameters
 
     return k_deg
 

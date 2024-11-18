@@ -14,8 +14,8 @@ def create_inputsTable_UTOPIA(
     t_frag_gen_FreeSurfaceWater,
     biof_frag_factor,
     heter_frag_factor,
-    deepW_soilS_frag_factor,
-    sediment_frag_factor,
+    factor_deepWater_soilSurface,
+    factor_sediment,
     save_op,
 ):
     compNames = model_lists["compartmentNames_list"]
@@ -51,11 +51,95 @@ def create_inputsTable_UTOPIA(
     "Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
     # Assumptions:
     # Heteroaggregated particles degrade 10 times slower than the free MPs
-    # Biofouled particles degrade 5 times slower than the free MPs
+    # Biofouled particles degrade 2 times faster than the free MPs
 
-    for key in thalf_deg_d_dict:
-        cond = dataFrame_inputs["MPform"] == key
-        dataFrame_inputs.loc[cond, "thalf_deg_d"] = thalf_deg_d_dict[key]
+    # Different degradation rates as a function of particle size--> This has been implemented in the RC_generator.py file: it is now surface area dependent ans scaled by d**2, so that smaller particles  degrade faster than bigger ones.
+
+    # Both degradation and fragmentation are compartment dependent so that in the surface water compartments fragmentation and degradation would be fastest ans slower the deeper into the water compartment and also slower in sediment and soil deeper layers than in water. This is captured by the following factors:
+    # Degradation in Air occurs 1000 times slower than in surface water compartments (NEW assimption!! Should we also put is as 0 value?? like for fragmentation? It will anyways be super small with this assumption, but maybe not so much for nano sized particles that will end up in Air...TO be discussed!)
+    factor_air = 1000
+
+    # factor_deepWater_soilSurface = deepW_soilS_frag_factor  # in deep waters and in the soil surface frag and deg are 10x slower than in the surface water
+
+    # factor_sediment = sediment_frag_factor  # in the sediment and in the soil compartments frag and deg are 100x slower than in the surface water compartments
+
+    # Define compartments by type
+
+    surface_water_compartments = [
+        "Ocean_Surface_Water",
+        "Coast_Surface_Water",
+        "Surface_Freshwater",
+    ]
+    deepWater_surfaceSoil_compartments = [
+        "Ocean_Mixed_Water",
+        "Ocean_Column_Water",
+        "Coast_Column_Water",
+        "Bulk_Freshwater",
+        "Beaches_Soil_Surface",
+        "Impacted_Soil_Surface",
+        "Background_Soil_Surface",
+    ]
+    sediment_deepSoil_compartments = [
+        "Sediment_Freshwater",
+        "Sediment_Ocean",
+        "Sediment_Coast",
+        "Beaches_Deep_Soil",
+        "Background_Soil",
+        "Impacted_Soil",
+    ]
+    MP_size_deg_factors = {
+        "mp1": (0.5**2) / (50**2),
+        "mp2": (5**2) / (50**2),
+        "mp3": (50**2) / (50**2),
+        "mp4": (500**2) / (50**2),
+        "mp5": (5000**2) / (50**2),
+    }
+    for c in compNames:
+        if c in surface_water_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor
+                    )
+
+        elif c in deepWater_surfaceSoil_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_deepWater_soilSurface * factor
+                    )
+        elif c in sediment_deepSoil_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_sediment * factor
+                    )
+        elif c == "Air":
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_air * factor
+                    )
 
     # Timescale for fragmentation of the 5000um size fraction (mp5): tfrag_gen_d
 
@@ -73,8 +157,8 @@ def create_inputsTable_UTOPIA(
     # t_frag_gen_FreeSurfaceWater = 36.5
     factor_biofilm = biof_frag_factor  # 2
     factor_heter = heter_frag_factor  # 100
-    factor_deepWater_soilSurface = deepW_soilS_frag_factor  # 10
-    factor_sediment = sediment_frag_factor  # 100
+    # factor_deepWater_soilSurface = deepW_soilS_frag_factor  # 10
+    # factor_sediment = sediment_frag_factor  # 100
 
     cond_frag = (
         (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
