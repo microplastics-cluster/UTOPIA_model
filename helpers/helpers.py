@@ -142,8 +142,77 @@ def extract_inflows_outflows(flows_dict_mass, comp, MP_form, MP_size):
     ]
     outflow_p = [round((v / sum(list_outflow_val)) * 100, 4) for v in list_outflow_val]
 
+    pd_outflows = dict(zip(list_outflows, (list_outflow_val, outflow_p)))
+    # pd.DataFrame(
+    #     {"Outflows": list_outflows, "Rate_g_s": list_outflow_val, "%": outflow_p}
+    # )
+
+    return pd_inputFlows, pd_outflows
+
+
+def extract_inflows_outflows_comp(flows_dict_mass, comp):
+
+    # function to extract the input and output flows of the system (per compartmet)
+
+    # extract inflows
+    df_i = flows_dict_mass["input_flows"][comp]
+    df_ii = df_i.drop(["MP_size", "MP_form"], axis=1)
+    list_iflows = [k for k in df_ii]
+    list_iflows
+    list_inflow_val = [sum(df_ii[col]) for col in list_iflows]
+    inflow_p = [round((v / sum(list_inflow_val)) * 100, 4) for v in list_inflow_val]
+    pd_inputFlows = pd.DataFrame(
+        {"Inflows": list_iflows, "Rate_g_s": list_inflow_val, "%": inflow_p}
+    )
+    pd_inputFlows = pd.DataFrame(
+        {"Inflows": list_iflows, "Rate_g_s": list_inflow_val, "%": inflow_p}
+    )
+
+    # extract outflows
+    df_o = flows_dict_mass["output_flows"][comp]
+    df_o.reset_index(drop=True, inplace=True)
+    df_oo = df_o.drop(["MP_size", "MP_form"], axis=1)
+
+    outflow_val = [
+        sum(df_oo[ko]) if type(df_oo[ko][0]) != list else sum(df_oo[ko][0])
+        for ko in df_oo
+    ]
+    list_outflows = [
+        df_oo.columns[i] for i in range(len(df_oo.columns)) if outflow_val[i] != 0
+    ]
+    list_outflow_val = [val for val in outflow_val if val != 0]
+
+    outflow_p = [round((v / sum(list_outflow_val)) * 100, 4) for v in list_outflow_val]
+
     pd_outflows = pd.DataFrame(
         {"Outflows": list_outflows, "Rate_g_s": list_outflow_val, "%": outflow_p}
     )
+    pd_outflows
 
     return pd_inputFlows, pd_outflows
+
+
+def generate_fsd_matrix(FI):
+    # Initialize a 5x5 matrix with zeros
+    matrix = np.zeros((5, 5))
+    c1 = 0.2
+    c2 = 0.15
+    c3 = 0.1
+
+    matrix[1, 0] = 1
+    matrix[2, 0] = 1 - FI
+    matrix[2, 1] = FI
+    if FI <= 0.5:
+        matrix[3, 1] = FI * 2 * c1
+        matrix[4, 1] = FI * 2 * c2
+        matrix[4, 2] = FI * 2 * c3
+    else:
+        matrix[3, 1] = c1 - ((FI - 0.5) * 2 * c1)
+        matrix[4, 1] = c2 - ((FI - 0.5) * 2 * c2)
+        matrix[4, 2] = c3 - ((FI - 0.5) * 2 * c3)
+    matrix[3, 0] = matrix[2, 0] + (0.5 * matrix[3, 1])
+    matrix[3, 2] = 1 - matrix[3, 0] - matrix[3, 1]
+    matrix[4, 0] = matrix[3, 0] + (0.5 * matrix[4, 1]) + (0.25 * matrix[4, 2])
+    matrix[4, 3] = 1 - matrix[4, 0] - matrix[4, 1] - matrix[4, 2]
+
+    return matrix

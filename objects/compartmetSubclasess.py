@@ -13,15 +13,15 @@ UTOPIA_water_compartments = [
 ]
 
 UTOPIA_deep_soil_compartments = [
-    "Urban_Soil",
+    "Beaches_Deep_Soil",
     "Background_Soil",
-    "Agricultural_Soil",
+    "Impacted_Soil",
 ]
 
 UTOPIA_soil_surface_compartments = [
-    "Urban_Soil_Surface",
+    "Beaches_Soil_Surface",
     "Background_Soil_Surface",
-    "Agricultural_Soil_Surface",
+    "Impacted_Soil_Surface",
 ]
 
 UTOPIA_sediment_compartment = [
@@ -143,31 +143,6 @@ class compartment_sediment(Compartment):
         ]
 
 
-# class compartment_soil(Compartment):
-#     def __init__(
-#         self,
-#         Cname,
-#         infiltration_capacity=0.25,  # from SimpleBox(4plastics)
-#         precipitation_rate=2.22 * 1**-8,  # from SimpleBox(4plastics)
-#         soilPore_waterVolume_m3=None,
-#         Cdepth_m=None,
-#         Clength_m=None,
-#         Cwidth_m=None,
-#         Cvolume_m3=None,
-#         CsurfaceArea_m2=None,
-#     ):
-#         super().__init__(
-#             Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
-#         )
-#         self.processess = [
-#             "discorporation",
-#             "fragmentation"
-#         ]
-#         self.infiltration_capacity = infiltration_capacity
-#         self.precipitation_rate = precipitation_rate
-#         self.soilPore_waterVolume_m3 = soilPore_waterVolume_m3
-
-
 class compartment_soil_surface(Compartment):
     def __init__(
         self,
@@ -246,25 +221,7 @@ class compartment_air(Compartment):
             "discorporation",
             "fragmentation",
             "wind_trasport",
-            "dry_depossition",
-            "wet_depossition",
+            "dry_deposition",
+            "wet_deposition",
         ]
         # shall we also include heteroaggregation/heteroaggegrate break-up processess in the air compartment?
-
-
-class compartment_FullMulti_water(Compartment):
-    def __init__(
-        self,
-        Cname,
-        Cdepth_m=None,
-        Clength_m=None,
-        Cwidth_m=None,
-        Cvolume_m3=None,
-        CsurfaceArea_m2=None,
-    ):
-        super().__init__(
-            Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
-        )
-
-
-# distinguish between dissolution and discorporation (agein?) and add as an extra process?

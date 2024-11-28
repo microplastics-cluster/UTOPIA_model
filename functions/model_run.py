@@ -14,7 +14,6 @@ from functions.solver_SteadyState import *
 from functions.extract_results import *
 from functions.plot_results import *
 from functions.massBalance import *
-from functions.fill_interactions_Knames import *
 from functions.exposure_indicators_calculation import *
 from functions.save_results import *
 from functions.generate_compartmentFlows_tables import *

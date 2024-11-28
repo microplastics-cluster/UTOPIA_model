@@ -133,7 +133,7 @@ def emission_fractions_calculations(
         "Ocean_Surface_Water",
         "Ocean_Column_Water",
         "Sediment_Ocean",
-        "Background_Soil_Surface",
+        "Beaches_Soil_Surface",
     ]
 
     for target_remote_comp in target_remote_comp_List:
@@ -306,7 +306,7 @@ def plot_emission_fractions_multi(emission_fractions_data_list, emiss_comp_list)
         "φ2_Ocean_Surface_Water": "blue",
         "φ2_Ocean_Column_Water": "green",
         "φ2_Sediment_Ocean": "orange",
-        "φ2_Background_Soil_Surface": "purple",
+        "φ2_Beaches_Soil_Surface": "purple",
     }
 
     fig, axs = plt.subplots(
@@ -328,7 +328,7 @@ def plot_emission_fractions_multi(emission_fractions_data_list, emiss_comp_list)
                 "φ2_Ocean_Surface_Water",
                 "φ2_Ocean_Column_Water",
                 "φ2_Sediment_Ocean",
-                "φ2_Background_Soil_Surface",
+                "φ2_Beaches_Soil_Surface",
             ],
         }
         df = pd.DataFrame(data)

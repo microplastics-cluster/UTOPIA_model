@@ -1,4 +1,5 @@
 # function to organise results into a dictionary of compartments, each compartment containing a dictionary of aggregation states, of wich contain number of particles per size fraction
+import pandas as pd
 
 
 def extract_by_comp(Results, particle_compartmentCoding):
@@ -88,3 +89,64 @@ def results_subset(Results_df, crit, cond):
     #     else:
     out_df = Results_df[Results_df[crit] == cond]
     return out_df
+
+
+def extract_results_by_compartment(Results_extended, dict_comp):
+    mass_g = []
+    particle_number = []
+    mass_frac_100 = []
+    num_frac_100 = []
+    mass_conc_g_m3 = []
+    num_conc = []
+    for comp in list(dict_comp.keys()):
+        mass_g.append(
+            sum(Results_extended[Results_extended["Compartment"] == comp]["mass_g"])
+        )
+        particle_number.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == comp][
+                    "number_of_particles"
+                ]
+            )
+        )
+        mass_frac_100.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == comp][
+                    "mass_fraction"
+                ]
+            )
+            * 100
+        )
+        num_frac_100.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == comp][
+                    "number_fraction"
+                ]
+            )
+            * 100
+        )
+        mass_conc_g_m3.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == comp][
+                    "concentration_g_m3"
+                ]
+            )
+        )
+        num_conc.append(
+            sum(
+                Results_extended[Results_extended["Compartment"] == comp][
+                    "concentration_num_m3"
+                ]
+            )
+        )
+
+    mass_dist_comp = pd.DataFrame(columns=["Compartments"])
+    mass_dist_comp["Compartments"] = list(dict_comp.keys())
+    mass_dist_comp["mass_g"] = mass_g
+    mass_dist_comp["number_of_particles"] = particle_number
+    mass_dist_comp["%_mass"] = mass_frac_100
+    mass_dist_comp["%_number"] = num_frac_100
+    mass_dist_comp["Concentration_g_m3"] = mass_conc_g_m3
+    mass_dist_comp["Concentration_num_m3"] = num_conc
+
+    return mass_dist_comp

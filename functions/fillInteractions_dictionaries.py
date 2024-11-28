@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 
 
-def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList, surfComp_list):
+def fillInteractions_fun_OOP_dict(
+    system_particle_object_list, SpeciesList, surfComp_list
+):
     # Asign loose rates
     elimination_rates = eliminationProcesses(system_particle_object_list, SpeciesList)
 
@@ -15,7 +17,7 @@ def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList, surfComp_
 
     for sp1 in system_particle_object_list:
         interactions_df_rows.append(
-            interactionProcess(
+            interactionProcess_dict(
                 sp1, interactions_df, system_particle_object_list, surfComp_list
             )
         )
@@ -31,6 +33,7 @@ def fillInteractions_fun_OOP(system_particle_object_list, SpeciesList, surfComp_
 
 def eliminationProcesses(system_particle_object_list, SpeciesList):
     # Estimate losses (diagonal):the diagonal of the dataframe corresponds to the losses of each species
+    # Add soil_convection as elimination process from deep soil compartments
 
     """create the array of values for the diagonal wich is the sum of all RC corresponding to one species:"""
 
@@ -72,7 +75,7 @@ def eliminationProcesses(system_particle_object_list, SpeciesList):
     return diag_list
 
 
-def inboxProcess(sp1, sp2, surfComp_list):
+def inboxProcess_dict(sp1, sp2, surfComp_list):
     # If same compartment (compartment processes)
     if sp1.Pcode[2:] == sp2.Pcode[2:]:
         # Only different size bins --> Fragmentation
@@ -91,9 +94,11 @@ def inboxProcess(sp1, sp2, surfComp_list):
             if type(sp2.RateConstants["k_fragmentation"]) is tuple:
                 frag = sp2.RateConstants["k_fragmentation"]
 
-                sol = frag[0][fsd_index]
+                sol = {"k_fragmentation": frag[0][fsd_index]}
             else:
-                sol = sp2.RateConstants["k_fragmentation"][fsd_index]
+                sol = {
+                    "k_fragmentation": sp2.RateConstants["k_fragmentation"][fsd_index]
+                }
 
         # Different aggergation states (same size)--> heteroagg, biofouling,defouling and agg-breackup
 
@@ -104,7 +109,7 @@ def inboxProcess(sp1, sp2, surfComp_list):
             ):
                 process = "heteroaggregation"
                 if process in sp2.Pcompartment.processess:
-                    sol = sp2.RateConstants["k_" + process]
+                    sol = {"K_heteroaggregation": sp2.RateConstants["k_" + process]}
                 else:
                     sol = 0
 
@@ -114,7 +119,9 @@ def inboxProcess(sp1, sp2, surfComp_list):
             ):
                 process = "heteroaggregate_breackup"
                 if process in sp2.Pcompartment.processess:
-                    sol = sp2.RateConstants["k_" + process]
+                    sol = {
+                        "k_heteroaggregate_breackup": sp2.RateConstants["k_" + process]
+                    }
                 else:
                     sol = 0
 
@@ -124,7 +131,7 @@ def inboxProcess(sp1, sp2, surfComp_list):
             ):
                 process = "biofouling"
                 if process in sp2.Pcompartment.processess:
-                    sol = sp2.RateConstants["k_" + process]
+                    sol = {"k_biofouling": sp2.RateConstants["k_" + process]}
                 else:
                     sol = 0
 
@@ -134,7 +141,7 @@ def inboxProcess(sp1, sp2, surfComp_list):
             ):
                 process = "defouling"
                 if process in sp2.Pcompartment.processess:
-                    sol = sp2.RateConstants["k_" + process]
+                    sol = {"k_defouling": sp2.RateConstants["k_" + process]}
                 else:
                     sol = 0
 
@@ -157,56 +164,47 @@ def inboxProcess(sp1, sp2, surfComp_list):
         if sp1.Pcode[:2] == sp2.Pcode[:2]:
             process = sp2.Pcompartment.connexions[sp1.Pcompartment.Cname]
             if type(process) == list:
-                sol2 = []
+                sol2 = {}
                 for p in process:
                     if (
-                        p == "dry_depossition"
+                        p == "dry_deposition"
                     ):  # Select the rate corresponding to the recieving compartment dictated by surfComp_dict
-                        sol2.append(
-                            sp2.RateConstants["k_" + p][
-                                surfComp_dict[sp1.Pcompartment.Cname]
-                            ]
-                        )
+                        sol2["k_" + p] = sp2.RateConstants["k_" + p][
+                            surfComp_dict[sp1.Pcompartment.Cname]
+                        ]
 
-                    elif (
-                        p == "mixing"
-                    ):  ##To be implemented (mixing is still turned off)
-                        if type(sp2.RateConstants["k_" + p]) == dict:
+                    elif p == "mixing":
+                        if type(sp2.RateConstants["k_" + p]) == list:
                             if sp1.Pcompartment.Cname == "Ocean_Surface_Water":
-                                sol2.append(
-                                    sp2.RateConstants["k_" + p]["mix_up"]
-                                    * float(sp1.Pcompartment.Cvolume_m3)
-                                    / float(sp2.Pcompartment.Cvolume_m3)
-                                )
+                                sol2["k_" + p] = sp2.RateConstants["k_" + p][0]
 
                             elif sp1.Pcompartment.Cname == "Ocean_Column_Water":
-                                sol2.append(
-                                    sp2.RateConstants["k_" + p]["mix_down"]
-                                    * float(sp1.Pcompartment.Cvolume_m3)
-                                    / float(sp2.Pcompartment.Cvolume_m3)
-                                )
+                                sol2["k_" + p] = sp2.RateConstants["k_" + p][1]
                         else:
-                            sol2.append(
-                                sp2.RateConstants["k_" + p]
-                                * float(sp1.Pcompartment.Cvolume_m3)
-                                / float(sp2.Pcompartment.Cvolume_m3)
-                            )
+                            sol2["k_" + p] = sp2.RateConstants["k_" + p]
 
                     else:
-                        sol2.append(sp2.RateConstants["k_" + p])
-                sol = sum(sol2)
+                        sol2["k_" + p] = sp2.RateConstants["k_" + p]
+                sol = sol2
             else:
                 if process == "runoff_transport":
-                    """Seems to not work properly needs to be revisited"""
+
                     # Runoff can happen from soil surface to freshwater surface and to coast surface water and it will happen in different proportions. we stablish the fraction that goes into each water body through fdd : the matrix containing the fractions of the runoff of each surface soil type that goes into each surface water body (only coast and freshwater)
+                    if type(sp2.RateConstants["k_" + process]) != int:
+                        recieving_comp = {
+                            "Coast_Surface_Water": 0,
+                            "Surface_Freshwater": 1,
+                        }
 
-                    recieving_comp = {"Coast_Surface_Water": 0, "Surface_Freshwater": 1}
-
-                    sol = sp2.RateConstants["k_" + process][
-                        recieving_comp[sp1.Pcompartment.Cname]
-                    ]
+                        sol = {
+                            "k_runoff_transport": sp2.RateConstants["k_" + process][
+                                recieving_comp[sp1.Pcompartment.Cname]
+                            ]
+                        }
+                    else:
+                        sol = {"k_" + process: sp2.RateConstants["k_" + process]}
                 else:
-                    sol = sp2.RateConstants["k_" + process]
+                    sol = {"k_" + process: sp2.RateConstants["k_" + process]}
         else:
             sol = 0
     else:
@@ -215,7 +213,7 @@ def inboxProcess(sp1, sp2, surfComp_list):
     return sol
 
 
-def interactionProcess(
+def interactionProcess_dict(
     sp1, interactions_df, system_particle_object_list, surfComp_list
 ):
     sol = []
@@ -229,7 +227,7 @@ def interactionProcess(
             # Same box (i.e. river section RS)--> In box processes
 
             if sp1.Pcode.split("_")[1] == sp2.Pcode.split("_")[1]:
-                sol.append(inboxProcess(sp1, sp2, surfComp_list))
+                sol.append(inboxProcess_dict(sp1, sp2, surfComp_list))
 
             # Different Box but same particle in same compartment (Full Multi version where more than 1 box (i.e. river sections)) -->Transport (advection or sediment transport determined by flow_connectivity file)
 

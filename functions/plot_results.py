@@ -168,7 +168,7 @@ def sum_if_list(value):
 def plot_heatmap_RC(comp, rateConstants_df, path_RC):
     T = rateConstants_df[rateConstants_df["Compartment"] == comp]
 
-    selected_columns = T.columns[4:]
+    selected_columns = T.columns[3:]
     column1 = T["MP_form"]
     column2 = T["Size_Bin"]
 
@@ -271,12 +271,12 @@ def plot_fractionDistribution_heatmap(Results_extended, fraction):
         "Sediment_Freshwater",
         "Sediment_Ocean",
         "Sediment_Coast",
-        "Urban_Soil_Surface",
-        "Urban_Soil",
+        "Beaches_Soil_Surface",
+        "Beaches_Deep_Soil",
         "Background_Soil_Surface",
         "Background_Soil",
-        "Agricultural_Soil_Surface",
-        "Agricultural_Soil",
+        "Impacted_Soil_Surface",
+        "Impacted_Soil",
         "Air",
     ]  # Replace with your desired order
 

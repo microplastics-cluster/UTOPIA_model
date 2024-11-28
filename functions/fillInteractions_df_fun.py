@@ -161,7 +161,7 @@ def inboxProcess(sp1, sp2, surfComp_list):
                 sol2 = []
                 for p in process:
                     if (
-                        p == "dry_depossition"
+                        p == "dry_deposition"
                     ):  # Select the rate corresponding to the recieving compartment dictated by surfComp_dict
                         sol2.append(
                             sp2.RateConstants["k_" + p][

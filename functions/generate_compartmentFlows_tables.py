@@ -68,7 +68,7 @@ def estimate_inFlows(
                     ]
 
                     for proc in inpProc:
-                        if proc == "dry_depossition":
+                        if proc == "dry_deposition":
                             position = surfComp_list.index(comp)
                             df_inflows["k_" + proc] = df_inflows["k_" + proc].apply(
                                 lambda x: x[position] if isinstance(x, list) else x
@@ -150,3 +150,183 @@ def estimate_inFlows(
         tables_inputFlows[comp] = pd.concat(comp_input_flows).fillna(0)
         tables_inputFlows_num[comp] = pd.concat(comp_input_flows_num).fillna(0)
     return tables_inputFlows, tables_inputFlows_num
+
+
+def generate_flows_dict(
+    tables_outputFlows, tables_inputFlows, size_dict, MP_form_dict_reverse
+):
+    flows_dict = dict()
+    flows_dict["input_flows"] = {}
+    flows_dict["output_flows"] = {}
+
+    # Decode index in input and output flow tables
+    for comp in tables_outputFlows.keys():
+        df1 = tables_outputFlows[comp].copy()
+        MP_size_df1 = []
+        MP_form_df1 = []
+        for x in df1.index:
+            MP_size_df1.append(size_dict[x[0]])
+            MP_form_df1.append(MP_form_dict_reverse[x[1:2]])
+
+        df1.insert(0, "MP_size", MP_size_df1)
+        df1.insert(1, "MP_form", MP_form_df1)
+        flows_dict["output_flows"][comp] = df1
+
+    for comp in tables_inputFlows:
+        df2 = tables_inputFlows[comp].copy()
+        MP_size_df2 = []
+        MP_form_df2 = []
+        for y in df2.index:
+            MP_size_df2.append(size_dict[y[0]])
+            MP_form_df2.append(MP_form_dict_reverse[y[1:2]])
+        df2.insert(0, "MP_size", MP_size_df2)
+        df2.insert(1, "MP_form", MP_form_df2)
+        flows_dict["input_flows"][comp] = df2
+
+    return flows_dict
+
+
+# Function to handle summing lists and individual elements
+def handle_value(value):
+    if isinstance(value, list):
+        return sum(value)
+    return value
+
+
+def sum_column_values(column):
+    return sum(handle_value(value) for value in column)
+
+
+def process_flows(compartment, size_fraction, mp_form, flow_type, flows_dict):
+    """Process flows (inflows or outflows) for a given compartment, size fraction, and MP form."""
+    df_comp = flows_dict[flow_type][compartment]
+    df_filtered = df_comp[
+        (df_comp["MP_form"] == mp_form) & (df_comp["MP_size"] == size_fraction)
+    ]
+    df_cleaned = df_filtered.drop(["MP_size", "MP_form"], axis=1)
+    return {col: sum_column_values(df_cleaned[col]) for col in df_cleaned.columns}
+
+
+def process_flows_comp(compartment, flow_type, flows_dict):
+    """Process flows (inflows or outflows) for a given compartment"""
+    df_comp = flows_dict[flow_type][compartment]
+    df_cleaned = df_comp.drop(["MP_size", "MP_form"], axis=1)
+
+    return {col: sum_column_values(df_cleaned[col]) for col in df_cleaned.columns}
+
+
+def addFlows_to_results_df(Results_extended, flows_dict_mass, flows_dict_num):
+    """Calculate inflows and outflows (mass and number) and update Results_extended."""
+    inflows_mass_list = []
+    inflows_num_list = []
+    outflows_mass_list = []
+    outflows_num_list = []
+
+    for n in range(len(Results_extended)):
+        compartment = Results_extended.iloc[n]["Compartment"]
+        size_fraction = Results_extended.iloc[n]["Size_Fraction_um"]
+        mp_form = Results_extended.iloc[n]["MP_Form"]
+
+        # Calculate inflows and outflows for mass
+        inflows_mass = process_flows(
+            compartment, size_fraction, mp_form, "input_flows", flows_dict_mass
+        )
+        outflows_mass = process_flows(
+            compartment, size_fraction, mp_form, "output_flows", flows_dict_mass
+        )
+        inflows_mass_list.append(inflows_mass)
+        outflows_mass_list.append(outflows_mass)
+
+        # Calculate inflows and outflows for number
+        inflows_num = process_flows(
+            compartment, size_fraction, mp_form, "input_flows", flows_dict_num
+        )
+        outflows_num = process_flows(
+            compartment, size_fraction, mp_form, "output_flows", flows_dict_num
+        )
+        inflows_num_list.append(inflows_num)
+        outflows_num_list.append(outflows_num)
+
+    # Update the Results_extended DataFrame with the calculated flows
+    Results_extended["inflows_g_s"] = inflows_mass_list
+    Results_extended["inflows_num_s"] = inflows_num_list
+    Results_extended["outflows_g_s"] = outflows_mass_list
+    Results_extended["outflows_num_s"] = outflows_num_list
+
+    return Results_extended
+
+
+def addFlows_to_results_df_comp(mass_dist_comp, flows_dict_mass, flows_dict_num):
+    """Calculate inflows and outflows (mass and number) and update Results_extended."""
+    inflows_mass_list = []
+    inflows_num_list = []
+    outflows_mass_list = []
+    outflows_num_list = []
+
+    for n in range(len(mass_dist_comp)):
+        compartment = mass_dist_comp.iloc[n]["Compartments"]
+
+        # Calculate inflows and outflows for mass
+        inflows_mass = process_flows_comp(compartment, "input_flows", flows_dict_mass)
+        outflows_mass = process_flows_comp(compartment, "output_flows", flows_dict_mass)
+        inflows_mass_list.append(inflows_mass)
+        outflows_mass_list.append(outflows_mass)
+
+        # Calculate inflows and outflows for number
+        inflows_num = process_flows_comp(compartment, "input_flows", flows_dict_num)
+        outflows_num = process_flows_comp(compartment, "output_flows", flows_dict_num)
+        inflows_num_list.append(inflows_num)
+        outflows_num_list.append(outflows_num)
+
+    # Update the Results_extended DataFrame with the calculated flows
+    mass_dist_comp["inflows_g_s"] = inflows_mass_list
+    mass_dist_comp["inflows_num_s"] = inflows_num_list
+    mass_dist_comp["outflows_g_s"] = outflows_mass_list
+    mass_dist_comp["outflows_num_s"] = outflows_num_list
+
+    return mass_dist_comp
+
+
+def add_output_flow_conexions(
+    results_by_comp,
+    dict_comp,
+    outputflow_type="outflows_g_s",
+    inputflow_type="inflows_g_s",
+):
+    # Genrate table of output flows connexions beteen compartments to b used in the mass flow diagram (ti me developed)
+
+    outflow_conexions_g_s = []
+    for c in results_by_comp["Compartments"]:
+        conexions = dict_comp[c].connexions
+        outfows = results_by_comp[results_by_comp["Compartments"] == c][
+            outputflow_type
+        ].values[0]
+        outflow_conexions = {}
+        for key, value in conexions.items():
+            # Check if the value is a list or a single string
+            if isinstance(value, list):
+                # Create a dictionary for each element in the list
+                if c == "Ocean_Mixed_Water":
+                    inflows_col = results_by_comp[
+                        results_by_comp["Compartments"] == key
+                    ][inputflow_type].values[0]
+                    outflow_conexions[key] = {
+                        item: (
+                            inflows_col["k_" + item]
+                            if item == "mixing"
+                            else outfows["k_" + item]
+                        )
+                        for item in value
+                    }
+                else:
+                    outflow_conexions[key] = {
+                        item: outfows["k_" + item] for item in value
+                    }
+            else:
+                # If it's a single string, directly map it
+                outflow_conexions[key] = {value: outfows["k_" + value]}
+
+        # Print the modified dictionary
+        outflow_conexions_g_s.append(outflow_conexions)
+    results_by_comp["outflow_conexions_" + outputflow_type[9:]] = outflow_conexions_g_s
+    return results_by_comp

@@ -12,6 +12,11 @@ def create_inputsTable_UTOPIA(
     thalf_deg_d_dict,
     alpha_hetr_dict,
     t_frag_gen_FreeSurfaceWater,
+    biof_frag_factor,
+    heter_frag_factor,
+    factor_deepWater_soilSurface,
+    factor_sediment,
+    save_op,
 ):
     compNames = model_lists["compartmentNames_list"]
     mpFormsLabels = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
@@ -46,13 +51,97 @@ def create_inputsTable_UTOPIA(
     "Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
     # Assumptions:
     # Heteroaggregated particles degrade 10 times slower than the free MPs
-    # Biofouled particles degrade 5 times slower than the free MPs
+    # Biofouled particles degrade 2 times faster than the free MPs
 
-    for key in thalf_deg_d_dict:
-        cond = dataFrame_inputs["MPform"] == key
-        dataFrame_inputs.loc[cond, "thalf_deg_d"] = thalf_deg_d_dict[key]
+    # Different degradation rates as a function of particle size--> This has been implemented in the RC_generator.py file: it is now surface area dependent ans scaled by d**2, so that smaller particles  degrade faster than bigger ones.
 
-    # Timescale for fragmentation of the 1000um size fraction (mp5): tfrag_gen_d
+    # Both degradation and fragmentation are compartment dependent so that in the surface water compartments fragmentation and degradation would be fastest ans slower the deeper into the water compartment and also slower in sediment and soil deeper layers than in water. This is captured by the following factors:
+    # Degradation in Air occurs 1000 times slower than in surface water compartments (NEW assimption!! Should we also put is as 0 value?? like for fragmentation? It will anyways be super small with this assumption, but maybe not so much for nano sized particles that will end up in Air...TO be discussed!)
+    factor_air = 1000
+
+    # factor_deepWater_soilSurface = deepW_soilS_frag_factor  # in deep waters and in the soil surface frag and deg are 10x slower than in the surface water
+
+    # factor_sediment = sediment_frag_factor  # in the sediment and in the soil compartments frag and deg are 100x slower than in the surface water compartments
+
+    # Define compartments by type
+
+    surface_water_compartments = [
+        "Ocean_Surface_Water",
+        "Coast_Surface_Water",
+        "Surface_Freshwater",
+    ]
+    deepWater_surfaceSoil_compartments = [
+        "Ocean_Mixed_Water",
+        "Ocean_Column_Water",
+        "Coast_Column_Water",
+        "Bulk_Freshwater",
+        "Beaches_Soil_Surface",
+        "Impacted_Soil_Surface",
+        "Background_Soil_Surface",
+    ]
+    sediment_deepSoil_compartments = [
+        "Sediment_Freshwater",
+        "Sediment_Ocean",
+        "Sediment_Coast",
+        "Beaches_Deep_Soil",
+        "Background_Soil",
+        "Impacted_Soil",
+    ]
+    MP_size_deg_factors = {
+        "mp1": (0.5**2) / (50**2),
+        "mp2": (5**2) / (50**2),
+        "mp3": (50**2) / (50**2),
+        "mp4": (500**2) / (50**2),
+        "mp5": (5000**2) / (50**2),
+    }
+    for c in compNames:
+        if c in surface_water_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor
+                    )
+
+        elif c in deepWater_surfaceSoil_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_deepWater_soilSurface * factor
+                    )
+        elif c in sediment_deepSoil_compartments:
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_sediment * factor
+                    )
+        elif c == "Air":
+            for key in thalf_deg_d_dict:
+                for size, factor in MP_size_deg_factors.items():
+                    cond = (
+                        (dataFrame_inputs["MPform"] == key)
+                        & (dataFrame_inputs["Compartment"] == c)
+                        & (dataFrame_inputs["sizeBin"] == size)
+                    )
+                    dataFrame_inputs.loc[cond, "thalf_deg_d"] = (
+                        thalf_deg_d_dict[key] * factor_air * factor
+                    )
+
+    # Timescale for fragmentation of the 5000um size fraction (mp5): tfrag_gen_d
 
     "Old Assumption (Full Multi): fragmentation only occurs for free and biofouled MPs and the timescale depends on the compartment and aggregation state"
     "In UTOPIA we include fragmentation of the heteroaggregated MPs as being 100 slower than fragmentation of the Free MPs and breackup of biofouled and heteroaggregated will be two times slowed of those only heteroaggregated, following the same assumption as for free and biofouled. These values are used in the Domercq et al. 2021 paper and they are asumptions made from lack of current knowlegde"  #!Values to be revisited
@@ -66,10 +155,10 @@ def create_inputsTable_UTOPIA(
     # Fragmentation in the sediment compartments take 100 times more time than in the surface water compartments
 
     # t_frag_gen_FreeSurfaceWater = 36.5
-    factor_biofilm = 2
-    factor_heter = 100
-    factor_deepWater_soilSurface = 10
-    factor_sediment = 100
+    factor_biofilm = biof_frag_factor  # 2
+    factor_heter = heter_frag_factor  # 100
+    # factor_deepWater_soilSurface = deepW_soilS_frag_factor  # 10
+    # factor_sediment = sediment_frag_factor  # 100
 
     cond_frag = (
         (dataFrame_inputs["Compartment"] == "Ocean_Surface_Water")
@@ -145,10 +234,10 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
@@ -173,10 +262,10 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
@@ -200,10 +289,10 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
@@ -227,13 +316,13 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Bulk_Freshwater")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Agricultural_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Background_Soil_Surface")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil_Surface")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -254,13 +343,13 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Deep_Soil")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil")
         & (dataFrame_inputs["MPform"] == "freeMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -278,13 +367,13 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Deep_Soil")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil")
         & (dataFrame_inputs["MPform"] == "biofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -302,13 +391,13 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Deep_Soil")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil")
         & (dataFrame_inputs["MPform"] == "heterMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -326,13 +415,13 @@ def create_inputsTable_UTOPIA(
         | (dataFrame_inputs["Compartment"] == "Sediment_Coast")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Urban_Soil")
+        | (dataFrame_inputs["Compartment"] == "Beaches_Deep_Soil")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
         | (dataFrame_inputs["Compartment"] == "Background_Soil")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
-        | (dataFrame_inputs["Compartment"] == "Agricultural_Soil")
+        | (dataFrame_inputs["Compartment"] == "Impacted_Soil")
         & (dataFrame_inputs["MPform"] == "heterBiofMP")
         & (dataFrame_inputs["sizeBin"] == "mp5")
     )
@@ -446,12 +535,16 @@ def create_inputsTable_UTOPIA(
 
     # Output dataFrame_inputs as csv file
 
-    dataFrame_inputs.to_csv(inputs_path + "\processInputs_table.csv", index=False)
+    if save_op == "save":
+
+        dataFrame_inputs.to_csv(inputs_path + "\processInputs_table.csv", index=False)
+    else:
+        pass
 
     return dataFrame_inputs
 
 
-"""List of references for the parameterization of the environmental compartments characteristics"""
+"""List of references for the parameterization of the environmental compartments characteristics"""  ### NEW COMPARTMENTs LIST ###
 
 # def create_compartment_inputsTable():
 
@@ -466,12 +559,12 @@ def create_inputsTable_UTOPIA(
 #         "Sediment_Freshwater",
 #         "Sediment_Ocean",
 #         "Sediment_Coast",
-#         "Urban_Soil_Surface",
-#         "Urban_Soil",
+#         "Beaches_Soil_Surface",
+#         "Beaches_Deep_Soil",
 #         "Background_Soil_Surface",
 #         "Background_Soil",
-#         "Agricultural_Soil_Surface",
-#         "Agricultural_Soil",
+#         "Impacted_Soil_Surface",
+#         "Impacted_Soil",
 #         "Air",
 #     ]
 
@@ -494,7 +587,10 @@ def create_inputsTable_UTOPIA(
 #     coastWater_SA_m2 = oceanSeaWater_SA_m2 * 7.6/100
 #     oceanWater_SA_m2 = oceanSeaWater_SA_m2 * (100-7.6)/100
 
-#     # 38% of the land area is developed for agriculture (Ref: FAO 2020. Land use in agriculture by the numbers (https://www.fao.org/sustainability/news/detail/en/c/1274219/))
+#
+#  With the new classification of the soil compartments we describe an impacted soil compartment that would include all agricultural soil and urban areas and a beach soil compartment. The areas of these newly named compartments have to be reparameterized.
+
+# # 38% of the land area is developed for agriculture (Ref: FAO 2020. Land use in agriculture by the numbers (https://www.fao.org/sustainability/news/detail/en/c/1274219/))
 #     agri_land_SA_m2 = (
 #         land_SA_m2 * 0.38
 #     )
@@ -505,7 +601,19 @@ def create_inputsTable_UTOPIA(
 #         land_SA_m2 * 0.03
 #     )
 
-#     background_land_SA_m2 = land_SA_m2 -agri_land_SA_m2 - urban_land_SA_m2
+#     impacted_land_SA_m2 = agri_land_SA_m2 + urban_land_SA_m2
+
+#     Global Occurrence of Sandy Shorelines: The total length of the world’s ice-free shoreline determined from this analysis is 1.11 million km and 31% of the world’s ice-free shoreline are sandy. (REF: Luijendijk, A., Hagenaars, G., Ranasinghe, R., Baart, F., Donchyts, G. and Aarninkhof, S., 2018. The state of the world’s beaches. Scientific reports, 8(1), pp.1-11.)
+
+#     sandy_shoreline_km =(1.11*10**6)*0.31
+
+#     average_beach_width_m= 100 # Coastal Processes and Beaches
+# By: Andrew D. Short (Professor, School of Geosciences University of Sydney, Australia) © 2012 Nature Education
+# Citation: Short, A. D. (2012) Coastal Processes and Beaches. Nature Education Knowledge 3(10):15
+# #
+#     sandy_beaches_SA_m2 = sandy_shoreline_km * average_beach_width_m/1000
+
+#     background_land_SA_m2 = land_SA_m2 - impacted_land_SA_m2-sandy_beaches_SA_m2
 
 #     flow_velocity_ocean_m_s = 0.02  # Ref: from The OECD Pov and LRTP Screening Tool (Version 2.2). F. Wegmann et al(2009), Environmental Modeling & Software 24, 228-237.
 #     flow_velocity_ocean_surace_m_s = 0.03 # For the surface layer (first 5 m depth) of the ocean water we asume a higher flow velocity due to waves action.

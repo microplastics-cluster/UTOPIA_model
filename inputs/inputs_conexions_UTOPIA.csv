@@ -37,9 +37,9 @@ ID,Compartment,Connexion,connexions ID,Process
 13,Agricultural Soil Surface,Background Soil,12,runoff_transport
 13,Agricultural Soil Surface,Agricultural Soil,14,"percolation,tillage"
 14,Agricultural Soil,Agricultural Soil Surface,13,tillage
-15,Air,Agricultural Soil Surface,13,"dry_depossition, wet_depossition"
-15,Air,Background Soil Surface,11,"dry_depossition, wet_depossition"
-15,Air,Urban Soil Surface,9,"dry_depossition, wet_depossition"
-15,Air,Surface Freshwater,6,"dry_depossition, wet_depossition"
-15,Air,Coast Surface Water,4,"dry_depossition, wet_depossition"
-15,Air,Ocean Surface Water,1,"dry_depossition, wet_depossition"
+15,Air,Agricultural Soil Surface,13,"dry_deposition, wet_deposition"
+15,Air,Background Soil Surface,11,"dry_deposition, wet_deposition"
+15,Air,Urban Soil Surface,9,"dry_deposition, wet_deposition"
+15,Air,Surface Freshwater,6,"dry_deposition, wet_deposition"
+15,Air,Coast Surface Water,4,"dry_deposition, wet_deposition"
+15,Air,Ocean Surface Water,1,"dry_deposition, wet_deposition"
