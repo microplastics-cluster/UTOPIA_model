@@ -208,11 +208,24 @@ def process_flows(compartment, size_fraction, mp_form, flow_type, flows_dict):
 
 
 def process_flows_comp(compartment, flow_type, flows_dict):
-    """Process flows (inflows or outflows) for a given compartment"""
+    """Process flows (inflows or outflows) for a given compartment, this means the heteroaggregation and biofouling processess should not be included"""
     df_comp = flows_dict[flow_type][compartment]
     df_cleaned = df_comp.drop(["MP_size", "MP_form"], axis=1)
 
-    return {col: sum_column_values(df_cleaned[col]) for col in df_cleaned.columns}
+    # List of processess to not include:
+    excluded_columns = [
+        "k_heteroaggregation",
+        "k_heteroaggregate_breackup",
+        "k_biofouling",
+        "k_defouling",
+        "k_fragmentation",
+    ]
+
+    return {
+        col: sum_column_values(df_cleaned[col])
+        for col in df_cleaned.columns
+        if col not in excluded_columns
+    }
 
 
 def addFlows_to_results_df(Results_extended, flows_dict_mass, flows_dict_num):

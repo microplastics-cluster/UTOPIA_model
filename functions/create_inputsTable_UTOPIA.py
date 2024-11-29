@@ -88,11 +88,11 @@ def create_inputsTable_UTOPIA(
         "Impacted_Soil",
     ]
     MP_size_deg_factors = {
-        "mp1": (0.5**2) / (50**2),
-        "mp2": (5**2) / (50**2),
+        "mp1": (50**2) / (0.5**2),
+        "mp2": (50**2) / (5**2),
         "mp3": (50**2) / (50**2),
-        "mp4": (500**2) / (50**2),
-        "mp5": (5000**2) / (50**2),
+        "mp4": (50**2) / (500**2),
+        "mp5": (50**2) / (5000**2),
     }
     for c in compNames:
         if c in surface_water_compartments:
