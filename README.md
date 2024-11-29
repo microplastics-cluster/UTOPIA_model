@@ -51,7 +51,8 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
   - If emission are targeted to a single compartment the user should define:
     - input_flow_g_s
     - emiss_comp
-  - If there are emissions into several compartments the user should add the corresponding input flows per compartment in the dictionary q_mass_g_s_dict (L252). Note that if this second option is chossen the user should double check that the inputs above match the enission scenario targeted.
+  - If there are emissions into several compartments the user should add the corresponding input flows per compartment in the dictionary q_mass_g_s_dict (L252). Note that if this second option is chossen the user should double check that the inputs above match the enission scenario  
+ targeted.
 
 
 ### 2- Generate model objects by reading on input files:
@@ -71,7 +72,6 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
  -Associate particles to the compartments
   
 ### 4-Parameterise concentrations/emissions
-
 
 ### 5-Generate model processes input parameters table based on the stablished model structure (key parameters such as attachment efficiency, degradation times, fragmentation times, etc.)
 
