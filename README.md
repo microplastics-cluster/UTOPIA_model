@@ -81,8 +81,8 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
 
 ![image](https://user-images.githubusercontent.com/58487662/186609599-c75bb341-45f4-4bf4-a055-fb332aff3756.png)
 
-    -Generate Matrix of interactions (MFullMulti)
-    -Build system of differential equations
+-Generate Matrix of interactions (MFullMulti)
+-Build system of differential equations
 
 ### 8-Solve mass balance (in steady state for UTOPIA)
 
