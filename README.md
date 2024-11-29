@@ -10,24 +10,7 @@ The model comprises 17 compartments and tracks the fate of multiple sizes (5 siz
 
 The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems. Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (although pending of definition).
 
-![image](https://user-images.githubusercontent.com/58487662/188827636-eeab9b13-f9e1-4e3e-91aa-8041f5b31ba9.png)
-
-1.1. Advective transport 
-1.2. Settling 
-1.3. Rising 
-1.4. Sediment resuspension 
-1.5. Diffusion
-1.6. Dry deposition 
-1.7. Wet deposition/scavenging
-1.8. Runoff transport
-1.9. Percolation 
-1.10. Bioturbation + Tilling
-1.11. Sea spray aerosol 
-1.12. Soil to air resuspension
-1.13. Mixing ??
-1.14. Burial in the sediments
-1.15. Sequestration within deep soils
-
+![image](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_processes.png)
 
 ## Model Workflow
 
