@@ -12,6 +12,8 @@ The UTOPIA model is being developed based on experiences and knowledge acquired 
 
 ![image](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_processes.png)
 
+The processess marked in red are not yet included in UTOPIA.
+
 ## Model Workflow
 
 Description of the workflow followed to develope UTOPIA
@@ -21,17 +23,25 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
 
   Microplastics properties:
 
-  - MPdensity_kg_m3 (L34)
-  - MP_composition (L35) (Has to match the defined density)
-  - big_bin_diameter_um (we recomend using the default value but cna be modified within the limits from 10000 um to 1000 um)
+  - MPdensity_kg_m3 
+  - MP_composition  (Has to match the defined density)
 
   Compartment properties:
 
-  To do so one should copy the inputs_compartments.csv file and modify its values without changing the format of the file. Once a new file is generated this can be saved with a new name and the new name should be provided in line 66 of the script_UTOPIA_user.py file assigned to comp_impFile_name.
+  To do so one should copy the inputs_compartments.csv file and modify its values without changing the format of the file. Once a new file is generated this can be saved with a new name and the new name should be provided for the comp_impFile_name variable of the script_UTOPIA_user.py
 
   Plastic weathering properties:
 
-  - Select a fragmentation style form the ones defined in frag_styles_dict (L103) by updating the name of the selected style in line 142 (frag_style=)
+  - Select a fragmentation style by choosing a FI value that goes from 0 to 1 to select a scenario between Erosive (FI0=) and sequential (FI=1) fragmentation as described in the code.
+  - Type the fragmentation timescale (given in number of days) in: t_frag_gen_FreeSurfaceWater (default values= 36.5)
+  - Type the disintegration timescale (given in number of days) in: t_half_deg_free (default value=66000)
+  - Fractors that infuence fragmentation and disintegration according to the environmental compartment and aggregation state are defined with default values as listed:
+  - heter_deg_factor = 10
+  - biof_deg_factor = 1 / 2
+  - factor_deepWater_soilSurface = 10
+  - factor_sediment = 100
+  - biof_frag_factor = 2
+  - heter_frag_factor = 100
 
   Emission scenario:
   describe the porperties of the emitted plastic particles (particle size and form) and the recieving compartment/s and its flow of emission/s
@@ -41,7 +51,7 @@ Go to the file script_UTOPIA_user.py and follow the instructions given in the co
   - If emission are targeted to a single compartment the user should define:
     - input_flow_g_s
     - emiss_comp
-  - If there are emissions into several compartments the suer should add the corresponding input flows per compartment in the dictionary q_mass_g_s_dict (L252). Note that if this second option is chossen the user should double check that the inputs above match the enission scenario targeted.
+  - If there are emissions into several compartments the user should add the corresponding input flows per compartment in the dictionary q_mass_g_s_dict (L252). Note that if this second option is chossen the user should double check that the inputs above match the enission scenario targeted.
 
 
 ### 2- Generate model objects by reading on input files:
