@@ -86,3 +86,6 @@ pip install -r requirements.txt
 ```bash
 python script_UTOPIA_user.py
 ```
+
+##### Acknowledgements
+Thanks to the European Chemical Industry Council Long-Range Research Initiative (Cefic-LRI) for providing funding for this work, under project number ECO56.
