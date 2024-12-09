@@ -14,8 +14,6 @@ def store_results(
     Results_comp_dict,
     Results_comp_organiced,
     model_lists,
-    df_massDistribution,
-    df_numberDistribution,
     mass_dist_comp,
     tables_outputFlows,
     tables_inputFlows,
