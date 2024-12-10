@@ -21,6 +21,7 @@ from functions.loop_CTD_calculation import *
 from functions.generate_compartmentFlows_tables import *
 from functions.emission_fractions_calculation import *
 from helpers.helpers import *
+from functions.fillInteractions_dictionaries import *
 
 inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
@@ -31,8 +32,8 @@ inputs_path = os.path.join(os.path.dirname(__file__), "inputs")
 
 # The user can also select a preloaded file instead of typing in the values. In this case the user wont need to run the code between lines 29 and 34 and neither the code between lines 42 and 50. The user will have to run line 56 with the selected input file
 
-MPdensity_kg_m3 = 1580
-MP_composition = "PVC"
+MPdensity_kg_m3 = 980
+MP_composition = "PE"
 shape = "sphere"  # Fixed for now
 N_sizeBins = 5  # Fixed, should not be changed. The 5 size bins are generated as being one order of magnitude appart and cover the range from mm to nm(i.e. 5000um, 500um, 50um, 5um, 0.5um)
 big_bin_diameter_um = 5000  # This size can not be bigger than 10 mm (10000um) or smaller than 1 mm(1000um)
@@ -347,19 +348,6 @@ interactions_df = fillInteractions_fun_OOP(
     system_particle_object_list, SpeciesList, surfComp_list
 )
 
-# from functions.fillInteractions_dictionaries import*
-
-# interactions_pp_df=fillInteractions_fun_OOP_dict(
-#     system_particle_object_list, SpeciesList, surfComp_list
-# )
-
-# particle_inflows_dict={}
-# for p in system_particle_object_list:
-#     inflows_p=[]
-#     for p2 in system_particle_object_list:
-#         inflows_p.append(interactions_pp_df[p2.Pcode][p.Pcode])
-#     particle_inflows_dict[p.Pcode]=inflows_p
-
 """SOLVE SYSTEM OF ODES"""
 
 particle_compartmentCoding = dict(
@@ -455,7 +443,7 @@ results_by_comp = extract_results_by_compartment(Results_extended, dict_comp)
     system_particle_object_list, dict_comp
 )
 
-# Estimate imput flows from transport from other compartments
+# Estimate input flows from transport from other compartments
 (tables_inputFlows, tables_inputFlows_num) = estimate_inFlows(
     tables_outputFlows, tables_outputFlows_number, dict_comp, surfComp_list
 )
@@ -523,6 +511,51 @@ Results_extended = addFlows_to_results_df(
     Results_extended, flows_dict_mass, flows_dict_num
 )
 
+# Correct input flows to include also the transformation processess (e.g.heteroaggregation)
+# Only working for mass at the moment, need to estimate steady state particle numbers
+
+# This is all in mass units
+interactions_pp_df = fillInteractions_fun_OOP_dict(
+    system_particle_object_list, SpeciesList, surfComp_list
+)
+
+# Create a dictionary of recieving inflows per particle taking the values from the interactions matrix
+particle_inflows_dict_mass = {}
+particle_inflows_dict_number = {}
+for p in system_particle_object_list:
+    inflows_p_mass = []
+    # inflows_p_num=[]
+    for p2 in system_particle_object_list:
+        interaction_rate = interactions_pp_df[p2.Pcode][p.Pcode]
+        if type(interaction_rate) == dict:
+            inflow = {k: v * p2.Pmass_g_SS for k, v in interaction_rate.items()}
+            inflows_p_mass.append(inflow)
+            # inflows_p_num.append({k: v * p2.Pnum_g_SS for k, v in interaction_rate.items()})
+        else:
+            inflows_p_mass.append(interaction_rate)
+            # inflows_p_num.append(interaction_rate)
+    dict_list = [item for item in inflows_p_mass if isinstance(item, dict)]
+    # dict_list_num=[item for item in inflows_p_num if isinstance(item, dict)]
+    merged_dict = {}
+    # merged_dict_num={}
+    for d in dict_list:
+        for k, v in d.items():
+            if k in merged_dict:
+                merged_dict[k] += v
+                # merged_dict_num[k] += v
+            else:
+                merged_dict[k] = v
+                # merged_dict_num[k] = v
+
+    particle_inflows_dict_mass[p.Pcode] = merged_dict
+    # particle_inflows_dict_number[p.Pcode]=merged_dict_num
+
+# Substitute the inputflow values in the results_extended dataframe:
+
+for ele in particle_inflows_dict_mass:
+    Results_extended.at[ele, "inflows_g_s"] = particle_inflows_dict_mass[ele]
+    # Results_extended.at[ele, "inflows_num_s"] = particle_inflows_dict_number[ele]
+
 Results_extended["Total_inflows_g_s"] = [
     sum(Results_extended.iloc[i].inflows_g_s.values())
     for i in range(len(Results_extended))
@@ -542,12 +575,50 @@ Results_extended["Total_outflows_num_s"] = [
     sum(Results_extended.iloc[i].outflows_num_s.values())
     for i in range(len(Results_extended))
 ]
-
 """ Add iput and output flows dict to compartment results dataframe (results_by_comp)"""
 results_by_comp = addFlows_to_results_df_comp(
     results_by_comp, flows_dict_mass, flows_dict_num
 )
 
+# TODO double chech if works
+Results_extended_comp = calculate_persistence_residence_time_comp(results_by_comp)
+
+## Mass and particle number distribution by size fraction
+size_distr = [0.5, 5, 50, 500, 5000]
+Pmass = []
+Pnumber = []
+for size in size_distr:
+    Pmass.append(
+        round(
+            sum(
+                Results_extended[Results_extended["Size_Fraction_um"] == size]["mass_g"]
+            )
+            / sum(Results_extended["mass_g"])
+            * 100,
+            2,
+        )
+    )
+    Pnumber.append(
+        round(
+            sum(
+                Results_extended[Results_extended["Size_Fraction_um"] == size][
+                    "number_of_particles"
+                ]
+            )
+            / sum(Results_extended["number_of_particles"])
+            * 100,
+            2,
+        )
+    )
+
+# This is the data for overall % in table
+size_distribution_df = pd.DataFrame(
+    {
+        "size_fraction_um": size_distr,
+        "percent_of_total_mass": Pmass,
+        "percent_of_total_number": Pnumber,
+    }
+)
 
 """ Estimate exposure indicators """
 
@@ -788,6 +859,19 @@ store_results(
     titlename_fignum,
     emiss_fract_fig,
 )
+
+
+""" Run Monte Carlo simulation for Sensitivity and Uncertainty Analysis """
+
+# Import Monaco package that runs the Monte Carlo simulations
+import monaco as mc
+
+# Import the statistical distributions from scipy.stats that you will be using.
+# These must be rv_discrete or rv_continuous functions.
+# See https://docs.scipy.org/doc/scipy/reference/stats.html for a complete list.
+from scipy.stats import randint, rv_discrete, lognorm, uniform
+
+# Continue code here
 
 """ Generate PDF report """  ## WORK IN PROGRESS
 # from functions.generate_pfd_report import *
