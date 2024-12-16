@@ -521,7 +521,7 @@ def burial(particle):
 
 
 def soil_air_resuspension(particle):
-    # REF: BETR global approach for soil-air resuspension (10^-10 m/h)
+    # REF: global average soil-air 6x10^-10 m/h  and max value 10^-7 m/h. Qureshi et al. (2009) ## We should include a density factor...
 
     sar_rate = 10e-10 / 60 / 60
 
@@ -529,8 +529,8 @@ def soil_air_resuspension(particle):
         "a": sar_rate,
         "b": sar_rate,
         "c": sar_rate,
-        "d": sar_rate / 100,
-        "e": sar_rate / 1e4,
+        "d": sar_rate,
+        "e": sar_rate,
     }
 
     k_sa_reusp = sar_rate / float(particle.Pcompartment.Cdepth_m)
@@ -684,9 +684,8 @@ def wet_deposition(particle, dict_comp):
 
 def sea_spray_aerosol(particle):
     # particles resuspension from ocean and coastal surface waters to air
-    # REF: BETR global approach for ocean-air resuspension (10^-10 m/h)
-
-    ssa_rate = 10e-10 / 60 / 60
+    # REF: REF: Qureshi et al. (2009) approach for ocean-air resuspension (10^-5 m/h) Maximum value = 10^-5 m/h!! Global average value 10^-8. We should include a density factor...
+    ssa_rate = 10e-5 / 60 / 60
 
     k_sea_spray_aerosol = ssa_rate / float(particle.Pcompartment.Cdepth_m)
 
@@ -694,15 +693,13 @@ def sea_spray_aerosol(particle):
         "a": ssa_rate,
         "b": ssa_rate,
         "c": ssa_rate,
-        "d": ssa_rate / 100,
-        "e": ssa_rate / 1e4,
+        "d": ssa_rate,
+        "e": ssa_rate,
     }
 
     k_sea_spray_aerosol = ssa_rate_dict[particle.Pcode[0]] / float(
         particle.Pcompartment.Cdepth_m
     )
-
-    # k_sea_spray_aerosol = 0
 
     return k_sea_spray_aerosol
 
