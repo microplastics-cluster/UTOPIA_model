@@ -169,12 +169,15 @@ By choosing a value between 0 and 1 the user can select a fragmentation style in
 •	Mixing (references in the RC_generator.py file)
 •	Settling (same as in the Full Multi, needs to be updated!)
 •	Rising (same as in the Full Multi, needs to be updated!)
-•	Biofouling ()
-
-
-
-
-
+•	Biofouling (same as in the Full Multi)
+•	Sediment resuspension. Currently placeholder values. To be revisited
+•	Burial. Currenlty place holder values. To be revisited
+•	Soil air resuspension: We should include a density factor...
+•	Soil convection: mixing of soil particles via bioturbation and freeze/thaw cycles
+•	Percolation: downwards movement of particles in soil via infiltrated water. To be defined/formulated! (currently =0)
+•	Runoff transport: from BETR global approach and mass of runoff distributed to the recieving compartments defined by fro matrix. In this example of fro all runoff goes to surface freshwater. To be reviewed!!
+•	Beaching: Transport from surface coastal water to background soil surface. We assume that beaching rate is 1/30 of the transport rate of plastic to open ocean based on https://doi.org/10.1038/s41561-023-01216-0 
+•	Dry_deposition: 
 
 ## MODEL MODIFICATIONS
 

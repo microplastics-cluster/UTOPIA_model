@@ -590,7 +590,7 @@ def runoff_transport(particle):
     }
     # column number corresponds to the recieving compartment
 
-    # In this example of fdd all runoff goes to surface freshwater. To be discussed later
+    # In this example of fro all runoff goes to surface freshwater. To be discussed later
 
     k_runoff = runoff_rate * fro[soilSurf_dic[particle.Pcompartment.Cname]]
     k_runoff = k_runoff.tolist()
@@ -623,8 +623,6 @@ def wind_trasport(particle):
 
 def dry_deposition(particle, dict_comp):
     # particles depossition from air to soil or water compartments
-
-    # CORRECT NAMING in all the code!!
 
     # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
