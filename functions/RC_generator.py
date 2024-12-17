@@ -36,10 +36,6 @@ def discorporation(particle, process_inputs_df):
     # k_desint_50um_h= 6.3*10**-6 #(in h-1)
     # k_deg_free=k_desint_50um_h*(50/particle.diameter_um)
 
-    """relates only to MP & NPs. Full degradation probably extremely slow
-    possibly not significant for most simulations. But add anyway for scenario
-    analysis or biodegradable polymers. Values currently placeholders
-    ! Add a size relation?!"""
     # degradation half-life of MPs used as input is in days
     cond = (
         (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
@@ -53,7 +49,7 @@ def discorporation(particle, process_inputs_df):
 
     # * (
     #     50**2 / (particle.diameter_um) ** 2
-    # )  # the discorporation rate is normalised to the surface area to volume ratio of the 50um particles since using t_half degradation rates derived from Pfohl et al. 2022 paper. this has already been included when building the table of input parameters
+    # )  # the discorporation rate is normalised to the surface area to volume ratio of the 50um particles since using t_half degradation rates derived from Pfohl et al. 2022 paper. this is included when building the table of input parameters (generate_MPinputs_table.py)
 
     return k_deg
 
@@ -64,8 +60,6 @@ def fragmentation(particle, fsd, process_inputs_df):
     # for fragmentation of pristine particles in the largest (x=5000μm => mp5 => e) size class.
 
     # estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html)
-
-    # Fragmentation of heteroaggregated particles is assumed negligible in the default model formulation
 
     cond = (
         (process_inputs_df["Compartment"] == particle.Pcompartment.Cname)
@@ -99,9 +93,7 @@ def fragmentation(particle, fsd, process_inputs_df):
 
     k_frag = frag_rate * fsd[size_dict[particle.Pcode[0]]]
 
-    return (
-        k_frag.tolist()
-    )  # I have removed the fragments formed from the output to have an homogeneus solution in the table of rate constants (consider dumping this values in another way later when/if needed (for Mass Balance?))
+    return k_frag.tolist()
 
 
 def settling(particle):
@@ -119,10 +111,6 @@ def settling(particle):
         w_den_kg_m3 = density_seaWater_kg_m3
 
     settlingMethod = "Stokes"
-
-    # Settling occurs in all aquatic compartments which should be specified in the comprtment class
-    # if particle.Pcompartment.Cname in ["Sediment", "Agricultural Soil","Urban Soil"...]
-    #     k_set = 0
 
     if settlingMethod == "Stokes":
         vSet_m_s = (
@@ -209,16 +197,10 @@ def rising(particle):
 def heteroaggregation(particle, spm, process_inputs_df):
     if (particle.Pform == "freeMP") or (particle.Pform == "biofMP"):
         # heteroaggregation rate constants
-        """heteroaggregation requires to particles to collide and interact
-        favorably for the collision to result in attachment
-        the heteroaggregation rate constants is therefore composed of two
-        parts, 1) a collision rate constant and 2) and attachement
-        efficiency (alpha) (representing the probability of attachement).
-        For heteroaggregation a common simplifaction is the assumption that
-        SPM concentration is not signficantly affected by the heteroaggre-
-        gation process. Therefore, a pseudo first-order heteroaggregation
-        rate constant is obtained by multiplying collision rate with alpha
-        and with the SPM number concentration"""
+        """heteroaggregation requires to particles to collide and interact favorably for the collision to result in attachment
+        the heteroaggregation rate constants is therefore composed of two parts, 1) a collision rate constant and 2) and attachement efficiency (alpha) (representing the probability of attachement).
+        For heteroaggregation a common simplifaction is the assumption that SPM concentration is not signficantly affected by the heteroaggregation process. Therefore, a pseudo first-order heteroaggregation rate constant is obtained by multiplying collision rate with alpha
+        and with the SPM number concentration (REF: @AntoniaPraetorius)"""
 
         # first the different collision mechanisms are calculated
         k_peri = (

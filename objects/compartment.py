@@ -50,8 +50,7 @@ class Compartment:
         particle.assign_compartment(self)
 
     def assign_particlesEmiss(self, emissionsFile):
-        # Emissions are given as total in tons per year for each compartment but then distributed in percentages for the different size fractions
-        # and MP types (default only emissions of pristine particles?)
+        # and MP types (default only emissions of pristine particles?)Still not in use
         with open(emissionsFile, "r") as f:
             reader = csv.DictReader(f)
             emissions = list(reader)

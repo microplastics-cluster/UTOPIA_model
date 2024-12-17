@@ -135,12 +135,12 @@ class compartment_sediment(Compartment):
         super().__init__(
             Cname, Cdepth_m, Clength_m, Cwidth_m, Cvolume_m3, CsurfaceArea_m2
         )
-        self.processess = [
-            "discorporation",
-            "fragmentation",
-            "sediment_resuspension",
-            "burial",
-        ]
+            self.processess = [
+                "discorporation",
+                "fragmentation",
+                "sediment_resuspension",
+                "burial",
+            ]
 
 
 class compartment_soil_surface(Compartment):

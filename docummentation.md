@@ -1,8 +1,10 @@
-# UTOPIA documentation (to be translated to markdown)
-## Model Structure
+# UTOPIA documentation 
 ### OBJECTS
 •	Model box (UTOPIA)
-##### Attributes:
+•	Model compartments
+•	Particulates: free, BF and SPM
+
+##### Box Model attributes:
 Bname   
 Bdepth_m    
 Blength_m   
@@ -14,7 +16,6 @@ Compartments =[]
 •	Model compartments
 
 ##### Shared compartment class attributes:
-
 Cname   
 Cdepth_m    
 Clength_m   
@@ -22,56 +23,158 @@ Cwidth_m
 Cvolume_m3  
 CsurfaceArea_m2 
 particles = {"freeMP": [],"heterMP": [],"biofMP": [],"heterBiofMP":[]}Each key corresponds to another dicttionary of size bins    
-connexions = [] 
+connexions = []
+processess = [
+            "degradation",
+            "fragmentation",
+            "heteroaggregation",
+            "heteroaggregate_breackup",
+            "biofouling",
+            "defouling",
+            "advective_transport",
+            "settling",
+            "rising",
+        ]
+
+##### Shared compartment class functions
+assign_box(self, Box)
+dd_particles(self, particle)
+calc_volume(self)
+calc_particleConcentration_Nm3_initial(self)
+
+Still to be inmplemented: 
+assign_particlesEmiss(self, emissionsFile)
+assign_backgroundMPConc()
+
+
+##### Compartment subclasses with specific attributes:
+Subclasses (inheritances) of the class compartment add extra attributes to the compatment that define the type of compartment
+
+UTOPIA_surfaceSea_water_compartments = ["Ocean_Surface_Water", "Coast_Surface_Water"]
 
 UTOPIA_water_compartments = [
-    "Ocean Surface Water",
-    "Ocean Mixed Water",
-    "Ocean Column Water",
-    "Coast Surface Water",
-    "Coast Column Water",
-    "Surface Freshwater",
-    "Bulk Freshwater",
+    "Ocean_Mixed_Water",
+    "Ocean_Column_Water",
+    "Coast_Column_Water",
+    "Surface_Freshwater",
+    "Bulk_Freshwater",
 ]
 
-##### Subclass specific attributes:
-SPM_mgL 
-waterFlow_m3_s  
-T_K 
-G   
-flowVelocity_m_s    
-processess = ["discorporation","fragmentation","heteroaggregation","heteroaggregate_breackup","biofouling","defouling","advective_transport","settling","rising","mixing"]  
-
-
-UTOPIA_soil_compartments = [
-    "Sediment",
-    "Urban Soil Surface",
-    "Urban Soil",
-    "Background Soil Surface",
-    "Background Soil",
-    "Agricultural Soil Surface",
-    "Agricultural Soil",
+UTOPIA_deep_soil_compartments = [
+    "Beaches_Deep_Soil",
+    "Background_Soil",
+    "Impacted_Soil",
 ]
 
-##### Subclass specific attributes:
-infiltration_capacity=0.25,  # from SimpleBox(4plastics)    
-precipitation_rate=2.22 * 1**-8,  # from SimpleBox(4plastics)   
-soilPore_waterVolume_m3 
-processess = ["discorporation","fragmentation","runoff_transport","tillage","percolation", "soil_air_resuspension"] 
+UTOPIA_soil_surface_compartments = [
+    "Beaches_Soil_Surface",
+    "Background_Soil_Surface",
+    "Impacted_Soil_Surface",
+]
 
+UTOPIA_sediment_compartment = [
+    "Sediment_Freshwater",
+    "Sediment_Ocean",
+    "Sediment_Coast",
+]
 
 UTOPIA_air_compartments = ["Air"]
 
-##### Subclass specific attributes:
-wind_speed_m_s  
-I_rainfall_mm   
-processess = ["discorporation","fragmentation","wind_trasport","dry_depossition","wet_depossition"] 
+•	compartment_water specific attributes:
+        SPM_mgL,
+        waterFlow_m3_s,
+        T_K,
+        G,
+        flowVelocity_m_s
+        waterFlow_m3_s
 
-•	Particles
+•	compartment_surfaceSea_water specific attributes:
+    extra processess: "sea_spray_aerosol","beaching"
 
--	Particulates
--	ParticulatesBF
--	ParticulatesSPM
+•	compartment_sediment specific attributes:
+    extra processess = "sediment_resuspension","burial"
+
+•	compartment_soil_surface specific attributes:
+    extra processess = "runoff_transport","percolation",
+            "soil_air_resuspension","soil_convection".
+
+•	compartment_deep_soil specific attributes:
+    extra processess =  "sequestration_deep_soils", "soil_convection"
+
+•	compartment_air specific attributes:
+    wind_speed_m_s
+    I_rainfall_mm
+    extra processess = "wind_trasport","dry_deposition", "wet_deposition"
+
+
+
+### MODEL ASUMPTIONS
+
+#### Processess parmeterizations and asumptions
+
+•	Discorporation
+
+Defined as loos of corporeal nature of the particle (not a particle anymore and cosidered as a loss of the particle from the system)
+
+The discorporation rate is assumend to be size, aggregation state and compartment dependent. Values for discorporation rates in the different size fractions, aggregation astates and compartments are estimated from an stabished value of discorporation for free 50 um microplastic particles in surface water (t_half_deg_free), wich is multiplied by a size, aggregation state and compartment factor:
+
+    -Size:  the higuer the surface area to volume ratio of the particle the fastest the process happens according to our assumprions. Therefore, the smaller particles fragment at faster rates. size_factor = (d_base**2) / (d_frac**2), where d_base= 50um
+    -Aggregation state asumptions: Heteroaggregated particles degrade 10 times slower than the free MPs (heter_deg_factor = 10) and Biofouled particles degrade 2 times faster than the free MPs (biof_deg_factor= 1/2)
+    - Compartment assumptions: we assume that in the surface water compartments both degradation and fragmentation are fastest, in soil surface and deeper water compartments both rates are 10 times slower (factor_deepWater_soilSurface = 10) and in sediments and deeper soil compartments they both are 100 times slower (factor_sediment = 100)
+
+•	Fragmentation
+
+Modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d) for fragmentation of pristine (free) particles in the largest (x=5000μm => mp5 => e) size class and in the ater surface compartments.
+
+The fragmentation timescales are deteremined from the stablished fragmentation half time of 36.5 days for the biggest size fraction in free form in the surface water compartments following the parameters chosen in Domercq et al. 2021.
+
+Assumptions: 
+Fragmentation is cosidered aggreagtion state and compartment dependent:
+    -Aggregation state:fragmentation of the heteroaggregated MPs is stablished as being 100 slower than fragmentation of the Free MPs (heter_frag_factor = 100) and fragmentation of the biofouled particles as being 2 times slower (biof_frag_factor = 2).
+    -Compartments: we assume that in the surface water compartments both degradation and fragmentation are fastest, in soil surface and deeper water compartments both rates are 10 times slower (factor_deepWater_soilSurface = 10) and in sediments and deeper soil compartments they both are 100 times slower (factor_sediment = 100)
+
+ The fragmentation relation between size bins is stablished using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html). The values of the matrix is determined by the fragmentation inder FI that selects a vlaue between 0 and 1 representing each extream a fragmentation syle as follows:
+
+ - Erosive fragmentation (FI=0): In this scenario the particles are being eroded on their surface and therefore most of their mass remain in their same size fraction and samall fraction in going to the samllest size bins. Its representative fsd is:
+
+         [[0, 0, 0, 0, 0],
+
+         [1, 0, 0, 0, 0],
+
+         [0.99, 0.01, 0, 0, 0],
+
+         [0.999, 0, 0.001, 0, 0],
+
+         [0.9999, 0, 0, 0.0001, 0],]
+
+- Sequential fragmentation (FI=1): in this scenario each size fraction breacks down completely into the next smallest size bin.
+Its representative fsd is:
+
+         [[0, 0, 0, 0, 0],
+
+         [1, 0, 0, 0, 0],
+
+         [0, 1, 0, 0, 0],
+
+         [0, 0, 1, 0, 0],
+
+         [0, 0, 0, 1, 0],]
+
+By choosing a value between 0 and 1 the user can select a fragmentation style in between both extremes. (i.e. FI=0.5 will represent the mixed fragmentation style)
+
+•	Heteroaggregation: formulated as in The FullMulti 
+•	Heteroaggregate brackup: formulated as in The FullMulti, asumed 10E8 times slower than the formation of heteroaggregates.
+
+•	Advective_transport (same as in The Full Multi)
+•	Mixing (references in the RC_generator.py file)
+•	Settling (same as in the Full Multi, needs to be updated!)
+•	Rising (same as in the Full Multi, needs to be updated!)
+•	Biofouling ()
+
+
+
+
+
 
 ## MODEL MODIFICATIONS
 
@@ -83,7 +186,6 @@ If new attributes are added to the class this have to also be added in the class
 
 •	Rate constants
 
-If we want to change rate constant values directly on the model these have to be changed at the particle level (not on the output table of Rate constants) so that the changes are reflected in the interactions matrix and model
 
 Time limit can be included in the rate constants using the function timeLimit_particles_RC(system_particle_object_list, k), where k is the maximum value that k can take corresponding to it time limit 1/tlim (currently 30min on the processes that exceeds that speed (k > 0.000556)))
 

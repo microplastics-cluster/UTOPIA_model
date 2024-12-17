@@ -151,9 +151,9 @@ fsd_df.to_csv(fsd_filename)
 
 ##### Define Weathering processes input parameters
 
-##### Degradation half time: thalf_deg_d
+##### Discorporation half time: thalf_deg_d
 
-# The assumptions made for the definition of these degradation times: (NEW assumptions)
+# The assumptions made for the definition of these discorporation times:
 #     - Heteroaggregated particles degrade 10 times slower than the free MPs
 #     - Biofouled particles degrade 2 times faster than the free MPs
 #     - Both degradation and fragmentation rates are compartment dependent : we assume that in the surface water compartments both degradation and fragmentation are fastest, in soil surface and deeper water compartments both rates are 10 times slower (factor_deepWater_soilSurface) and in sediments and deeper soil compartments they both are 100 times slower (factor_sediment)
