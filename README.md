@@ -14,7 +14,9 @@ The UTOPIA model is being developed based on experiences and knowledge acquired 
 
 The processess marked in red are not yet included in UTOPIA.
 
-### Select input parameters
+## Instructions for parameterising and runing UTOPIA
+
+### Selection of input parameters
 Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_Nov2024.ipynb and follow the instructions given in the code. Currently it is possible to modify:
 
   1- Microplastics properties:
@@ -22,11 +24,11 @@ Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_
   - MPdensity_kg_m3 
   - MP_composition  (Has to match the defined density)
 
-  Compartment properties:
+  2- Compartment properties:
 
   To do so one should copy the inputs_compartments.csv file and modify its values without changing the format of the file. Once a new file is generated this can be saved with a new name and the new name should be provided for the comp_impFile_name variable of the script_UTOPIA_user.py
 
-  2- Plastic weathering properties:
+  3- Plastic weathering properties:
 
   - Select a fragmentation style by choosing a FI value that goes from 0 to 1 to select a scenario between Erosive (FI=0) and sequential (FI=1) fragmentation as described in the code.
   - Type the fragmentation timescale (given in number of days) in: t_frag_gen_FreeSurfaceWater (default values= 36.5)
@@ -39,7 +41,7 @@ Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_
   - biof_frag_factor = 2
   - heter_frag_factor = 100
 
-  3- Emission scenario:
+  4- Emission scenario:
   describe the porperties of the emitted plastic particles (particle size and form) and the recieving compartment/s and its flow of emission/s
 
   - size_bin: choose a size fraction from the size_dict dictionary (if chosen the default settings: a= 0.5 um, b= 5 um, c= 50 um, d= 500 um, e= 5000 um)
@@ -56,10 +58,10 @@ Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_
 
 ### Plot and save results
 
-  -Mass and particle number concentrations
-  -Mass and numbers distribution as fraction of the total mass or total number
-  -Exposure metrics (Overall persistence, characteristic travel distance, transfer efficiency)
-  -Emission fractions
+  - Mass and particle number concentrations
+  - Mass and numbers distribution as fraction of the total mass or total number
+  - Exposure metrics (Overall persistence, characteristic travel distance, transfer efficiency)
+  - Emission fractions
 
 
 ## Instalation guidelines
