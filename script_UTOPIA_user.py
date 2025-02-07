@@ -64,7 +64,7 @@ spm_density_kg_m3 = 1388  # REF: Kooi et al. (2017)
 
 ## choose input files to load
 
-comp_impFile_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
+comp_input_file_name = "\inputs_compartments.csv"  # Preloaded values, the user should be able to create its own inputs_compartments.csv file (via donwloading the file and typing news values without chaing the structure of the file) when a new file wants to be used the name should be changed here
 comp_interactFile_name = (
     "\compartment_interactions.csv"  # Fixed, should not be modified
 )
@@ -86,7 +86,7 @@ boxName = "Utopia"  # fixed, do not modify
     inputs_path,
     boxName=boxName,
     MPforms_list=MPforms_list,
-    comp_impFile_name=comp_impFile_name,
+    comp_input_file_name=comp_input_file_name,
     comp_interactFile_name=comp_interactFile_name,
     mp_imputFile_name=mp_imputFile_name,
     spm_radius_um=spm_radius_um,
@@ -213,8 +213,7 @@ process_inputs_df = create_inputsTable_UTOPIA(
 
 ## Emission Scenario
 
-# Choose input flow (in g per second)
-# Define particle imput (sp_imput): the user has to define in wich form and size the particles are released into the environment and specify the input flow for each compartment
+# Choose input flow (in g per second) for each compartment and size fraction. The particle form will remain fixed to FreeMP for now.
 
 # Size fraction:
 # for the preloaded scenario:
@@ -227,6 +226,29 @@ import string
 
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
+
+# Each of the input flows should be typed in in the emissions dictionary:
+
+# emissions_dict = {compartment: {size: 0 for size in size_dict} for compartment in model_lists["compartmentNames_list"]}
+
+# emissions_dict={'Ocean_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Ocean_Mixed_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Ocean_Column_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Coast_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Coast_Column_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Surface_Freshwater': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Bulk_Freshwater': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Sediment_Freshwater': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Sediment_Ocean': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Sediment_Coast': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Beaches_Soil_Surface': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Beaches_Deep_Soil': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Background_Soil_Surface': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Background_Soil': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Impacted_Soil_Surface': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Impacted_Soil': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Air': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0}}
+
 
 size_bin = "e"  # Chosse from size_dict
 
