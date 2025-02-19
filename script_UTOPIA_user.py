@@ -511,8 +511,6 @@ Results_extended = addFlows_to_results_df(
     Results_extended, flows_dict_mass, flows_dict_num
 )
 
-# Correct input flows to include also the transformation processess (e.g.heteroaggregation)
-# Only working for mass at the moment, need to estimate steady state particle numbers
 
 # This is all in mass units
 interactions_pp_df = fillInteractions_fun_OOP_dict(
@@ -579,9 +577,6 @@ Results_extended["Total_outflows_num_s"] = [
 results_by_comp = addFlows_to_results_df_comp(
     results_by_comp, flows_dict_mass, flows_dict_num
 )
-
-# TODO double chech if works
-Results_extended_comp = calculate_persistence_residence_time_comp(results_by_comp)
 
 ## Mass and particle number distribution by size fraction
 size_distr = [0.5, 5, 50, 500, 5000]
@@ -808,13 +803,13 @@ print(
 
 """ Extract input and output flows per compartment """
 
-results_comp_extended = add_output_flow_conexions(
+add_output_flow_conexions(
     results_by_comp,
     dict_comp,
     outputflow_type="outflows_g_s",
     inputflow_type="inflows_g_s",
 )
-results_comp_extended = add_output_flow_conexions(
+add_output_flow_conexions(
     results_by_comp,
     dict_comp,
     outputflow_type="outflows_num_s",
