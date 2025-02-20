@@ -23,13 +23,10 @@ from helpers.globalConstants import *
 
 def discorporation(particle, process_inputs_df):
     # degradation estimations
-    # discorporation state will be given as output after runing
-    # the model with no discorporation. degradation state will be given in time units as residence time in the compartment
-
     # Change process name from degradation
     # to discorporation from corporeal
-
-    ##discorporation should be particle size dependent so that the higuer the surface area to volume ratio of the particel the fastest the process should happen (therfore for smaller particles fagmentation should happen at faster rates)
+    # Check asumptions made in the create_inputsTable_UTOPIA.py file
+    # Different degradation rates as a function of particle size-->it is surface area dependent ans scaled by d**2, so that smaller particles degrade faster than bigger ones.
 
     # If we use the data from Pfohl et al. 2022 we would use a degradation rate of 6.3 x 10-6 but this is for particles of TPU-ether arom in the size range between 50-200um. We asume this value as discorporation rate for the 50 um MP plastics in free form
 
@@ -55,7 +52,7 @@ def discorporation(particle, process_inputs_df):
 
 
 def fragmentation(particle, fsd, process_inputs_df):
-
+    # asumptions for K frag for different sizes, aggregation states and compartments described in the create_inputsTable_UTOPIA.py file
     # modelled as a size-dependent process based on an estimated rate constant (𝑘frag_gen= 1/tfrag_gen_d)
     # for fragmentation of pristine particles in the largest (x=5000μm => mp5 => e) size class.
 

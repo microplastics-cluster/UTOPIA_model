@@ -306,7 +306,7 @@ def add_output_flow_conexions(
     outputflow_type="outflows_g_s",
     inputflow_type="inflows_g_s",
 ):
-    # Genrate table of output flows connexions beteen compartments to b used in the mass flow diagram (ti me developed)
+    # Genrate table of output flows connexions between compartments to be used in the mass flow diagram (to me developed)
 
     outflow_conexions_g_s = []
     for c in results_by_comp["Compartments"]:
@@ -330,6 +330,13 @@ def add_output_flow_conexions(
                             else outfows["k_" + item]
                         )
                         for item in value
+                    }
+                elif c == "Air":
+                    inflows_col = results_by_comp[
+                        results_by_comp["Compartments"] == key
+                    ][inputflow_type].values[0]
+                    outflow_conexions[key] = {
+                        item: inflows_col["k_" + item] for item in value
                     }
                 else:
                     outflow_conexions[key] = {

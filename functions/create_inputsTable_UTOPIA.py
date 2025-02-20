@@ -49,6 +49,9 @@ def create_inputsTable_UTOPIA(
 
     ## Degradation half time: thalf_deg_d
     "Values used in Domercq et al. 2021, go to publication for more details on the selection of these values and asumptions made"
+
+    """To do: provide degradation state as output in time units (particle age). Provide discorporation state as output after runing the model with no discorporation. degradation state will be given in time units as residence time in the compartment"""
+
     # Assumptions:
     # Heteroaggregated particles degrade 10 times slower than the free MPs
     # Biofouled particles degrade 2 times faster than the free MPs
@@ -145,6 +148,8 @@ def create_inputsTable_UTOPIA(
 
     "Old Assumption (Full Multi): fragmentation only occurs for free and biofouled MPs and the timescale depends on the compartment and aggregation state"
     "In UTOPIA we include fragmentation of the heteroaggregated MPs as being 100 slower than fragmentation of the Free MPs and breackup of biofouled and heteroaggregated will be two times slowed of those only heteroaggregated, following the same assumption as for free and biofouled. These values are used in the Domercq et al. 2021 paper and they are asumptions made from lack of current knowlegde"  #!Values to be revisited
+
+    """To do: use degradation state (particle age) to determine the Kfrag accoding to the etimated values from ECO59 project outputs. """
 
     ## Assumptions:
 

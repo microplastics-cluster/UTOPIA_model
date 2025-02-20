@@ -100,7 +100,7 @@ surfComp_list = [c for c in dict_comp if "Surface" in c]
 ## Select fragmentation style
 """estimate fragmentation relation between size bins using fragment size distribution matrix (https://microplastics-cluster.github.io/fragment-mnp/advanced-usage/fragment-size-distribution.html). Each particle fractions into fragments of smaller sizes and the distribution is expresses via the fragment size distribution matrix fsd. # In this matrix the smallest size fraction is in the first possition and we consider no fragmentation for this size class """
 
-# We provide a slider (to be done) where the user can select a fragmentation style by means of choosing a value of FI (fragmentation index) between 0 and 1 that describes two scenarios :
+# We provide a slider (in the user interface) where the user can select a fragmentation style by means of choosing a value of FI (fragmentation index) between 0 and 1 that describes two scenarios :
 
 #     - Erosive fragmentation (FI=0): In this scenario the particles are being eroded on their surface and therefore most of their mass remain in their same size fraction and samall fraction in going to the samllest size bins. Its representative fsd is:
 
@@ -132,7 +132,7 @@ surfComp_list = [c for c in dict_comp if "Surface" in c]
 ## Select a value for FI in the range 0-1 from a slider where we shoud indicate Erosive Fragmentation under the value 0 and Sequential Fragmentation under the value 1, like in the following dictionary:
 # frag_styles_dict = {0:"erosive_fragmentation",0.5:"mixed_fragmentation",1:"sequential_fragmentation"}
 
-FI = 0.5  # from slider or user imput
+FI = 0.5  # from slider or user imput ( only valid numbers between 0 an 1 are accepted with one decimal)
 
 # Generate the fsd matrix
 fsd = generate_fsd_matrix(FI)
@@ -176,9 +176,17 @@ thalf_deg_d_dict = {
 factor_deepWater_soilSurface = 10
 factor_sediment = 100
 
+# If user wants to modify the default thalf_deg_d_dict, they can do so here or through the csv file and upload it to the inputs folder
 # t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
 # t_half_deg_df = pd.DataFrame(list(thalf_deg_d_dict.items()), columns=['MP_form', 'thalf_deg_d'])
 # t_half_deg_df.to_csv(t_half_deg_filename,index=False)
+
+# Read the CSV file into a DataFrame
+# t_half_deg_filename = os.path.join(inputs_path, "t_half_deg.csv")
+# t_half_deg_df = pd.read_csv(t_half_deg_filename)
+
+# Convert the DataFrame to a dictionary
+# thalf_deg_d_dict = t_half_deg_df.set_index("MP_form")["thalf_deg_d"].to_dict()
 
 # Heteroaggregation attachment efficiency: alpha_heter.
 alpha_heter_filename = os.path.join(inputs_path, "alpha_heter.csv")
@@ -209,7 +217,6 @@ process_inputs_df = create_inputsTable_UTOPIA(
     save_op="save",
 )
 
-"""Revisit create inputs table function...assumptions to be discussed and parameters to be added"""
 
 ## Emission Scenario
 
@@ -314,7 +321,7 @@ q_mass_g_s_dict[emiss_comp] = input_flow_g_s
 #     "Air": 0,
 # }
 
-# If inputs are made to different size classess and MP forms a new dictionary has to be used (TO be done)
+# If inputs are made to different size classess and MP form is keptin the FreeMP a new dictionary has to be used (TO be done)
 
 input_flow_filename = os.path.join(inputs_path, "inputFlows.csv")
 input_flows_df = pd.DataFrame(
@@ -533,10 +540,8 @@ Results_extended = addFlows_to_results_df(
     Results_extended, flows_dict_mass, flows_dict_num
 )
 
-# Correct input flows to include also the transformation processess (e.g.heteroaggregation)
-# Only working for mass at the moment, need to estimate steady state particle numbers
 
-# This is all in mass units
+""" Estimate interactions between particles"""
 interactions_pp_df = fillInteractions_fun_OOP_dict(
     system_particle_object_list, SpeciesList, surfComp_list
 )
@@ -601,9 +606,6 @@ Results_extended["Total_outflows_num_s"] = [
 results_by_comp = addFlows_to_results_df_comp(
     results_by_comp, flows_dict_mass, flows_dict_num
 )
-
-# TODO double chech if works
-Results_extended_comp = calculate_persistence_residence_time_comp(results_by_comp)
 
 ## Mass and particle number distribution by size fraction
 size_distr = [0.5, 5, 50, 500, 5000]
@@ -830,13 +832,13 @@ print(
 
 """ Extract input and output flows per compartment """
 
-results_comp_extended = add_output_flow_conexions(
+add_output_flow_conexions(
     results_by_comp,
     dict_comp,
     outputflow_type="outflows_g_s",
     inputflow_type="inflows_g_s",
 )
-results_comp_extended = add_output_flow_conexions(
+add_output_flow_conexions(
     results_by_comp,
     dict_comp,
     outputflow_type="outflows_num_s",
