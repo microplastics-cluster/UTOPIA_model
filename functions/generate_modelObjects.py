@@ -15,7 +15,7 @@ def generate_objects(
     inputs_path,
     boxName,
     MPforms_list,
-    comp_impFile_name,
+    comp_input_file_name,
     comp_interactFile_name,
     mp_imputFile_name,
     spm_density_kg_m3,
@@ -32,7 +32,7 @@ def generate_objects(
     # Compartmets
     """Call read imput file function for compartments"""
 
-    compartments = instantiate_compartments(inputs_path + comp_impFile_name)
+    compartments = instantiate_compartments(inputs_path + comp_input_file_name)
 
     # Establish connexions between compartments defining their interaction mechanism: only listed those compartments wich will recieve particles from the define compartment. i.e. the ocean surface water compartment transports particles to the ocean mix layer through settling and to air through sea spray resuspension
 
