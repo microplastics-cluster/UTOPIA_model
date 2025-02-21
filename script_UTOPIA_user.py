@@ -234,14 +234,17 @@ import string
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 
-# Each of the input flows should be typed in in the emissions dictionary:
+# Each of the input flows should be typed in in the emissions dictionary. In this versions emissions will be always in Free form and one cna only choose flows for different size classes and compartments. Simultaneus emissions are now allowed through the emissions_dict:
 
-# emissions_dict = {compartment: {size: 0 for size in size_dict} for compartment in model_lists["compartmentNames_list"]}
+emissions_dict = {
+    compartment: {size: 0 for size in size_dict}
+    for compartment in model_lists["compartmentNames_list"]
+}
 
-# emissions_dict={'Ocean_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+# emissions_dict={'Ocean_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 1},
 #  'Ocean_Mixed_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
 #  'Ocean_Column_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
-#  'Coast_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
+#  'Coast_Surface_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 1},
 #  'Coast_Column_Water': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
 #  'Surface_Freshwater': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
 #  'Bulk_Freshwater': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
@@ -256,9 +259,34 @@ size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 #  'Impacted_Soil': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0},
 #  'Air': {'a': 0, 'b': 0, 'c': 0, 'd': 0, 'e': 0}}
 
+# to be disussed how to implement in the user interface. In this version the user has to type in the flows withing the emissions_dict. Therefore no need to chose a single size_bin,  recieving compartment or single imput flow.
 
-size_bin = "e"  # Chosse from size_dict
+# size_bin = "e"  # Chosse from size_dict
+MP_form = "freeMP"  # To be left fixed in the current version
 
+# input flow (in g per second) for each compartment the User should specify here the input flows per compartment
+
+# input_flow_g_s = 1
+
+# emiss_comp = "Ocean_Surface_Water"
+
+# To reproducce the emission scenario above:
+emissions_dict["Ocean_Surface_Water"]["e"] = 1
+
+# Read on the emission scenario:
+
+for cp in emissions_dict:
+    if sum(emissions_dict[cp].values()) > 0:
+        print("Emissions to " + cp + " in the following size fractions: ")
+        for s in [
+            size_dict[size]
+            for size in emissions_dict[cp]
+            if emissions_dict[cp][size] > 0
+        ]:
+            print(str(s) + ":" + str(emissions_dict[cp][size_dict[s]]))
+        input_flow_g_s = sum(emissions_dict[cp].values())
+
+#
 
 # Aggregation state (MP form):
 # A= Free MP
@@ -269,13 +297,6 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 
-MP_form = "freeMP"  # Choose from MPforms_list above
-
-# input flow (in g per second) for each compartment the User should specify here the input flows per compartment
-
-input_flow_g_s = 1
-
-emiss_comp = "Ocean_Surface_Water"
 
 q_mass_g_s_dict = {
     "Ocean_Surface_Water": 0,
