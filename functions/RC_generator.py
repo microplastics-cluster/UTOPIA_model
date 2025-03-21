@@ -23,7 +23,6 @@ from helpers.globalConstants import *
 
 def discorporation(particle, process_inputs_df):
     # degradation estimations
-    # Change process name from degradation
     # to discorporation from corporeal
     # Check asumptions made in the create_inputsTable_UTOPIA.py file
     # Different degradation rates as a function of particle size-->it is surface area dependent ans scaled by d**2, so that smaller particles degrade faster than bigger ones.
@@ -39,7 +38,7 @@ def discorporation(particle, process_inputs_df):
         & (process_inputs_df["MPform"] == particle.Pform)
         & (process_inputs_df["sizeBin"] == particle.Pname[0:3])
     )
-    t_half_d = float(process_inputs_df.loc[cond, "thalf_deg_d"])
+    t_half_d = float(process_inputs_df.loc[cond, "thalf_deg_d"].iloc[0])
 
     # degradation rate constant
     k_deg = math.log(2) / (t_half_d * 24 * 60 * 60)
@@ -623,7 +622,7 @@ def dry_deposition(particle, dict_comp):
 
     # Discuss if to use the dry depossition fractions of distribution here or move it into the fill_interactions function as done for runoff and fragments (we would contruct a dry deposition distribution matrix with the corresponding surface area ratios)
 
-    # Based on figure 6.4 in the Handbook of Chemical Mass Transport in the Environment (2011).
+    # Based on figure 6.4 in the Handbook of Chemical Mass Transport in the Environment (2011). Dry deposition rate is size dependent
 
     dd_rate = 7.91e-6
 

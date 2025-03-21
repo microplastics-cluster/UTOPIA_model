@@ -234,7 +234,7 @@ import string
 size_codes = [letter for letter in string.ascii_lowercase[0:N_sizeBins]]
 size_dict = dict(zip(size_codes, model_lists["dict_size_coding"].values()))
 
-# Each of the input flows should be typed in in the emissions dictionary. In this versions emissions will be always in Free form and one cna only choose flows for different size classes and compartments. Simultaneus emissions are now allowed through the emissions_dict:
+# Each of the input flows should be typed in in the emissions dictionary. In this versions emissions will be always in Free form and one can only choose flows for different size classes and compartments. Simultaneus emissions are now allowed through the emissions_dict:
 
 emissions_dict = {
     compartment: {size: 0 for size in size_dict}
@@ -271,22 +271,9 @@ MP_form = "freeMP"  # To be left fixed in the current version
 # emiss_comp = "Ocean_Surface_Water"
 
 # To reproducce the emission scenario above:
-emissions_dict["Ocean_Surface_Water"]["e"] = 1
+emissions_dict["Ocean_Surface_Water"]["e"] = 25000
+emissions_dict["Coast_Surface_Water"]["e"] = 15000
 
-# Read on the emission scenario:
-
-for cp in emissions_dict:
-    if sum(emissions_dict[cp].values()) > 0:
-        print("Emissions to " + cp + " in the following size fractions: ")
-        for s in [
-            size_dict[size]
-            for size in emissions_dict[cp]
-            if emissions_dict[cp][size] > 0
-        ]:
-            print(str(s) + ":" + str(emissions_dict[cp][size_dict[s]]))
-        input_flow_g_s = sum(emissions_dict[cp].values())
-
-#
 
 # Aggregation state (MP form):
 # A= Free MP
@@ -297,30 +284,6 @@ MPforms_list = ["freeMP", "heterMP", "biofMP", "heterBiofMP"]
 particle_forms_coding = dict(zip(MPforms_list, ["A", "B", "C", "D"]))
 MP_form_dict_reverse = {v: k for k, v in particle_forms_coding.items()}
 
-
-q_mass_g_s_dict = {
-    "Ocean_Surface_Water": 0,
-    "Ocean_Mixed_Water": 0,
-    "Ocean_Column_Water": 0,
-    "Coast_Surface_Water": 0,
-    "Coast_Column_Water": 0,
-    "Surface_Freshwater": 0,
-    "Bulk_Freshwater": 0,
-    "Sediment_Freshwater": 0,
-    "Sediment_Ocean": 0,
-    "Sediment_Coast": 0,
-    "Beaches_Soil_Surface": 0,
-    "Beaches_Deep_Soil": 0,
-    "Background_Soil_Surface": 0,
-    "Background_Soil": 0,
-    "Impacted_Soil_Surface": 0,
-    "Impacted_Soil": 0,
-    "Air": 0,
-}
-
-q_mass_g_s_dict[emiss_comp] = input_flow_g_s
-
-# If emissions are made to several compartments type the input flows corresponding to the specific compartments in the following dictionary:
 
 # q_mass_g_s_dict = {
 #     "Ocean_Surface_Water": 0,
@@ -333,48 +296,56 @@ q_mass_g_s_dict[emiss_comp] = input_flow_g_s
 #     "Sediment_Freshwater": 0,
 #     "Sediment_Ocean": 0,
 #     "Sediment_Coast": 0,
-#     "Urban_Soil_Surface": 0,
-#     "Urban_Soil": 0,
+#     "Beaches_Soil_Surface": 0,
+#     "Beaches_Deep_Soil": 0,
 #     "Background_Soil_Surface": 0,
 #     "Background_Soil": 0,
-#     "Agricultural_Soil_Surface": 0,
-#     "Agricultural_Soil": 0,
+#     "Impacted_Soil_Surface": 0,
+#     "Impacted_Soil": 0,
 #     "Air": 0,
 # }
 
-# If inputs are made to different size classess and MP form is keptin the FreeMP a new dictionary has to be used (TO be done)
+# q_mass_g_s_dict[emiss_comp] = input_flow_g_s
 
-input_flow_filename = os.path.join(inputs_path, "inputFlows.csv")
-input_flows_df = pd.DataFrame(
-    list(q_mass_g_s_dict.items()), columns=["compartment", "q_mass_g_s"]
-)
-input_flows_df.to_csv(input_flow_filename, index=False)
 
 # input_flows_df = pd.read_csv(input_flow_filename)
 # q_mass_g_s_dict=input_flows_df.set_index('compartment')['q_mass_g_s'].to_dict()
 
-saveName = (
-    MP_composition
-    + "_MP_Emissions_"
-    + MP_form
-    + "_"
-    + str(size_dict[size_bin])
-    + "_nm_"
-    + "_FI_"
-    + str(FI)
-)
 
 # Print model run summary
 
 print("Model run: ")
-print("Emissions flow (g/s): ", input_flow_g_s)
-desired_key = next(key for key, value in q_mass_g_s_dict.items() if value > 0)
-print("Receiving compartment/s: ", desired_key)
+# Read on the emission scenario:
+# Iterate through the dictionary and print nonzero emissions
+for compartment, size_fractions in emissions_dict.items():
+    for fraction, value in size_fractions.items():
+        if value > 0:
+            print(
+                f"Emissions to {compartment} for size fraction {size_dict[fraction]} {chr(181)}m: {value} g/s"
+            )
+
+
+# print("Emissions flow (g/s): ", input_flow_g_s)
+
+# desired_key = next(key for key, value in q_mass_g_s_dict.items() if value > 0)
+# print("Receiving compartment/s: ", desired_key)
 print("Emitted MP density (kg/m3): ", MPdensity_kg_m3)
 print("Emitted MP shape: ", shape)
-print("Emitted MP form: ", MP_form)
-print("Emitted MP size (um): ", size_dict[size_bin])
-print(saveName)
+
+
+def print_fragmentation_style(F):
+    if F == 0:
+        print("Fragmentation style: Erosive")
+    elif F == 1:
+        print("Fragmentation style: Sequential")
+    else:
+        print(f"Fragmentation style: Mixed (F = {F})")
+
+
+print_fragmentation_style(FI)
+
+print("Fragmetation timescale (days): ", t_frag_gen_FreeSurfaceWater)
+print("Discorporation timescale (days): ", t_half_deg_free)
 
 
 """Estimate rate constants per particle"""
@@ -386,10 +357,6 @@ for particle in system_particle_object_list:
 ## create rate constants table:
 RC_df = create_rateConstants_table(system_particle_object_list)
 df4 = RC_df.fillna(0)
-
-# Plot rate constants (not implemented anymore)
-
-"""(FIX RC for wet deposition, now its given as a list of rate constants per surface compartment only for dry deposition and wet depossition is turned off)This needs to be fixed also for the matrix of interactions and estimation of flows"""
 
 
 """Build Matrix of interactions"""
@@ -410,16 +377,17 @@ comp_dict_inverse = {v: k for k, v in particle_compartmentCoding.items()}
 
 sp_imputs = []
 q_mass_g_s = []
-for compartment in q_mass_g_s_dict.keys():
+for compartment in emissions_dict.keys():
+    for size_bin in emissions_dict[compartment].keys():
 
-    sp_imputs.append(
-        size_bin
-        + particle_forms_coding[MP_form]
-        + str(particle_compartmentCoding[compartment])
-        + "_"
-        + boxName
-    )
-    q_mass_g_s.append(q_mass_g_s_dict[compartment])
+        sp_imputs.append(
+            size_bin
+            + particle_forms_coding[MP_form]
+            + str(particle_compartmentCoding[compartment])
+            + "_"
+            + boxName
+        )
+        q_mass_g_s.append(emissions_dict[compartment][size_bin])
 
 imput_flows_g_s = dict(zip(sp_imputs, q_mass_g_s))
 
