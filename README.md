@@ -8,16 +8,50 @@ The model comprises 17 compartments and tracks the fate of multiple sizes (5 siz
 
 ![image](https://user-images.githubusercontent.com/58487662/188824142-892a10e0-ec4c-42af-adfc-a6a626a35808.png)
 
-The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems. Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (and currently being reviwed for parametrization).
+The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project [ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems] (https://cefic-lri.org/projects/eco48-nano2plast-extending-nanoparticle-models-to-open-source-models-of-the-fate-and-transport-of-microplastic-in-aquatic-systems/). Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (and currently being reviwed for parametrization).
 
 ![image](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_processes.png)
 
 The processess marked in red are not yet included in UTOPIA.
 
+
+## UTOPIA Interactive web version
+
+Alternatively to runing the UTOPIA python code users can access the UTOPIA interactive version: [UTOPIA web-app](https://utopia-webapp.onrender.com/)
+
+The model code used in the web-app matches the release: [v1.0-webapp](https://github.com/microplastics-cluster/UTOPIA_model/releases/tag/v1.0-webapp)
+
+## Instalation guidelines
+
+### Getting started for Windows
+
+Download the repository to your computer by clicking on the green CODE button on the rigth of the repository screen.
+
+### Create, activate, and download dependencies with a virtual environment using venv
+
+### Create a virtual environment named 'venv'
+```bash
+python -m venv venv
+```
+### Activate the virtual environment on Windows
+```bash
+venv\Scripts\activate
+```
+### Install requirements
+```bash
+pip install -r requirements.txt
+```
+### Run server 
+```bash
+python script_UTOPIA_user.py
+```
+
 ## Instructions for parameterising and runing UTOPIA
 
 ### Selection of input parameters
-Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_Nov2024.ipynb and follow the instructions given in the code. Currently it is possible to modify:
+Go to the file script_UTOPIA_user.py or to the Jupyter [Notebook UTOPIA_notebook_Nov2024.ipynb](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_notebook_Nov2024.ipynb) and follow the instructions given in the code. 
+
+Currently it is possible to modify:
 
   1- Microplastics properties:
 
@@ -64,30 +98,7 @@ Go to the file script_UTOPIA_user.py or to the Jupyter Notebook UTOPIA_notebook_
   - Emission fractions
 
 
-## Instalation guidelines
 
-### Getting started for Windows
-
-Download the repository to your computer by clicking on the green CODE button on the rigth of the repository screen.
-
-### Create, activate, and download dependencies with a virtual environment using venv
-
-### Create a virtual environment named 'venv'
-```bash
-python -m venv venv
-```
-### Activate the virtual environment on Windows
-```bash
-venv\Scripts\activate
-```
-### Install requirements
-```bash
-pip install -r requirements.txt
-```
-### Run server 
-```bash
-python script_UTOPIA_user.py
-```
 
 ##### Acknowledgements
 Thanks to the European Chemical Industry Council Long-Range Research Initiative (Cefic-LRI) for providing funding for this work, under project number ECO56.
