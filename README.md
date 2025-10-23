@@ -8,7 +8,7 @@ The model comprises 17 compartments and tracks the fate of multiple sizes (5 siz
 
 ![image](https://user-images.githubusercontent.com/58487662/188824142-892a10e0-ec4c-42af-adfc-a6a626a35808.png)
 
-The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project [ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems] (https://cefic-lri.org/projects/eco48-nano2plast-extending-nanoparticle-models-to-open-source-models-of-the-fate-and-transport-of-microplastic-in-aquatic-systems/). Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (and currently being reviwed for parametrization).
+The UTOPIA model is being developed based on experiences and knowledge acquired from a previous project [ECO48 project Nano2Plast: Extending nanoparticle models to open source models of the fate and transport of plastic in aquatic systems](https://cefic-lri.org/projects/eco48-nano2plast-extending-nanoparticle-models-to-open-source-models-of-the-fate-and-transport-of-microplastic-in-aquatic-systems/). Therefore, the aquatiac processess included in The Full Multi are used within this project. Further processess of transport between non-aquatic compartments such as sea spray aerosol resuspension to air, runoff of plastics from land, dry and wet depossition of plastics into surface compartments, have been included in UTOPIA (and currently being reviwed for parametrization).
 
 ![image](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_processes.png)
 
@@ -102,3 +102,4 @@ Currently it is possible to modify:
 
 ##### Acknowledgements
 Thanks to the European Chemical Industry Council Long-Range Research Initiative (Cefic-LRI) for providing funding for this work, under project number ECO56.
+
