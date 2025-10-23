@@ -1,8 +1,8 @@
-﻿# UTOPIA_model
+﻿# UTOPIA model
 
 A multimedia unit world open-source model for microplastics 
 
-The model comprises 17 compartments and tracks the fate of multiple sizes (5 size bins covering the a size range from nano- to milimeters in size) and four different speciation states of microplastic though solving an overall mass balance that is defined by a system of coupled first-order differential equations.  The masses, m (g), and or particle number (N) of the different microplastic forms and sizes are obtained as the steady-state solutions of the mass balance equations for all compartments.
+The model comprises 17 compartments and tracks the fate of multiple sizes (5 size bins covering the a size range from nano- to milimeters in size) and four different speciation states of microplastic though solving an overall mass balance that is defined by a system of 340 coupled first-order differential equations.  The masses, m (g), and or particle number (N) of the different microplastic forms and sizes are obtained as the steady-state solutions of the mass balance equations for all compartments, sizes and forms.
 
 ![image](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_building_blocks.png)
 
@@ -49,6 +49,7 @@ python script_UTOPIA_user.py
 ## Instructions for parameterising and runing UTOPIA
 
 ### Selection of input parameters
+
 Go to the file script_UTOPIA_user.py or to the Jupyter [Notebook UTOPIA_notebook_Nov2024.ipynb](https://github.com/microplastics-cluster/UTOPIA_model/blob/main/UTOPIA_notebook_Nov2024.ipynb) and follow the instructions given in the code. 
 
 Currently it is possible to modify:
@@ -98,8 +99,14 @@ Currently it is possible to modify:
   - Emission fractions
 
 
+## License and authorship
+
+Developed by [Prado Domercq](https://github.com/PradoDomercq).  
+Transferred to [microplastics-cluster](https://github.com/microplastics-cluster) for continued collaborative development and maintenance
+`utopia` is licensed under the terms of the MIT license.
 
 
-##### Acknowledgements
-Thanks to the European Chemical Industry Council Long-Range Research Initiative (Cefic-LRI) for providing funding for this work, under project number ECO56.
+## Acknowledgements
+Thanks to the European Chemical Industry Council Long-Range Research Initiative ([Cefic-LRI](https://cefic-lri.org/)) for providing funding for this work, under project number ECO56.
+
 
